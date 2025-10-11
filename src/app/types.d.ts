@@ -11,6 +11,7 @@ type ServerMotd = {
 
 type ServerInfo = {
     hostname: string
+    port?: number
     version: string
     icon?: string
     online: boolean

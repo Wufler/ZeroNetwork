@@ -118,6 +118,12 @@ export default function Header({ data }: ComponentProps) {
 		[data.id, data.alert]
 	)
 
+	const getFullServerIp = (server: ServerInfo) => {
+		if (!server.hostname) return 'Missing IP'
+		const port = server.port || 25565
+		return port === 25565 ? server.hostname : `${server.hostname}:${port}`
+	}
+
 	const StatusIndicator = ({ server }: { server: ServerInfo }) => (
 		<div className="relative mt-2">
 			<div
@@ -167,7 +173,7 @@ export default function Header({ data }: ComponentProps) {
 								<div className="group relative">
 									{isAdmin ? (
 										<Editable.Root
-											defaultValue={server.hostname}
+											defaultValue={getFullServerIp(server)}
 											placeholder="Missing IP"
 											triggerMode="dblclick"
 											dismissible={false}
@@ -197,9 +203,9 @@ export default function Header({ data }: ComponentProps) {
 										<Button
 											variant="link"
 											className="font-syne h-auto p-0 font-bold"
-											onClick={() => handleCopyIp(server.hostname)}
+											onClick={() => handleCopyIp(getFullServerIp(server))}
 										>
-											{server.hostname || 'Missing IP'}
+											{getFullServerIp(server)}
 											<Clipboard className="ml-2 size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
 										</Button>
 									)}
