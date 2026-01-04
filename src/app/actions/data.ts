@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { sendWebhook } from '@/lib/webhook';
 
 export async function fetchData(): Promise<ServerConfig | null> {
-    return await prisma.serverConfig.findFirst({
+    const serverConfig = await prisma.serverConfig.findFirst({
         include: {
             timelineItems: {
                 include: {
@@ -19,13 +19,34 @@ export async function fetchData(): Promise<ServerConfig | null> {
                     { id: 'desc' },
                 ]
             },
-            galleryImages: {
-                orderBy: {
-                    createdAt: 'desc',
-                }
-            },
         },
     });
+
+    if (!serverConfig) return null;
+
+    const galleryImages = await prisma.timelineMediaItem.findMany({
+        where: {
+            galleryImage: true,
+            timelineItem: {
+                serverConfigId: serverConfig.id,
+            },
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+        select: {
+            id: true,
+            imageUrl: true,
+            altText: true,
+            createdAt: true,
+            updatedAt: true,
+        },
+    });
+
+    return {
+        ...serverConfig,
+        galleryImages,
+    };
 }
 
 export async function updateServerIps(id: number, index: string, ip: string) {

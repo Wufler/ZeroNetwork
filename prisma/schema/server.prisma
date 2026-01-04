@@ -9,7 +9,6 @@ model ServerConfig {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @default(now()) @updatedAt
   timelineItems    TimelineItem[]
-  galleryImages    GalleryImage[]
 
   @@map("servers")
 }
@@ -38,22 +37,11 @@ model TimelineMediaItem {
   imageUrl       String
   altText        String
   displayOrder   Int          @default(0)
+  galleryImage   Boolean      @default(false)
   timelineItem   TimelineItem @relation(fields: [timelineItemId], references: [id], onDelete: Cascade)
   timelineItemId Int
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
 
   @@map("timeline_media")
-}
-
-model GalleryImage {
-  id             Int           @id @default(autoincrement())
-  imageUrl       String
-  altText        String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now()) @updatedAt
-  serverConfig   ServerConfig? @relation(fields: [serverConfigId], references: [id])
-  serverConfigId Int?
-
-  @@map("images")
 }

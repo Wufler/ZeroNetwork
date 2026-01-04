@@ -182,6 +182,7 @@ export async function addTimelineMedia(
         imageUrl: string
         altText: string
         displayOrder?: number
+        galleryImage?: boolean
     }
 ) {
     await checkAdmin()
@@ -192,6 +193,7 @@ export async function addTimelineMedia(
             imageUrl: data.imageUrl,
             altText: data.altText,
             displayOrder: data.displayOrder ?? 0,
+            galleryImage: data.galleryImage ?? false,
         },
     })
 
@@ -205,6 +207,7 @@ export async function updateTimelineMedia(
         imageUrl?: string
         altText?: string
         displayOrder?: number
+        galleryImage?: boolean
     }
 ) {
     await checkAdmin()

@@ -50,7 +50,7 @@ const features = [
 	},
 ]
 
-export default function Description() {
+export default function Features() {
 	return (
 		<section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
 			<div className="mx-auto max-w-7xl relative z-10">

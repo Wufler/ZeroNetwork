@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { motion, useAnimationControls } from 'motion/react'
 
-export default function Images({ data }: ComponentProps) {
+export default function Gallery({ data }: ComponentProps) {
 	const [width, setWidth] = useState(0)
 	const carousel = useRef<HTMLDivElement>(null)
 	const controls = useAnimationControls()

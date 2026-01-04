@@ -31,10 +31,10 @@ const timelineData = [
         downloadUrl: 'https://www.feed-the-beast.com/ftb-app',
         serverConfigId: 1,
         media: [
-            { imageUrl: 'https://up.wolfey.me/Ox9BuzXO', altText: 'Server Image 6', displayOrder: 0 },
-            { imageUrl: 'https://up.wolfey.me/dm5AK5zH', altText: 'Server Image 7', displayOrder: 1 },
-            { imageUrl: 'https://up.wolfey.me/oGZ_L0Ep', altText: 'Server Image 8', displayOrder: 2 },
-            { imageUrl: 'https://up.wolfey.me/BPZh8CgU', altText: 'Server Image 9', displayOrder: 3 },
+            { imageUrl: 'https://up.wolfey.me/Ox9BuzXO', altText: 'Server Image 6', displayOrder: 0, galleryImage: true },
+            { imageUrl: 'https://up.wolfey.me/dm5AK5zH', altText: 'Server Image 7', displayOrder: 1, galleryImage: true },
+            { imageUrl: 'https://up.wolfey.me/oGZ_L0Ep', altText: 'Server Image 8', displayOrder: 2, galleryImage: true },
+            { imageUrl: 'https://up.wolfey.me/BPZh8CgU', altText: 'Server Image 9', displayOrder: 3, galleryImage: true },
         ],
     },
     {
@@ -48,8 +48,8 @@ const timelineData = [
         downloadUrl: 'https://www.feed-the-beast.com/ftb-app',
         serverConfigId: 1,
         media: [
-            { imageUrl: 'https://up.wolfey.me/61go2B-r', altText: 'Server Image 6', displayOrder: 0 },
-            { imageUrl: 'https://up.wolfey.me/2ecONgMj', altText: 'Server Image 7', displayOrder: 1 },
+            { imageUrl: 'https://up.wolfey.me/61go2B-r', altText: 'Server Image 6', displayOrder: 0, galleryImage: true },
+            { imageUrl: 'https://up.wolfey.me/2ecONgMj', altText: 'Server Image 7', displayOrder: 1, galleryImage: true },
         ],
     },
     {
@@ -63,8 +63,8 @@ const timelineData = [
         downloadUrl: 'https://www.feed-the-beast.com/ftb-app',
         serverConfigId: 1,
         media: [
-            { imageUrl: 'https://up.wolfey.me/1DmhYiww', altText: 'Server Image 6', displayOrder: 0 },
-            { imageUrl: 'https://up.wolfey.me/2G-Qpv0m', altText: 'Server Image 7', displayOrder: 1 },
+            { imageUrl: 'https://up.wolfey.me/1DmhYiww', altText: 'Server Image 6', displayOrder: 0, galleryImage: true },
+            { imageUrl: 'https://up.wolfey.me/2G-Qpv0m', altText: 'Server Image 7', displayOrder: 1, galleryImage: true },
         ],
     },
     {
@@ -78,7 +78,7 @@ const timelineData = [
         downloadUrl: 'https://www.feed-the-beast.com/ftb-app',
         serverConfigId: 1,
         media: [
-            { imageUrl: 'https://up.wolfey.me/z2gPiu5U', altText: 'Server Image 6', displayOrder: 0 },
+            { imageUrl: 'https://up.wolfey.me/z2gPiu5U', altText: 'Server Image 6', displayOrder: 0, galleryImage: true },
         ],
     },
 ];
@@ -96,19 +96,6 @@ const pollData: Prisma.PollCreateManyInput[] = [
         visible: true,
         votes: [0, 0, 0, 0],
     },
-];
-
-const galleryImagesData: Prisma.GalleryImageCreateManyInput[] = [
-    { imageUrl: 'https://up.wolfey.me/INmc5-Zu', altText: 'Server Image 1', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/onavCRTD', altText: 'Server Image 2', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/MXeTbumU', altText: 'Server Image 3', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/fCkapYPl', altText: 'Server Image 4', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/PeC-Cz5V', altText: 'Server Image 5', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/qi_85lbY', altText: 'Server Image 6', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/Fx2fxhIH', altText: 'Server Image 7', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/smjx5CNl', altText: 'Server Image 8', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/O8ZIwvHv', altText: 'Server Image 9', serverConfigId: 1 },
-    { imageUrl: 'https://up.wolfey.me/GtoJ4VAY', altText: 'Server Image 10', serverConfigId: 1 },
 ];
 
 async function main() {
@@ -139,10 +126,6 @@ async function main() {
 
     await prisma.poll.createMany({
         data: pollData,
-    });
-
-    await prisma.galleryImage.createMany({
-        data: galleryImagesData,
     });
 
     console.log('Database seeded successfully!');

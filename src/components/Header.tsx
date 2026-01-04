@@ -468,7 +468,7 @@ export default function Header({ data }: ComponentProps) {
 					transition={{ duration: 0.8, delay: 0.5 }}
 					className="relative w-125 h-100 md:w-175 md:h-125"
 				>
-					<div className="absolute top-10 right-0 w-3/5 h-3/5 z-10">
+					<div className="absolute top-20 right-10 w-3/5 h-3/5 z-10">
 						<Image
 							fill
 							src="/header/2.png"
@@ -478,7 +478,7 @@ export default function Header({ data }: ComponentProps) {
 						/>
 					</div>
 
-					<div className="absolute bottom-0 left-0 w-1/2 h-4/5 z-20">
+					<div className="absolute -bottom-5 left-20 w-1/2 h-4/5 z-20">
 						<Image
 							fill
 							src="/header/3.png"
@@ -488,7 +488,7 @@ export default function Header({ data }: ComponentProps) {
 						/>
 					</div>
 
-					<div className="absolute bottom-0 left-[30%] w-1/3 h-3/5 z-30">
+					<div className="absolute bottom-0 right-40 w-1/3 h-3/5 z-30">
 						<Image
 							fill
 							src="/header/4.png"
@@ -498,7 +498,7 @@ export default function Header({ data }: ComponentProps) {
 						/>
 					</div>
 
-					<div className="absolute bottom-0 right-[15%] w-1/3 h-3/5 z-40">
+					<div className="absolute bottom-0 right-10 w-1/3 h-3/5 z-40">
 						<Image
 							fill
 							src="/header/1.png"

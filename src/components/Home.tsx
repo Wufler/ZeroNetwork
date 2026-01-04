@@ -1,8 +1,8 @@
 'use client'
 import Header from './Header'
-import Images from './Images'
+import Gallery from './Gallery'
 import Timeline from './Timeline'
-import Description from './Description'
+import Features from './Features'
 import Team from './Team'
 import Footer from './Footer'
 import WithersWrath from './WithersWrath'
@@ -17,7 +17,7 @@ export default function Home({ data }: ComponentProps) {
 			<Header data={data} />
 
 			<div className="w-full py-12 bg-background/50 backdrop-blur-sm border-y border-border/50">
-				<Images data={data} />
+				<Gallery data={data} />
 			</div>
 
 			<div className="relative bg-linear-to-b from-background via-secondary/30 to-background">
@@ -26,7 +26,7 @@ export default function Home({ data }: ComponentProps) {
 
 			<div className="relative">
 				<div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
-				<Description />
+				<Features />
 			</div>
 
 			<WithersWrath />

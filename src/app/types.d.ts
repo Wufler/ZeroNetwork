@@ -25,16 +25,19 @@ type BaseItem = {
     updatedAt: Date
 }
 
-type GalleryImage = BaseItem & {
+type GalleryImage = {
+    id: number
     imageUrl: string
     altText: string
-    serverConfigId: number | null
+    createdAt: Date
+    updatedAt: Date
 }
 
 type TimelineMediaItem = BaseItem & {
     imageUrl: string
     altText: string
     displayOrder: number
+    galleryImage: boolean
     timelineItemId: number
 }
 

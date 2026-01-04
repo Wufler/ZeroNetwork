@@ -11,6 +11,7 @@ import {
 	Trash2,
 	Plus,
 	Image as ImageIcon,
+	GripVertical,
 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useSession } from '@/lib/auth-client'
@@ -48,8 +49,102 @@ import {
 	deleteTimelineMedia,
 } from '@/app/actions/timeline'
 import { toast } from 'sonner'
+import {
+	DndContext,
+	closestCenter,
+	KeyboardSensor,
+	PointerSensor,
+	useSensor,
+	useSensors,
+	type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+	arrayMove,
+	SortableContext,
+	sortableKeyboardCoordinates,
+	useSortable,
+	verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 type TimelineItemType = ComponentProps['data']['timelineItems'][0]
+type MediaItemType = TimelineItemType['media'][0]
+
+function SortableMediaItem({
+	media,
+	editingMediaId,
+	onEdit,
+	onDelete,
+}: {
+	media: MediaItemType
+	editingMediaId: number | null
+	onEdit: (media: MediaItemType) => void
+	onDelete: (id: number) => void
+}) {
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		transform,
+		transition,
+		isDragging,
+	} = useSortable({ id: media.id })
+
+	const style = {
+		transform: CSS.Transform.toString(transform),
+		transition,
+	}
+
+	return (
+		<div
+			ref={setNodeRef}
+			style={style}
+			className={cn(
+				'flex items-center gap-2 p-2 border rounded-md bg-background',
+				editingMediaId === media.id && 'ring-2 ring-primary',
+				isDragging && 'opacity-50 shadow-lg'
+			)}
+		>
+			<button
+				className="cursor-grab active:cursor-grabbing touch-none p-1 hover:bg-muted rounded"
+				{...attributes}
+				{...listeners}
+			>
+				<GripVertical className="size-4 text-muted-foreground" />
+			</button>
+			<div className="relative size-12 rounded overflow-hidden bg-muted shrink-0">
+				<Image
+					src={media.imageUrl}
+					alt={media.altText}
+					fill
+					className="object-cover"
+				/>
+			</div>
+			<div className="flex-1 min-w-0">
+				<p className="text-sm truncate">{media.altText}</p>
+				{media.galleryImage && (
+					<span className="text-xs text-primary">• Gallery</span>
+				)}
+			</div>
+			<Button
+				variant="ghost"
+				size="sm"
+				onClick={() => onEdit(media)}
+				disabled={editingMediaId !== null}
+			>
+				<Edit className="size-4" />
+			</Button>
+			<Button
+				variant="ghost"
+				size="sm"
+				onClick={() => onDelete(media.id)}
+				disabled={editingMediaId !== null}
+			>
+				<Trash2 className="size-4" />
+			</Button>
+		</div>
+	)
+}
 
 function TimelineEditDialog({
 	item,
@@ -71,8 +166,16 @@ function TimelineEditDialog({
 	const [mediaItems, setMediaItems] = useState(item?.media || [])
 	const [newMediaUrl, setNewMediaUrl] = useState('')
 	const [newMediaAlt, setNewMediaAlt] = useState('')
+	const [newMediaGalleryImage, setNewMediaGalleryImage] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
 	const [editingMediaId, setEditingMediaId] = useState<number | null>(null)
+
+	const sensors = useSensors(
+		useSensor(PointerSensor),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		})
+	)
 
 	const handleSave = async () => {
 		if (!formData.title || !formData.subtitle || !formData.description) {
@@ -106,10 +209,12 @@ function TimelineEditDialog({
 				imageUrl: newMediaUrl,
 				altText: newMediaAlt,
 				displayOrder: mediaItems.length,
+				galleryImage: newMediaGalleryImage,
 			})
 			setMediaItems([...mediaItems, media])
 			setNewMediaUrl('')
 			setNewMediaAlt('')
+			setNewMediaGalleryImage(false)
 			toast.success('Media added successfully')
 		} catch (error) {
 			toast.error('Failed to add media')
@@ -117,16 +222,41 @@ function TimelineEditDialog({
 		}
 	}
 
-	const handleStartEdit = (media: (typeof mediaItems)[0]) => {
+	const handleDragEnd = async (event: DragEndEvent) => {
+		const { active, over } = event
+		if (!over || active.id === over.id) return
+
+		const oldIndex = mediaItems.findIndex(m => m.id === active.id)
+		const newIndex = mediaItems.findIndex(m => m.id === over.id)
+
+		const newItems = arrayMove(mediaItems, oldIndex, newIndex)
+		setMediaItems(newItems)
+
+		try {
+			await Promise.all(
+				newItems.map((item, index) =>
+					updateTimelineMedia(item.id, { displayOrder: index })
+				)
+			)
+			toast.success('Order updated')
+		} catch (error) {
+			toast.error('Failed to update order')
+			console.error(error)
+		}
+	}
+
+	const handleStartEdit = (media: MediaItemType) => {
 		setEditingMediaId(media.id)
 		setNewMediaUrl(media.imageUrl)
 		setNewMediaAlt(media.altText)
+		setNewMediaGalleryImage(media.galleryImage)
 	}
 
 	const handleCancelEdit = () => {
 		setEditingMediaId(null)
 		setNewMediaUrl('')
 		setNewMediaAlt('')
+		setNewMediaGalleryImage(false)
 	}
 
 	const handleUpdateMedia = async () => {
@@ -136,6 +266,7 @@ function TimelineEditDialog({
 			const updated = await updateTimelineMedia(editingMediaId, {
 				imageUrl: newMediaUrl,
 				altText: newMediaAlt,
+				galleryImage: newMediaGalleryImage,
 			})
 			setMediaItems(
 				mediaItems.map(m => (m.id === editingMediaId ? { ...m, ...updated } : m))
@@ -143,6 +274,7 @@ function TimelineEditDialog({
 			setEditingMediaId(null)
 			setNewMediaUrl('')
 			setNewMediaAlt('')
+			setNewMediaGalleryImage(false)
 			toast.success('Media updated successfully')
 		} catch (error) {
 			toast.error('Failed to update media')
@@ -260,46 +392,32 @@ function TimelineEditDialog({
 						<h3 className="text-sm font-medium mb-3 flex items-center gap-2">
 							<ImageIcon className="size-4" />
 							Media Items
+							<span className="text-xs text-muted-foreground ml-auto">
+								Drag to reorder
+							</span>
 						</h3>
-						<div className="space-y-2 mb-3">
-							{mediaItems.map(media => (
-								<div
-									key={media.id}
-									className={cn(
-										'flex items-center gap-2 p-2 border rounded-md',
-										editingMediaId === media.id && 'ring-2 ring-primary'
-									)}
-								>
-									<div className="relative size-16 rounded overflow-hidden bg-muted">
-										<Image
-											src={media.imageUrl}
-											alt={media.altText}
-											fill
-											className="object-cover"
+						<DndContext
+							sensors={sensors}
+							collisionDetection={closestCenter}
+							onDragEnd={handleDragEnd}
+						>
+							<SortableContext
+								items={mediaItems.map(m => m.id)}
+								strategy={verticalListSortingStrategy}
+							>
+								<div className="space-y-2 mb-3">
+									{mediaItems.map(media => (
+										<SortableMediaItem
+											key={media.id}
+											media={media}
+											editingMediaId={editingMediaId}
+											onEdit={handleStartEdit}
+											onDelete={handleDeleteMedia}
 										/>
-									</div>
-									<div className="flex-1 min-w-0">
-										<p className="text-sm truncate">{media.altText}</p>
-									</div>
-									<Button
-										variant="ghost"
-										size="sm"
-										onClick={() => handleStartEdit(media)}
-										disabled={editingMediaId !== null}
-									>
-										<Edit className="size-4" />
-									</Button>
-									<Button
-										variant="ghost"
-										size="sm"
-										onClick={() => handleDeleteMedia(media.id)}
-										disabled={editingMediaId !== null}
-									>
-										<Trash2 className="size-4" />
-									</Button>
+									))}
 								</div>
-							))}
-						</div>
+							</SortableContext>
+						</DndContext>
 
 						<div className="space-y-2">
 							<Input
@@ -312,6 +430,13 @@ function TimelineEditDialog({
 								onChange={e => setNewMediaAlt(e.target.value)}
 								placeholder="Image description"
 							/>
+							<div className="flex items-center gap-2 px-3 py-2 border rounded-md">
+								<label className="text-sm text-muted-foreground">Show in Gallery</label>
+								<Switch
+									checked={newMediaGalleryImage}
+									onCheckedChange={setNewMediaGalleryImage}
+								/>
+							</div>
 							{editingMediaId ? (
 								<div className="flex gap-2">
 									<Button
