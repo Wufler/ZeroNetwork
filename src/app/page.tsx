@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
-import { fetchData } from '@/actions/data'
 import Home from '@/components/Home'
 import Dev from '@/components/Dev'
+import { fetchData } from './actions/data'
 
 export default async function Page() {
 	const data = await fetchData()

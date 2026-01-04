@@ -14,7 +14,7 @@ import {
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { authClient } from '@/lib/auth-client'
 import {
 	vote,
@@ -24,14 +24,25 @@ import {
 	togglePollVisibility,
 	deletePoll,
 	endPoll,
-} from '@/actions/poll'
-import { ArrowLeft, ArrowRight, X } from 'lucide-react'
-import { Input } from './ui/input'
-import { Skeleton } from './ui/skeleton'
+} from '@/app/actions/poll'
+import {
+	ArrowLeft,
+	ArrowRight,
+	X,
+	BarChart2,
+	Clock,
+	CheckCircle2,
+	Eye,
+	EyeOff,
+	Plus,
+} from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { getVisitorId } from '@/lib/fingerprint'
 import { isPast, format, isBefore } from 'date-fns'
+import { motion, AnimatePresence } from 'motion/react'
 
 export default function Poll() {
 	const local_storage_key = 'poll_votes'
@@ -189,9 +200,9 @@ export default function Poll() {
 		}
 
 		return (
-			<div className="border-t pt-4">
+			<div className="border-t border-border pt-4 mt-4">
 				<div className="flex justify-center items-center">
-					<div className="flex gap-2 w-full">
+					<div className="flex flex-col sm:flex-row gap-2 w-full">
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
 								<Button
@@ -203,7 +214,7 @@ export default function Poll() {
 									{isDeleting[poll.id] ? 'Deleting...' : 'Delete Poll'}
 								</Button>
 							</AlertDialogTrigger>
-							<AlertDialogContent>
+							<AlertDialogContent className="bg-popover backdrop-blur-xl border-border">
 								<AlertDialogHeader>
 									<AlertDialogTitle>Remove Poll</AlertDialogTitle>
 									<AlertDialogDescription>
@@ -248,7 +259,7 @@ export default function Poll() {
 										{isEnding[poll.id] ? 'Ending...' : 'End Poll'}
 									</Button>
 								</AlertDialogTrigger>
-								<AlertDialogContent>
+								<AlertDialogContent className="bg-popover backdrop-blur-xl border-border">
 									<AlertDialogHeader>
 										<AlertDialogTitle>End Poll</AlertDialogTitle>
 										<AlertDialogDescription>
@@ -349,509 +360,584 @@ export default function Poll() {
 		<div className="pt-6">
 			<AlertDialog>
 				<AlertDialogTrigger asChild>
-					<Button variant="ghost">
-						<div className="relative mr-2">
-							<div className="size-3 rounded-full ring-2 ring-opacity-30 bg-green-500 ring-green-500" />
-							<div className="absolute inset-0 rounded-full bg-green-500/50 animate-ping" />
-						</div>
-						Vote on Polls
+					<Button
+						variant="ghost"
+						className="relative overflow-hidden group bg-secondary hover:bg-secondary/80 border border-border text-foreground rounded-full px-6"
+					>
+						<span className="relative z-10">Community Polls</span>
 					</Button>
 				</AlertDialogTrigger>
-				<AlertDialogContent className="max-w-2xl p-4">
+				<AlertDialogContent className="w-full max-w-[calc(100vw-2rem)] sm:max-w-4xl p-0 bg-popover backdrop-blur-xl border-border shadow-2xl overflow-hidden">
 					<AlertDialogTitle className="hidden" />
-					<Tabs
-						value={activeTab}
-						onValueChange={setActiveTab}
-						orientation="vertical"
-						className="w-full hidden lg:flex"
-					>
-						<div className="flex gap-4 min-h-[350px] w-full">
-							<AlertDialogCancel className="hidden lg:block z-50 absolute top-3 left-3 p-2 h-8 border-none bg-transparent">
-								<X />
-							</AlertDialogCancel>
-							<ScrollArea className="min-w-32 max-w-48 h-[450px] pt-6 pb-10">
-								<div className="absolute bottom-0 flex justify-center items-center w-full gap-2">
+					<div className="flex h-[90vh] sm:h-150 relative z-10">
+						<div className="hidden md:flex w-64 border-r border-border bg-muted/50 flex-col">
+							<div className="p-4 border-b border-border flex items-center justify-between">
+								<h3 className="font-syne font-bold text-foreground flex items-center gap-2">
+									<BarChart2 className="size-4 text-primary" />
+									Polls
+								</h3>
+								<div className="flex gap-1">
 									<Button
-										variant="outline"
+										variant="ghost"
+										size="icon"
 										onClick={() => handleNavigation('prev')}
 										disabled={parseInt(activeTab) === 0}
-										className="w-full"
+										className="h-8 w-8"
 									>
-										<ArrowLeft />
+										<ArrowLeft className="size-4" />
 									</Button>
 									<Button
-										variant="outline"
+										variant="ghost"
+										size="icon"
 										onClick={() => handleNavigation('next')}
 										disabled={parseInt(activeTab) === displayedPolls.length - 1}
-										className="w-full"
+										className="h-8 w-8"
 									>
-										<ArrowRight />
+										<ArrowRight className="size-4" />
 									</Button>
 								</div>
-								<TabsList className="flex-col rounded-none border-r bg-transparent p-0 min-w-32 max-w-48">
-									{isLoading ? (
-										<TabsTrigger
-											value="0"
-											disabled
-											className="data-[state=active]:after:bg-primary relative w-full justify-start rounded-none after:absolute after:inset-y-0 after:end-0 after:w-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-										>
-											<Skeleton className="h-4 w-16" />
-										</TabsTrigger>
-									) : (
-										displayedPolls.map((poll, index) => (
-											<TabsTrigger
-												key={poll.id}
-												value={index.toString()}
-												className={`${
-													isAdmin
-														? 'px-4'
-														: hasUserVoted[poll.id] ||
-														  poll.endedAt ||
-														  (poll.until !== null &&
-																poll.until !== undefined &&
-																isPast(poll.until))
-														? 'px-0'
-														: 'px-4'
-												} data-[state=active]:after:bg-primary relative w-full justify-start rounded-none after:absolute after:inset-y-0 after:end-0 after:w-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none`}
-											>
-												{poll.question.length > 20
-													? `${poll.question.slice(0, 20)}...`
-													: poll.question}
-												{isAdmin ? (
-													poll.visible ? (
-														<span className="absolute left-0 top-1/2 -translate-y-1/2 rounded-full bg-green-500 h-2 w-2" />
-													) : (
-														<span className="absolute left-0 top-1/2 -translate-y-1/2 rounded-full bg-red-500 h-2 w-2" />
-													)
-												) : (
-													!hasUserVoted[poll.id] &&
-													!poll.endedAt &&
-													(!poll.until || !isPast(poll.until)) && (
-														<span className="absolute left-0 top-1/2 -translate-y-1/2 rounded-full bg-blue-500 h-2 w-2" />
-													)
-												)}
-											</TabsTrigger>
-										))
-									)}
-								</TabsList>
-							</ScrollArea>
-							<div className="flex-1">
-								<ScrollArea className="border rounded-lg p-3 h-[450px] w-full">
-									{isLoading ? (
-										<TabsContent value="0" className="px-4 py-3">
-											<div className="space-y-4">
-												<Skeleton className="h-8 w-3/4" />
-												<div className="space-y-4">
-													{[1, 2, 3].map((_, i) => (
-														<div key={i} className="space-y-2">
-															<Skeleton className="h-6 w-full" />
-															<Skeleton className="h-2.5 w-full" />
-														</div>
-													))}
-												</div>
-											</div>
-										</TabsContent>
-									) : (
-										displayedPolls.map((poll, index) => (
-											<TabsContent
-												key={poll.id}
-												value={index.toString()}
-												className="p-2 mt-0"
-											>
-												<div className="space-y-6">
-													<AlertDialogDescription asChild>
-														<section className="space-y-4">
-															<h2 className="text-lg font-semibold [overflow-wrap:anywhere] text-black dark:text-white">
-																{poll.question}
-															</h2>
-															{(poll.endedAt ||
-																(!poll.endedAt && poll.until && isPast(poll.until))) && (
-																<p className="text-sm text-yellow-500">This poll has ended</p>
-															)}
-															{poll.answers.map((answer: string, answerIndex: number) => (
-																<div key={answerIndex} className="space-y-2">
-																	{!hasUserVoted[poll.id] &&
-																	!poll.endedAt &&
-																	(!poll.until || !isPast(poll.until)) ? (
-																		<RadioGroup
-																			value={selectedOption?.toString()}
-																			onValueChange={value => setSelectedOption(Number(value))}
-																			className="gap-2 w-full"
-																		>
-																			<div className="border-input hover:bg-accent hover:text-accent-foreground has-[data-state=checked]:border-primary/50 relative flex w-full items-start rounded-md border p-4 shadow-sm outline-none">
-																				<RadioGroupItem
-																					value={answerIndex.toString()}
-																					id={`option-${poll.id}-${answerIndex}`}
-																					className="order-1 after:absolute after:inset-0"
-																				/>
-																				<div className="grid grow gap-2">
-																					<span className="text-sm text-foreground [overflow-wrap:anywhere] pr-2">
-																						{answer}
-																					</span>
-																				</div>
-																			</div>
-																		</RadioGroup>
-																	) : (
-																		<>
-																			<div className="flex justify-between items-baseline gap-2 text-sm text-foreground">
-																				<span>{answer}</span>
-																				<span className="whitespace-nowrap">
-																					{poll.votes[answerIndex]} vote
-																					{poll.votes[answerIndex] !== 1 ? 's' : ''} (
-																					{Math.round(
-																						getVotePercentage(
-																							poll.votes[answerIndex],
-																							getTotalVotes(poll)
-																						)
-																					)}
-																					%)
-																				</span>
-																			</div>
-																			<div className="w-full bg-muted rounded-full h-2.5">
-																				<div
-																					className="bg-primary h-2.5 rounded-full transition-all duration-500"
-																					style={{
-																						width: `${getVotePercentage(
-																							poll.votes[answerIndex],
-																							getTotalVotes(poll)
-																						)}%`,
-																					}}
-																				/>
-																			</div>
-																		</>
-																	)}
-																</div>
-															))}
-															<div className="mt-4 space-y-4">
-																{!hasUserVoted[poll.id]
-																	? !poll.endedAt &&
-																	  (!poll.until || new Date() <= new Date(poll.until)) && (
-																			<Button
-																				onClick={() => handleVote(poll.id)}
-																				disabled={selectedOption === null || isVoting[poll.id]}
-																				className="w-full"
-																			>
-																				{isVoting[poll.id] ? 'Voting...' : 'Vote'}
-																			</Button>
-																	  )
-																	: showVoteText[poll.id] && (
-																			<p className="text-sm text-blue-500">
-																				Thank you for voting!
-																			</p>
-																	  )}
-															</div>
-															<p className="text-sm text-muted-foreground mt-2">
-																Total votes: {getTotalVotes(poll)}
-															</p>
-															{poll.until && !poll.endedAt && (
-																<p className="text-sm text-muted-foreground">
-																	Ends at: {format(poll.until, 'PPPp')}
-																</p>
-															)}
-															{poll.endedAt && (
-																<p className="text-sm text-muted-foreground">
-																	Ended at: {format(poll.endedAt, 'PPPp')}
-																</p>
-															)}
-														</section>
-													</AlertDialogDescription>
-
-													{isAdmin && <PollAdminActions poll={poll} />}
-												</div>
-											</TabsContent>
-										))
-									)}
-								</ScrollArea>
 							</div>
-						</div>
-					</Tabs>
-					<div className="w-full lg:hidden space-y-4">
-						<div className="flex items-center gap-2">
-							<AlertDialogCancel className="z-50 p-3 mt-0 border-none bg-transparent">
-								<X />
-							</AlertDialogCancel>
-							<div className="flex justify-between gap-2">
-								<Button
-									variant="outline"
-									onClick={() => handleNavigation('prev')}
-									disabled={parseInt(activeTab) === 0}
-								>
-									<ArrowLeft />
-								</Button>
-								<select
+
+							<ScrollArea className="flex-1 h-full min-h-0">
+								<Tabs
 									value={activeTab}
-									onChange={e => setActiveTab(e.target.value)}
-									className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+									onValueChange={setActiveTab}
+									orientation="vertical"
+									className="w-full"
 								>
-									{displayedPolls.map((poll, index) => (
-										<option key={poll.id} value={index.toString()}>
-											{poll.question}
-										</option>
-									))}
-								</select>
-								<Button
-									variant="outline"
-									onClick={() => handleNavigation('next')}
-									disabled={parseInt(activeTab) === displayedPolls.length - 1}
-								>
-									<ArrowRight />
-								</Button>
-							</div>
-						</div>
-						<ScrollArea className="border rounded-lg p-4 h-[350px]">
-							{isLoading ? (
-								<div className="px-4 py-3">
-									<div className="space-y-4">
-										<Skeleton className="h-8 w-3/4" />
-										<div className="space-y-4">
-											{[1, 2, 3].map((_, i) => (
-												<div key={i} className="space-y-2">
-													<Skeleton className="h-6 w-full" />
-													<Skeleton className="h-2.5 w-full" />
-												</div>
-											))}
-										</div>
-									</div>
-								</div>
-							) : (
-								displayedPolls.map((poll, index) => (
-									<div
-										key={poll.id}
-										className={`p-1 ${
-											activeTab === index.toString() ? 'block' : 'hidden'
-										}`}
-									>
-										<div className="space-y-6">
-											<AlertDialogDescription asChild>
-												<section className="space-y-4">
-													<h2 className="text-lg font-semibold [overflow-wrap:anywhere] text-black dark:text-white">
-														{poll.question}
-													</h2>
-													{(poll.endedAt ||
-														(!poll.endedAt && poll.until && isPast(poll.until))) && (
-														<p className="text-sm text-yellow-500">This poll has ended</p>
-													)}
-													{poll.answers.map((answer: string, answerIndex: number) => (
-														<div
-															key={answerIndex}
-															className="space-y-2 [overflow-wrap:anywhere]"
-														>
-															{!hasUserVoted[poll.id] &&
-															!poll.endedAt &&
-															(!poll.until || new Date() <= new Date(poll.until)) ? (
-																<RadioGroup
-																	value={selectedOption?.toString()}
-																	onValueChange={value => setSelectedOption(Number(value))}
-																	className="gap-2 w-full"
-																>
-																	<div className="border-input hover:bg-accent hover:text-accent-foreground has-[data-state=checked]:border-primary/50 relative flex w-full items-start rounded-md border p-4 shadow-sm outline-none">
-																		<RadioGroupItem
-																			value={answerIndex.toString()}
-																			id={`option-${poll.id}-${answerIndex}`}
-																			className="order-1 after:absolute after:inset-0"
-																		/>
-																		<div className="grid grow gap-2">
-																			<span className="text-sm text-foreground pr-2">
-																				{answer}
-																			</span>
-																		</div>
-																	</div>
-																</RadioGroup>
+									<TabsList className="flex-col h-auto bg-transparent p-0 w-full space-y-0">
+										{isLoading ? (
+											<div className="p-4 space-y-2">
+												{[1, 2, 3].map(i => (
+													<Skeleton key={i} className="h-10 w-full" />
+												))}
+											</div>
+										) : (
+											displayedPolls.map((poll, index) => (
+												<TabsTrigger
+													key={poll.id}
+													value={index.toString()}
+													className="w-full justify-start px-4 py-3 rounded-none border-l-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-secondary text-muted-foreground data-[state=active]:text-foreground transition-all text-left h-auto group relative pr-10"
+												>
+													<div className="flex flex-col gap-1 w-full overflow-hidden">
+														<span className="truncate font-medium text-sm max-w-48">
+															{poll.question}
+														</span>
+														<div className="flex items-center gap-2 text-xs opacity-60">
+															{isAdmin ? (
+																poll.visible ? (
+																	<span className="text-green-400 flex items-center gap-1">
+																		Visible
+																	</span>
+																) : (
+																	<span className="text-red-400 flex items-center gap-1">
+																		Hidden
+																	</span>
+																)
 															) : (
-																<>
-																	<div className="flex justify-between items-center gap-2 text-sm text-foreground">
-																		<span>{answer}</span>
-																		<span className="whitespace-nowrap">
-																			{poll.votes[answerIndex]} vote
-																			{poll.votes[answerIndex] !== 1 ? 's' : ''} (
-																			{Math.round(
-																				getVotePercentage(
-																					poll.votes[answerIndex],
-																					getTotalVotes(poll)
-																				)
-																			)}
-																			%)
-																		</span>
-																	</div>
-																	<div className="w-full bg-muted rounded-full h-2.5">
-																		<div
-																			className="bg-primary h-2.5 rounded-full transition-all duration-500"
-																			style={{
-																				width: `${getVotePercentage(
-																					poll.votes[answerIndex],
-																					getTotalVotes(poll)
-																				)}%`,
-																			}}
-																		/>
-																	</div>
-																</>
+																!hasUserVoted[poll.id] &&
+																!poll.endedAt &&
+																(!poll.until || !isPast(poll.until)) && (
+																	<span className="text-blue-400 flex items-center gap-1">
+																		Open
+																	</span>
+																)
+															)}
+															{poll.endedAt && <span className="text-yellow-400">Ended</span>}
+														</div>
+													</div>
+													{isAdmin && (
+														<div
+															className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 shrink-0 flex items-center justify-center rounded-md hover:bg-muted opacity-60 hover:opacity-100 group-hover:opacity-100 transition-opacity cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+															onClick={e => {
+																e.stopPropagation()
+																if (!isToggling[poll.id]) {
+																	handleToggleVisibility(poll.id, !poll.visible)
+																}
+															}}
+															title={poll.visible ? 'Hide Poll' : 'Show Poll'}
+															role="button"
+															tabIndex={0}
+															onKeyDown={e => {
+																if (
+																	(e.key === 'Enter' || e.key === ' ') &&
+																	!isToggling[poll.id]
+																) {
+																	e.preventDefault()
+																	e.stopPropagation()
+																	handleToggleVisibility(poll.id, !poll.visible)
+																}
+															}}
+														>
+															{isToggling[poll.id] ? (
+																<Clock className="size-4 animate-spin" />
+															) : poll.visible ? (
+																<Eye className="size-4" />
+															) : (
+																<EyeOff className="size-4" />
 															)}
 														</div>
-													))}
+													)}
+												</TabsTrigger>
+											))
+										)}
+									</TabsList>
+								</Tabs>
+							</ScrollArea>
 
-													<div className="mt-4 space-y-4">
-														{!hasUserVoted[poll.id]
-															? !poll.endedAt &&
-															  (!poll.until || new Date() <= new Date(poll.until)) && (
-																	<Button
-																		onClick={() => handleVote(poll.id)}
-																		disabled={selectedOption === null || isVoting[poll.id]}
-																		className="w-full"
-																	>
-																		{isVoting[poll.id] ? 'Voting...' : 'Vote'}
-																	</Button>
-															  )
-															: showVoteText[poll.id] && (
-																	<p className="text-sm text-blue-500">Thank you for voting!</p>
-															  )}
+							{isAdmin && (
+								<div className="p-4 border-t border-border hidden md:block">
+									<AlertDialog>
+										<AlertDialogTrigger asChild>
+											<Button className="w-full">Create New Poll</Button>
+										</AlertDialogTrigger>
+										<AlertDialogContent className="bg-popover backdrop-blur-xl border-border">
+											<AlertDialogHeader>
+												<AlertDialogTitle>Create New Poll</AlertDialogTitle>
+											</AlertDialogHeader>
+											<ScrollArea className="max-h-[60vh] pr-4">
+												<div className="space-y-4 py-4">
+													<div className="space-y-2">
+														<label className="text-sm font-medium text-foreground">
+															Question
+														</label>
+														<Input
+															type="text"
+															value={newPoll.question}
+															onChange={e => {
+																const value = e.target.value.slice(0, max_questions)
+																setNewPoll(prev => ({ ...prev, question: value }))
+															}}
+															placeholder="Enter your question"
+															maxLength={max_questions}
+														/>
 													</div>
-													<p className="text-sm text-muted-foreground">
-														Total votes: {getTotalVotes(poll)}
-													</p>
-													{poll.until && !poll.endedAt && (
-														<p className="text-sm text-muted-foreground">
-															Ends at: {format(poll.until, 'PPPp')}
-														</p>
-													)}
-													{poll.endedAt && (
-														<p className="text-sm text-muted-foreground">
-															Ended at: {format(poll.endedAt, 'PPPp')}
-														</p>
-													)}
-												</section>
-											</AlertDialogDescription>
-
-											{isAdmin && <PollAdminActions poll={poll} />}
-										</div>
-									</div>
-								))
-							)}
-						</ScrollArea>
-					</div>
-					{isAdmin && (
-						<AlertDialog>
-							<AlertDialogTrigger asChild>
-								<Button variant="outline" className="h-fit">
-									Create New Poll
-								</Button>
-							</AlertDialogTrigger>
-							<AlertDialogContent>
-								<AlertDialogHeader>
-									<AlertDialogTitle>Create New Poll</AlertDialogTitle>
-								</AlertDialogHeader>
-								<ScrollArea className="max-h-[70vh]">
-									<div className="space-y-4">
-										<div className="text-foreground">
-											<label className="block text-sm font-medium mb-1">Question</label>
-											<Input
-												type="text"
-												value={newPoll.question}
-												onChange={e => {
-													const value = e.target.value.slice(0, max_questions)
-													setNewPoll(prev => ({ ...prev, question: value }))
-												}}
-												placeholder="Enter your question"
-												maxLength={max_questions}
-											/>
-										</div>
-										<div className="space-y-2 text-black dark:text-white">
-											<label className="block text-sm font-medium">Answers</label>
-											{newPoll.answers.map((answer, i) => (
-												<div key={i} className="flex gap-2">
-													<Input
-														type="text"
-														value={answer}
-														onChange={e =>
-															setNewPoll(prev => ({
-																...prev,
-																answers: prev.answers.map((a, index) =>
-																	index === i ? e.target.value : a
-																),
-															}))
-														}
-														placeholder={`Answer ${i + 1}`}
-														maxLength={max_questions}
-													/>
-													{newPoll.answers.length > 2 && (
+													<div className="space-y-2">
+														<label className="text-sm font-medium text-foreground">
+															Answers
+														</label>
+														{newPoll.answers.map((answer, i) => (
+															<div key={i} className="flex gap-2">
+																<Input
+																	type="text"
+																	value={answer}
+																	onChange={e =>
+																		setNewPoll(prev => ({
+																			...prev,
+																			answers: prev.answers.map((a, index) =>
+																				index === i ? e.target.value : a
+																			),
+																		}))
+																	}
+																	placeholder={`Answer ${i + 1}`}
+																	maxLength={max_questions}
+																/>
+																{newPoll.answers.length > 2 && (
+																	<Button
+																		variant="destructive"
+																		size="icon"
+																		onClick={() =>
+																			setNewPoll(prev => ({
+																				...prev,
+																				answers: prev.answers.filter((_, index) => index !== i),
+																			}))
+																		}
+																	>
+																		<X className="size-4" />
+																	</Button>
+																)}
+															</div>
+														))}
 														<Button
-															variant="destructive"
-															size="icon"
 															onClick={() =>
 																setNewPoll(prev => ({
 																	...prev,
-																	answers: prev.answers.filter((_, index) => index !== i),
+																	answers: [...prev.answers, ''],
 																}))
 															}
+															variant="outline"
+															className="w-full"
+															disabled={newPoll.answers.length >= max_answers}
 														>
-															<X className="size-4" />
+															Add Answer Option ({newPoll.answers.length}/{max_answers})
 														</Button>
-													)}
-												</div>
-											))}
-											<Button
-												onClick={() =>
-													setNewPoll(prev => ({
-														...prev,
-														answers: [...prev.answers, ''],
-													}))
-												}
-												variant="outline"
-												className="w-full"
-												disabled={newPoll.answers.length >= max_answers}
-											>
-												Add Answer Option ({newPoll.answers.length}/{max_answers})
-											</Button>
-										</div>
-										<div className="space-y-4">
-											<div className="flex items-center justify-between">
-												<label className="text-sm font-medium">Set poll end time</label>
-												<Switch
-													checked={newPoll.timed}
-													onCheckedChange={checked =>
-														setNewPoll(prev => ({ ...prev, timed: checked }))
-													}
-												/>
-											</div>
-											{newPoll.timed && (
-												<div className="space-y-4">
-													<Calendar
-														mode="single"
-														selected={selectedDate}
-														onSelect={handleDateSelect}
-														disabled={date => isBefore(date, new Date())}
-														className="rounded-md border w-full flex justify-center items-center"
-													/>
-													<div>
-														<label className="text-sm font-medium">Time</label>
-														<Input
-															type="time"
-															value={selectedTime}
-															onChange={handleTimeChange}
-															className="mt-1"
-														/>
+													</div>
+													<div className="space-y-4 pt-4 border-t border-border">
+														<div className="flex items-center justify-between">
+															<label className="text-sm font-medium text-foreground">
+																Set poll end time
+															</label>
+															<Switch
+																checked={newPoll.timed}
+																onCheckedChange={checked =>
+																	setNewPoll(prev => ({ ...prev, timed: checked }))
+																}
+															/>
+														</div>
+														{newPoll.timed && (
+															<div className="space-y-4">
+																<Calendar
+																	mode="single"
+																	selected={selectedDate}
+																	onSelect={handleDateSelect}
+																	disabled={date => isBefore(date, new Date())}
+																	className="rounded-md border border-border bg-card w-full flex justify-center"
+																/>
+																<div>
+																	<label className="text-sm font-medium text-foreground">
+																		Time
+																	</label>
+																	<Input
+																		type="time"
+																		value={selectedTime}
+																		onChange={handleTimeChange}
+																		className="mt-1"
+																	/>
+																</div>
+															</div>
+														)}
 													</div>
 												</div>
-											)}
+											</ScrollArea>
+											<AlertDialogFooter>
+												<AlertDialogCancel>Cancel</AlertDialogCancel>
+												<Button
+													onClick={handleCreatePoll}
+													disabled={
+														!newPoll.question ||
+														newPoll.answers.some(a => !a) ||
+														isCreating ||
+														(newPoll.timed && !newPoll.until)
+													}
+													className="bg-primary hover:bg-primary/90 text-primary-foreground"
+												>
+													{isCreating ? 'Creating...' : 'Create Poll'}
+												</Button>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
+								</div>
+							)}
+						</div>
+
+						<div className="flex-1 flex flex-col relative">
+							<div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-muted/50">
+								<div className="flex items-center gap-2 flex-1 min-w-0">
+									<BarChart2 className="size-4 text-primary shrink-0" />
+									<span className="font-syne font-bold text-foreground text-sm">
+										Poll {parseInt(activeTab) + 1} of {displayedPolls.length}
+									</span>
+								</div>
+								<div className="flex items-center gap-1 shrink-0">
+									{isAdmin && (
+										<AlertDialog>
+											<AlertDialogTrigger asChild>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-8 w-8"
+													title="Create New Poll"
+												>
+													<Plus className="size-4" />
+												</Button>
+											</AlertDialogTrigger>
+											<AlertDialogContent className="bg-popover backdrop-blur-xl border-border">
+												<AlertDialogHeader>
+													<AlertDialogTitle>Create New Poll</AlertDialogTitle>
+												</AlertDialogHeader>
+												<ScrollArea className="max-h-[60vh] pr-4">
+													<div className="space-y-4 py-4">
+														<div className="space-y-2">
+															<label className="text-sm font-medium text-foreground">
+																Question
+															</label>
+															<Input
+																type="text"
+																value={newPoll.question}
+																onChange={e => {
+																	const value = e.target.value.slice(0, max_questions)
+																	setNewPoll(prev => ({ ...prev, question: value }))
+																}}
+																placeholder="Enter your question"
+																maxLength={max_questions}
+															/>
+														</div>
+														<div className="space-y-2">
+															<label className="text-sm font-medium text-foreground">
+																Answers
+															</label>
+															{newPoll.answers.map((answer, i) => (
+																<div key={i} className="flex gap-2">
+																	<Input
+																		type="text"
+																		value={answer}
+																		onChange={e =>
+																			setNewPoll(prev => ({
+																				...prev,
+																				answers: prev.answers.map((a, index) =>
+																					index === i ? e.target.value : a
+																				),
+																			}))
+																		}
+																		placeholder={`Answer ${i + 1}`}
+																		maxLength={max_questions}
+																	/>
+																	{newPoll.answers.length > 2 && (
+																		<Button
+																			variant="destructive"
+																			size="icon"
+																			onClick={() =>
+																				setNewPoll(prev => ({
+																					...prev,
+																					answers: prev.answers.filter((_, index) => index !== i),
+																				}))
+																			}
+																		>
+																			<X className="size-4" />
+																		</Button>
+																	)}
+																</div>
+															))}
+															<Button
+																onClick={() =>
+																	setNewPoll(prev => ({
+																		...prev,
+																		answers: [...prev.answers, ''],
+																	}))
+																}
+																variant="outline"
+																className="w-full"
+																disabled={newPoll.answers.length >= max_answers}
+															>
+																Add Answer Option ({newPoll.answers.length}/{max_answers})
+															</Button>
+														</div>
+														<div className="space-y-4 pt-4 border-t border-border">
+															<div className="flex items-center justify-between">
+																<label className="text-sm font-medium text-foreground">
+																	Set poll end time
+																</label>
+																<Switch
+																	checked={newPoll.timed}
+																	onCheckedChange={checked =>
+																		setNewPoll(prev => ({ ...prev, timed: checked }))
+																	}
+																/>
+															</div>
+															{newPoll.timed && (
+																<div className="space-y-4">
+																	<Calendar
+																		mode="single"
+																		selected={selectedDate}
+																		onSelect={handleDateSelect}
+																		disabled={date => isBefore(date, new Date())}
+																		className="rounded-md border border-border bg-card w-full flex justify-center"
+																	/>
+																	<div>
+																		<label className="text-sm font-medium text-foreground">
+																			Time
+																		</label>
+																		<Input
+																			type="time"
+																			value={selectedTime}
+																			onChange={handleTimeChange}
+																			className="mt-1"
+																		/>
+																	</div>
+																</div>
+															)}
+														</div>
+													</div>
+												</ScrollArea>
+												<AlertDialogFooter>
+													<AlertDialogCancel>Cancel</AlertDialogCancel>
+													<Button
+														onClick={handleCreatePoll}
+														disabled={
+															!newPoll.question ||
+															newPoll.answers.some(a => !a) ||
+															isCreating ||
+															(newPoll.timed && !newPoll.until)
+														}
+														className="bg-primary hover:bg-primary/90 text-primary-foreground"
+													>
+														{isCreating ? 'Creating...' : 'Create Poll'}
+													</Button>
+												</AlertDialogFooter>
+											</AlertDialogContent>
+										</AlertDialog>
+									)}
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={() => handleNavigation('prev')}
+										disabled={parseInt(activeTab) === 0}
+										className="h-8 w-8"
+									>
+										<ArrowLeft className="size-4" />
+									</Button>
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={() => handleNavigation('next')}
+										disabled={parseInt(activeTab) === displayedPolls.length - 1}
+										className="h-8 w-8"
+									>
+										<ArrowRight className="size-4" />
+									</Button>
+								</div>
+							</div>
+
+							<AlertDialogCancel className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 rounded-full bg-background/80 text-foreground hover:bg-background transition-colors backdrop-blur-md border border-border h-auto w-auto has-[>svg]:px-2">
+								<X className="size-4 sm:size-5" />
+							</AlertDialogCancel>
+
+							<ScrollArea className="flex-1 h-full min-h-0 p-4 sm:p-6 md:p-8">
+								{isLoading ? (
+									<div className="space-y-6">
+										<Skeleton className="h-12 w-3/4" />
+										<div className="space-y-4">
+											{[1, 2, 3].map((_, i) => (
+												<Skeleton key={i} className="h-16 w-full" />
+											))}
 										</div>
-										<AlertDialogFooter>
-											<AlertDialogCancel>Cancel</AlertDialogCancel>
-											<Button
-												onClick={handleCreatePoll}
-												disabled={
-													!newPoll.question ||
-													newPoll.answers.some(a => !a) ||
-													isCreating ||
-													(newPoll.timed && !newPoll.until)
-												}
-											>
-												{isCreating ? 'Creating...' : 'Create Poll'}
-											</Button>
-										</AlertDialogFooter>
 									</div>
-								</ScrollArea>
-							</AlertDialogContent>
-						</AlertDialog>
-					)}
+								) : (
+									displayedPolls.map((poll, index) => (
+										<div
+											key={poll.id}
+											className={activeTab === index.toString() ? 'block' : 'hidden'}
+										>
+											<div className="space-y-6 sm:space-y-8 max-w-2xl mx-auto">
+												<div className="space-y-2">
+													<h2 className="text-xl sm:text-2xl font-bold font-syne text-foreground leading-tight wrap-anywhere">
+														{poll.question}
+													</h2>
+													<div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+														<span className="flex items-center gap-1">
+															<BarChart2 className="size-3" />
+															{getTotalVotes(poll)} votes
+														</span>
+														{(poll.until || poll.endedAt) && (
+															<span className="flex items-center gap-1">
+																<Clock className="size-3" />
+																{poll.endedAt
+																	? `Ended ${format(poll.endedAt, 'MMM d, yyyy')}`
+																	: `Ends ${format(poll.until!, 'MMM d, yyyy')}`}
+															</span>
+														)}
+													</div>
+												</div>
+
+												{(poll.endedAt ||
+													(!poll.endedAt && poll.until && isPast(poll.until))) && (
+													<div className="bg-yellow-500/10 dark:bg-yellow-500/20 border border-yellow-500/20 dark:border-yellow-500/30 rounded-lg p-3 sm:p-4 text-yellow-700 dark:text-yellow-200 text-xs sm:text-sm flex items-center gap-2">
+														<Clock className="size-4 shrink-0" />
+														<span>This poll has ended. Voting is closed.</span>
+													</div>
+												)}
+
+												<div className="space-y-3">
+													{poll.answers.map((answer: string, answerIndex: number) => (
+														<div key={answerIndex} className="relative">
+															{!hasUserVoted[poll.id] &&
+															!poll.endedAt &&
+															(!poll.until || !isPast(poll.until)) ? (
+																<RadioGroup
+																	value={selectedOption?.toString()}
+																	onValueChange={value => setSelectedOption(Number(value))}
+																>
+																	<div
+																		className={`
+																			relative flex items-center p-3 sm:p-4 rounded-xl border transition-all cursor-pointer
+																			${
+																				selectedOption === answerIndex
+																					? 'bg-primary/10 border-primary/50 ring-1 ring-primary/50'
+																					: 'bg-muted border-border hover:bg-muted/80 hover:border-border'
+																			}
+																		`}
+																		onClick={() => setSelectedOption(answerIndex)}
+																	>
+																		<RadioGroupItem
+																			value={answerIndex.toString()}
+																			id={`option-${poll.id}-${answerIndex}`}
+																			className="mr-3 sm:mr-4"
+																		/>
+																		<span className="text-foreground font-medium text-sm sm:text-base wrap-anywhere">
+																			{answer}
+																		</span>
+																	</div>
+																</RadioGroup>
+															) : (
+																<div className="relative overflow-hidden rounded-xl bg-muted border border-border">
+																	<div
+																		className="absolute inset-y-0 left-0 bg-primary/20 transition-all duration-1000 ease-out"
+																		style={{
+																			width: `${getVotePercentage(
+																				poll.votes[answerIndex],
+																				getTotalVotes(poll)
+																			)}%`,
+																		}}
+																	/>
+																	<div className="relative p-3 sm:p-4 flex justify-between items-center z-10 gap-2">
+																		<span className="font-medium text-foreground text-sm sm:text-base flex-1 min-w-0 truncate">
+																			{answer}
+																		</span>
+																		<div className="flex items-center gap-2 sm:gap-3 shrink-0">
+																			<span className="text-xs sm:text-sm text-muted-foreground">
+																				{poll.votes[answerIndex]}{' '}
+																				{poll.votes[answerIndex] === 1 ? 'vote' : 'votes'}
+																			</span>
+																			<span className="font-bold text-primary text-sm sm:text-base">
+																				{Math.round(
+																					getVotePercentage(
+																						poll.votes[answerIndex],
+																						getTotalVotes(poll)
+																					)
+																				)}
+																				%
+																			</span>
+																		</div>
+																	</div>
+																</div>
+															)}
+														</div>
+													))}
+												</div>
+
+												<div>
+													{!hasUserVoted[poll.id]
+														? !poll.endedAt &&
+														  (!poll.until || new Date() <= new Date(poll.until)) && (
+																<Button
+																	size="lg"
+																	onClick={() => handleVote(poll.id)}
+																	disabled={selectedOption === null || isVoting[poll.id]}
+																	className="w-full font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 text-sm sm:text-base py-5 sm:py-6"
+																>
+																	{isVoting[poll.id] ? 'Submitting Vote...' : 'Submit Vote'}
+																</Button>
+														  )
+														: showVoteText[poll.id] && (
+																<motion.div
+																	initial={{ opacity: 0, y: 10 }}
+																	animate={{ opacity: 1, y: 0 }}
+																	className="flex items-center justify-center gap-2 text-green-400 font-medium p-3 sm:p-4 bg-green-500/10 rounded-xl border border-green-500/20 text-sm sm:text-base"
+																>
+																	<CheckCircle2 className="size-4 sm:size-5" />
+																	Thank you for voting!
+																</motion.div>
+														  )}
+												</div>
+
+												{isAdmin && <PollAdminActions poll={poll} />}
+											</div>
+										</div>
+									))
+								)}
+							</ScrollArea>
+						</div>
+					</div>
 				</AlertDialogContent>
 			</AlertDialog>
 		</div>
