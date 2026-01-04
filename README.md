@@ -1,4 +1,3 @@
-
 ![Header](https://github.com/user-attachments/assets/98339f15-4e14-44f0-9201-4739841145c6)
 
 Check out our minecraft server where we host different modpacks and more, this is mostly for our friends.

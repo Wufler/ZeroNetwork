@@ -1,94 +1,109 @@
 'use client'
 
-import { CheckCircle2, Clock, Wifi } from 'lucide-react'
+import { CheckCircle2, Clock, Wifi, Gamepad2, Users, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import Discord from './ui/discord'
+import { Discord } from './ui/discord'
 
-const facts = [
+const features = [
 	{
-		name: 'On 24/7',
-		description: "Besides updates, it shouldn't crash!",
+		title: '24/7 Uptime',
+		description:
+			'Our servers are always online, so you can play whenever you want.',
 		icon: Clock,
+		className:
+			'md:col-span-1 md:row-span-2 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20',
+		iconColor: 'text-orange-500',
 	},
 	{
-		name: 'Stable server',
-		description: 'Usually no lag!',
-		icon: Wifi,
+		title: 'Lag Free',
+		description: 'sometimes lol',
+		icon: Zap,
+		className:
+			'md:col-span-2 bg-gradient-to-br from-yellow-500/10 to-amber-500/10 border-yellow-500/20',
+		iconColor: 'text-yellow-500',
 	},
 	{
-		name: 'Always updated',
-		description: 'Never outdated!',
-		icon: CheckCircle2,
-	},
-	{
-		name: 'Great community',
-		description: 'Join us on Discord!',
+		title: 'Community',
+		description: 'Join our Discord to chat and suggest new features!',
 		icon: Discord,
 		link: 'https://discord.gg/a6JrZMa',
+		className:
+			'md:col-span-2 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-500/20',
+		iconColor: 'text-indigo-500',
+	},
+	{
+		title: 'Always Updated',
+		description: 'We keep our servers up to date with the latest versions.',
+		icon: CheckCircle2,
+		className:
+			'md:col-span-1 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20',
+		iconColor: 'text-green-500',
+	},
+	{
+		title: 'Modded & Vanilla',
+		description: 'Something for everyone, from modpacks to customized vanilla.',
+		icon: Gamepad2,
+		className:
+			'md:col-span-2 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20',
+		iconColor: 'text-blue-500',
 	},
 ]
 
 export default function Description() {
 	return (
-		<div className="py-8 sm:py-10">
-			<div className="mx-auto max-w-7xl">
+		<section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+			<div className="mx-auto max-w-7xl relative z-10">
 				<motion.div
-					className="mx-auto max-w-3xl text-center"
+					className="text-center mb-16"
 					initial={{ opacity: 0, y: 20 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
 				>
-					<h2 className="font-syne text-4xl font-bold tracking-tight sm:text-5xl">
-						What are we doing?!
+					<h2 className="font-syne text-4xl md:text-6xl font-bold tracking-tight mb-6 bg-linear-to-r from-foreground to-foreground/50 bg-clip-text text-transparent">
+						Why Choose Us?
 					</h2>
-					<div className="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-300">
-						<p>We run Minecraft servers with lots of fun features for everyone.</p>
-						<p className="mt-4">
-							Whether you like modded or vanilla Minecraft, we&apos;ve got something
-							for you. Suggest modpacks or ideas in our Discord!
-						</p>
-					</div>
 				</motion.div>
 
-				<div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-6 sm:gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:grid-rows-2">
-					{facts.map((fact, index) => (
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+					{features.map((feature, index) => (
 						<motion.div
-							key={fact.name}
-							className={`group relative rounded-3xl p-8 transition-all duration-300
-				${
-					index === 0 || index === facts.length - 1
-						? 'lg:col-span-2 bg-gradient-to-br from-gray-200/20 to-gray-900/10 dark:from-gray-500/10 dark:to-gray-900/20 lg:from-blue-500/10 lg:to-purple-500/10 dark:lg:from-blue-500/10 dark:lg:to-purple-500/10 dark:lg:hover:from-blue-500/20 dark:lg:hover:to-purple-500/20 lg:hover:from-blue-500/20 lg:hover:to-purple-500/20'
-						: 'bg-gradient-to-br from-gray-200/20 to-gray-900/10 lg:hover:from-gray-200/30 lg:hover:to-gray-900/20 dark:from-gray-500/10 dark:to-gray-900/20 lg:dark:hover:from-gray-500/20 lg:dark:hover:to-gray-900/30'
-				}`}
-							initial={{ opacity: 0, y: 20 }}
-							whileInView={{ opacity: 1, y: 0 }}
+							key={feature.title}
+							initial={{ opacity: 0, scale: 0.95 }}
+							whileInView={{ opacity: 1, scale: 1 }}
 							viewport={{ once: true }}
-							transition={{ duration: 0.5, delay: index * 0.1 }}
+							transition={{ duration: 0.4, delay: index * 0.1 }}
+							className={`group relative overflow-hidden rounded-3xl border p-6 transition-all hover:shadow-lg ${feature.className}`}
 						>
-							<div className="mb-4">
-								<fact.icon className="size-10 text-blue-500 group-hover:scale-110 group-hover:text-blue-600 transition-all duration-300" />
-							</div>
-							<dt className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-								{fact.name}
-							</dt>
-							<dd className="text-gray-600 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-								{fact.link ? (
-									<Link
-										href={fact.link}
-										target="_blank"
-										className="text-blue-500 hover:text-blue-600 transition-colors flex items-center gap-2 group-hover:gap-3"
+							<div className="relative z-10 h-full flex flex-col justify-between">
+								<div className="mb-4">
+									<div
+										className={`p-3 rounded-2xl bg-background/50 w-fit backdrop-blur-sm ${feature.iconColor}`}
 									>
-										{fact.description}
-									</Link>
-								) : (
-									fact.description
-								)}
-							</dd>
+										<feature.icon className="size-8" />
+									</div>
+								</div>
+								<div>
+									<h3 className="text-2xl font-bold font-syne mb-2">{feature.title}</h3>
+									<p className="text-muted-foreground font-medium">
+										{feature.link ? (
+											<Link
+												href={feature.link}
+												target="_blank"
+												className="hover:underline decoration-2 underline-offset-4"
+											>
+												{feature.description}
+											</Link>
+										) : (
+											feature.description
+										)}
+									</p>
+								</div>
+							</div>
 						</motion.div>
 					))}
 				</div>
 			</div>
-		</div>
+		</section>
 	)
 }

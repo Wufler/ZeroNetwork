@@ -1,0 +1,59 @@
+model ServerConfig {
+  id               Int            @id @default(autoincrement())
+  serverIps        String[]
+  alertMessage     String
+  alertVisible     Boolean        @default(false)
+  server1Visible   Boolean        @default(true)
+  server2Visible   Boolean        @default(true)
+  whitelistVisible Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @default(now()) @updatedAt
+  timelineItems    TimelineItem[]
+  galleryImages    GalleryImage[]
+
+  @@map("servers")
+}
+
+model TimelineItem {
+  id             Int                 @id @default(autoincrement())
+  title          String
+  subtitle       String
+  description    String
+  year           Int
+  showDetails    Boolean             @default(false)
+  showDownload   Boolean             @default(false)
+  detailsUrl     String?
+  downloadUrl    String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @default(now()) @updatedAt
+  serverConfig   ServerConfig?       @relation(fields: [serverConfigId], references: [id])
+  serverConfigId Int?
+  media          TimelineMediaItem[]
+
+  @@map("timeline")
+}
+
+model TimelineMediaItem {
+  id             Int          @id @default(autoincrement())
+  imageUrl       String
+  altText        String
+  displayOrder   Int          @default(0)
+  timelineItem   TimelineItem @relation(fields: [timelineItemId], references: [id], onDelete: Cascade)
+  timelineItemId Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
+
+  @@map("timeline_media")
+}
+
+model GalleryImage {
+  id             Int           @id @default(autoincrement())
+  imageUrl       String
+  altText        String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now()) @updatedAt
+  serverConfig   ServerConfig? @relation(fields: [serverConfigId], references: [id])
+  serverConfigId Int?
+
+  @@map("images")
+}

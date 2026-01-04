@@ -1,0 +1,27 @@
+model Poll {
+  id        Int        @id @default(autoincrement())
+  question  String
+  answers   String[]
+  votes     Int[]
+  visible   Boolean    @default(false)
+  until     DateTime?
+  endedAt   DateTime?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+  pollVotes PollVote[]
+
+  @@map("poll")
+}
+
+model PollVote {
+  id          Int      @id @default(autoincrement())
+  pollId      Int
+  poll        Poll     @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  ipHash      String
+  fingerprint String
+  votedOption Int
+  createdAt   DateTime @default(now())
+
+  @@unique([pollId, ipHash, fingerprint])
+  @@map("poll_vote")
+}

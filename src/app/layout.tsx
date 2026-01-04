@@ -11,14 +11,16 @@ const syne = Syne({ variable: '--font-syne', subsets: ['latin'] })
 
 export const metadata: Metadata = {
 	title: 'Im Her Zero Network',
-	description: "ImHer0's Minecraft Server",
+	description: 'Take a look at our Minecraft history and current server status!',
+	metadataBase: new URL('https://zeronetwork.vercel.app/'),
 	openGraph: {
 		title: 'Im Her Zero Network',
-		description: 'Check the status of our servers!',
+		description:
+			'Take a look at our Minecraft history and current server status!',
 		url: 'https://zeronetwork.vercel.app/',
 		images: [
 			{
-				url: 'https://wolfey.s-ul.eu/oTDF5P9b',
+				url: '/cover.png',
 				width: 1280,
 				height: 720,
 				alt: 'Thumbnail',
@@ -29,7 +31,7 @@ export const metadata: Metadata = {
 	},
 }
 
-export default async function RootLayout({
+export default function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode

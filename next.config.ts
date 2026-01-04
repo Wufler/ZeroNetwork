@@ -1,27 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  reactCompiler: true,
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'wolfey.s-ul.eu',
+        hostname: 'up.wolfey.me',
       },
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-      }
     ],
     minimumCacheTTL: 2678400,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-}
+};
 
-const withVercelToolbar = require('@vercel/toolbar/plugins/next')();
-
-export default withVercelToolbar(nextConfig);
+export default nextConfig;

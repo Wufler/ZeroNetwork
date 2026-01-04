@@ -25,9 +25,17 @@ type BaseItem = {
     updatedAt: Date
 }
 
-type ImageItem = BaseItem & {
-    image: string
-    alt: string
+type GalleryImage = BaseItem & {
+    imageUrl: string
+    altText: string
+    serverConfigId: number | null
+}
+
+type TimelineMediaItem = BaseItem & {
+    imageUrl: string
+    altText: string
+    displayOrder: number
+    timelineItemId: number
 }
 
 type TimelineItem = BaseItem & {
@@ -35,18 +43,23 @@ type TimelineItem = BaseItem & {
     subtitle: string
     description: string
     year: number
-    images: string[]
-    alt: string[]
-    url: string[]
-    button: boolean[]
+    showDetails: boolean
+    showDownload: boolean
+    detailsUrl: string | null
+    downloadUrl: string | null
+    serverConfigId: number | null
+    media: TimelineMediaItem[]
 }
 
 type ServerConfig = BaseItem & {
-    ips: string[]
-    alert: string
-    visible: boolean[] // [alert, server1, server2, whitelist]
-    timeline: TimelineItem[]
-    images: ImageItem[]
+    serverIps: string[]
+    alertMessage: string
+    alertVisible: boolean
+    server1Visible: boolean
+    server2Visible: boolean
+    whitelistVisible: boolean
+    timelineItems: TimelineItem[]
+    galleryImages: GalleryImage[]
 }
 
 type ComponentProps = {
