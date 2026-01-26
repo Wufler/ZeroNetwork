@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { ExternalLink, ChevronLeft, ChevronRight, Swords } from 'lucide-react'
+import { ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from './ui/button'
 import { motion, AnimatePresence } from 'motion/react'
 
@@ -138,8 +138,8 @@ export default function WithersWrath() {
 										key={index}
 										onClick={() => setCurrentImageIndex(index)}
 										className={`h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex
-												? 'w-8 bg-white'
-												: 'w-2 bg-white/50 hover:bg-white/80'
+											? 'w-8 bg-white'
+											: 'w-2 bg-white/50 hover:bg-white/80'
 											}`}
 									/>
 								))}
