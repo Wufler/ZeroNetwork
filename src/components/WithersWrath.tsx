@@ -45,8 +45,8 @@ export default function WithersWrath() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true }}
 					>
-						<div className="flex items-center lg:justify-start justify-center gap-4 mb-6">
-							<div className="relative lg:size-16 size-12 rounded-lg overflow-hidden">
+						<div className="flex lg:flex-row flex-col items-center lg:justify-start justify-center gap-4 mb-6">
+							<div className="relative size-16 rounded-lg overflow-hidden">
 								<Image
 									src="/witherswrath/icon.png"
 									alt="Withers Wrath Logo"

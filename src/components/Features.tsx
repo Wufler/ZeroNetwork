@@ -69,7 +69,7 @@ export default function Features() {
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
 				>
-					<h2 className="font-syne text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-linear-to-b from-foreground via-foreground to-foreground/40 bg-clip-text text-transparent">
+					<h2 className="font-syne text-3xl md:text-7xl font-bold tracking-tight mb-6 bg-linear-to-b from-foreground via-foreground to-foreground/40 bg-clip-text text-transparent">
 						What are we doing!?
 					</h2>
 					<p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">

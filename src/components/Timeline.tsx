@@ -831,7 +831,7 @@ function TimelineRow({
 										</DialogTrigger>
 										<DialogContent
 											showCloseButton={false}
-											className="w-screen h-screen max-w-none max-h-none m-0 p-0 rounded-none border-none bg-background/95"
+											className="w-screen h-dvh max-w-none max-h-none m-0 p-0 rounded-none border-none bg-background/95"
 										>
 											<TimelineModalContent item={item} />
 										</DialogContent>
@@ -896,7 +896,7 @@ export default function Timeline({ data }: ComponentProps) {
 		<section className="py-16 md:py-20 relative overflow-hidden">
 			<div className="max-w-6xl mx-auto">
 				<motion.div
-					className="text-center mb-24"
+					className="text-center mb-16 md:mb-24"
 					initial={{ opacity: 0, y: 30 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
