@@ -490,66 +490,162 @@ function TimelineEditDialog({
 function TimelineModalContent({
 	item,
 }: {
-	item: TimelineItem
+	item: TimelineItemType
 }) {
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 	const selectedImage = item.media?.[selectedImageIndex]
 
 	return (
-		<div className="flex flex-col md:flex-row w-full h-[90vh] md:h-[85vh] max-h-225">
-			<div className="flex-1 relative bg-black/50 flex items-center justify-center min-h-62.5 md:min-h-0">
+		<div className="flex flex-col-reverse lg:flex-row w-screen h-dvh bg-background/95">
+			{(item.detailsUrl || (item.downloadUrl && item.showDownload)) && (
+				<div className="p-4 border-t border-border/50 bg-background lg:hidden shrink-0 grid grid-cols-2 gap-3 z-10">
+					{item.detailsUrl && (
+						<Button
+							asChild
+							className="w-full h-10 text-sm font-medium rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+						>
+							<a href={item.detailsUrl} target="_blank" rel="noopener noreferrer">
+								Learn More <ExternalLink className="size-4" />
+							</a>
+						</Button>
+					)}
+					{item.downloadUrl && item.showDownload && (
+						<Button
+							asChild
+							variant="outline"
+							className="w-full h-10 text-sm font-medium rounded-xl hover:bg-muted transition-all"
+						>
+							<a href={item.downloadUrl} target="_blank" rel="noopener noreferrer">
+								Download <Download className="size-4" />
+							</a>
+						</Button>
+					)}
+				</div>
+			)}
+
+			<div className="relative w-full h-[35vh] lg:h-full lg:flex-1 bg-black flex items-center justify-center overflow-hidden group shrink-0">
 				{selectedImage ? (
-					<div className="relative w-full h-full">
-						<Image
-							src={selectedImage.imageUrl}
-							alt={selectedImage.altText}
-							fill
-							className="object-contain"
-							priority
-						/>
-						<div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-linear-to-t from-black/80 to-transparent">
-							<p className="text-white/90 text-xs md:text-sm font-medium">
+					<>
+						<div className="absolute inset-0">
+							<Image
+								src={selectedImage.imageUrl}
+								alt={selectedImage.altText}
+								fill
+								className="object-contain lg:object-cover blur-3xl opacity-30"
+								priority
+							/>
+							<div className="absolute inset-0 bg-black/40" />
+						</div>
+						<div className="relative w-full h-full p-4 lg:p-12">
+							<Image
+								src={selectedImage.imageUrl}
+								alt={selectedImage.altText}
+								fill
+								className="object-contain"
+								priority
+							/>
+						</div>
+
+						{item.media && item.media.length > 1 && (
+							<>
+								<button
+									onClick={(e) => {
+										e.stopPropagation()
+										setSelectedImageIndex((prev) =>
+											prev === 0 ? item.media!.length - 1 : prev - 1
+										)
+									}}
+									className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 hidden lg:block"
+								>
+									<ChevronRight className="size-6 rotate-180" />
+								</button>
+								<button
+									onClick={(e) => {
+										e.stopPropagation()
+										setSelectedImageIndex((prev) =>
+											prev === (item.media!.length - 1) ? 0 : prev + 1
+										)
+									}}
+									className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 hidden lg:block"
+								>
+									<ChevronRight className="size-6" />
+								</button>
+							</>
+						)}
+
+						<div className="absolute bottom-0 left-0 right-0 p-4 bg-linear-to-t from-black/90 via-black/50 to-transparent pt-12">
+							<p className="text-white/90 text-sm font-medium wrap-anywhere">
 								{selectedImage.altText}
 							</p>
 						</div>
-					</div>
+					</>
 				) : (
-					<div className="text-muted-foreground text-sm">No image selected</div>
+					<div className="text-muted-foreground text-sm flex flex-col items-center gap-2">
+						<ImageIcon className="size-8 opacity-50" />
+						<span>No image selected</span>
+					</div>
 				)}
 			</div>
 
-			<div className="w-full md:max-w-sm flex flex-col border-t md:border-t-0 md:border-l border-border/50 bg-background max-h-[40vh] md:max-h-none">
-				<div className="p-3 md:p-4 border-b border-border/50 flex items-center justify-between shrink-0">
-					<div className="flex items-center gap-2 text-primary font-mono text-xs md:text-sm">
-						<Calendar className="size-3 md:size-4" />
-						{item.year}
+			<div className="flex-1 lg:flex-none lg:w-[450px] flex flex-col bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b lg:border-b-0 lg:border-l border-border/50 overflow-hidden min-h-0">
+				<div className="p-6 border-b border-border/50 hidden lg:flex items-center justify-between shrink-0">
+					<div className="flex items-center gap-3">
+						<div className="h-8 w-1 bg-primary rounded-full" />
+						<div>
+							<div className="text-xs font-bold text-primary uppercase tracking-wider">
+								{item.year}
+							</div>
+							<div className="text-xl font-bold font-syne truncate max-w-[300px]">
+								{item.title}
+							</div>
+						</div>
 					</div>
 					<DialogClose className="rounded-full p-2 hover:bg-muted transition-colors">
-						<X className="size-4 md:size-5" />
+						<X className="size-5" />
 					</DialogClose>
 				</div>
 
-				<ScrollArea className="flex-1 overflow-auto">
-					<div className="p-3 md:p-4 space-y-4 md:space-y-6">
+				<div className="p-4 lg:hidden border-b border-border/50 bg-muted/30 flex items-start justify-between gap-4">
+					<div>
+						<div className="flex items-center gap-2 mb-1">
+							<span className="text-xs font-bold text-primary px-2 py-0.5 rounded-full bg-primary/10">
+								{item.year}
+							</span>
+						</div>
+						<h2 className="text-xl font-bold font-syne line-clamp-2">{item.title}</h2>
+					</div>
+					<DialogClose className="rounded-full p-2 hover:bg-background/50 transition-colors shrink-0 -mr-2 -mt-2">
+						<X className="size-5" />
+					</DialogClose>
+				</div>
+
+				<div className="flex-1 overflow-y-auto overscroll-contain">
+					<div className="px-4 py-4 lg:px-6 lg:py-0 lg:pt-4 space-y-6">
 						<div>
-							<DialogTitle className="text-xl md:text-2xl font-bold font-syne mb-2">
-								{item.title}
-							</DialogTitle>
-							<DialogDescription className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+							<DialogTitle className="sr-only">{item.title}</DialogTitle>
+							<h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
+								Description
+							</h3>
+							<div className="text-sm lg:text-base text-foreground/80 leading-relaxed whitespace-pre-wrap">
 								{item.description}
-							</DialogDescription>
+							</div>
 						</div>
 
 						{item.media && item.media.length > 0 && (
 							<div>
-								<div className="grid grid-cols-2 gap-2">
+								<h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
+									Gallery ({item.media.length})
+								</h3>
+								<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3">
 									{item.media.map((mediaItem, i) => (
 										<button
 											key={mediaItem.id}
 											onClick={() => setSelectedImageIndex(i)}
 											className={cn(
-												'relative aspect-video rounded-lg overflow-hidden bg-muted ring-2 transition-all hover:ring-primary/50',
-												selectedImageIndex === i ? 'ring-primary' : 'ring-transparent',
+												'relative aspect-video rounded-lg overflow-hidden bg-muted transition-all duration-300',
+												selectedImageIndex === i
+													? 'ring-2 ring-primary z-10'
+													: 'hover:ring-2 hover:ring-primary/50 opacity-70 hover:opacity-100'
 											)}
 										>
 											<Image
@@ -557,7 +653,7 @@ function TimelineModalContent({
 												alt={mediaItem.altText}
 												fill
 												className="object-cover"
-												sizes="150px"
+												sizes="(max-width: 768px) 33vw, 50vw"
 											/>
 											<div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent transition-opacity">
 												<span className="absolute bottom-1 left-1 right-1 text-[10px] text-white/90 truncate">
@@ -570,19 +666,31 @@ function TimelineModalContent({
 							</div>
 						)}
 					</div>
-				</ScrollArea>
+				</div>
 
-				{item.detailsUrl && (
-					<div className="p-3 md:p-4 border-t border-border/50 shrink-0">
-						<Button
-							asChild
-							className="w-full rounded-full shadow-lg shadow-primary/20"
-							size="sm"
-						>
-							<a href={item.detailsUrl} target="_blank">
-								Learn More <ExternalLink className="ml-2 size-3 md:size-4" />
-							</a>
-						</Button>
+				{(item.detailsUrl || (item.downloadUrl && item.showDownload)) && (
+					<div className="hidden lg:grid p-6 border-t border-border/50 bg-muted/10 shrink-0 grid-cols-1 gap-3">
+						{item.detailsUrl && (
+							<Button
+								asChild
+								className="w-full h-12 text-base font-medium rounded-xl"
+							>
+								<a href={item.detailsUrl} target="_blank" rel="noopener noreferrer">
+									Learn More <ExternalLink className="size-4" />
+								</a>
+							</Button>
+						)}
+						{item.downloadUrl && item.showDownload && (
+							<Button
+								asChild
+								variant="outline"
+								className="w-full h-12 text-base font-medium rounded-xl hover:bg-muted"
+							>
+								<a href={item.downloadUrl} target="_blank" rel="noopener noreferrer">
+									Download Resources <Download className="size-4" />
+								</a>
+							</Button>
+						)}
 					</div>
 				)}
 			</div>
@@ -599,7 +707,7 @@ function TimelineRow({
 	index: number
 	isAdmin: boolean
 }) {
-	const isEven = index % 2 === 0
+	const isEven = index % 2 !== 0
 	const [showEditDialog, setShowEditDialog] = useState(false)
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 	const [isDeleting, setIsDeleting] = useState(false)
@@ -621,8 +729,8 @@ function TimelineRow({
 	return (
 		<motion.div
 			className={cn(
-				'relative flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-0 group',
-				isEven ? 'md:flex-row-reverse' : '',
+				'relative flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-0 group',
+				isEven ? 'lg:flex-row-reverse' : '',
 			)}
 			initial={{ opacity: 0, y: 50 }}
 			whileInView={{ opacity: 1, y: 0 }}
@@ -631,7 +739,7 @@ function TimelineRow({
 		>
 			<div
 				className={cn(
-					'hidden md:flex w-1/2 flex-col justify-center px-16',
+					'hidden lg:flex w-1/2 flex-col justify-center px-16',
 					isEven ? 'items-start text-left' : 'items-end text-right',
 				)}
 			>
@@ -640,20 +748,20 @@ function TimelineRow({
 				</div>
 			</div>
 
-			<div className="absolute left-6 md:left-1/2 -translate-x-1/2 flex items-center justify-center">
+			<div className="absolute left-5.75 lg:left-1/2 lg:-translate-x-1/2 flex items-center justify-center">
 				<div className="w-4 h-4 rounded-full bg-background border-2 border-primary ring-4 ring-background shadow-[0_0_20px_rgba(var(--primary),0.3)] z-10 transition-transform duration-500 group-hover:scale-150" />
 			</div>
 
 			<div
 				className={cn(
-					'w-full md:w-1/2 pl-16 md:pl-0',
-					isEven ? 'md:pr-16' : 'md:pl-16',
+					'w-full lg:w-1/2 pl-12 lg:pl-0',
+					isEven ? 'lg:pr-12' : 'lg:pl-12',
 				)}
 			>
-				<Card className="border-primary/10 backdrop-blur-md hover:border-primary/20 transition-all duration-500 group/card overflow-hidden bg-transparent border-none">
-					<CardContent className="p-6 md:p-8">
+				<Card className="border-primary/10 backdrop-blur-md hover:border-primary/20 transition-all duration-500 group/card overflow-hidden bg-transparent border-none py-0 gap-0">
+					<CardContent className={cn('-mt-1', isEven ? 'lg:text-right' : 'lg:text-left')}>
 						{isAdmin && (
-							<div className="flex gap-2 mb-4">
+							<div className={cn('flex gap-2 mb-4', isEven ? 'lg:justify-end' : '')}>
 								<Button
 									variant="outline"
 									size="sm"
@@ -675,19 +783,19 @@ function TimelineRow({
 							</div>
 						)}
 
-						<div className="md:hidden flex items-center gap-2 text-primary font-bold mb-4 font-mono">
+						<div className="lg:hidden flex items-center gap-2 text-primary font-bold mb-4 font-mono">
 							<Calendar className="size-4" />
 							{item.year}
 						</div>
 
-						<h3 className="text-2xl md:text-3xl font-bold font-syne mb-3 group-hover/card:text-primary transition-colors duration-300">
+						<h3 className="text-2xl lg:text-3xl font-bold font-syne mb-3 group-hover/card:text-primary transition-colors duration-300">
 							{item.title}
 						</h3>
 						<p className="text-muted-foreground mb-6 leading-relaxed text-base">
 							{item.subtitle}
 						</p>
 
-						<div className="flex flex-wrap gap-3">
+						<div className={cn('flex flex-wrap gap-3', isEven ? 'lg:justify-end' : '')}>
 							{item.showDownload && item.downloadUrl && (
 								<Button
 									asChild
@@ -717,7 +825,7 @@ function TimelineRow({
 										</DialogTrigger>
 										<DialogContent
 											showCloseButton={false}
-											className="max-w-6xl w-[95vw] h-[90vh] md:h-auto p-0 overflow-hidden bg-background/95 backdrop-blur-2xl border-border/50"
+											className="w-screen h-screen max-w-none max-h-none m-0 p-0 rounded-none border-none bg-background/95 backdrop-blur-3xl"
 										>
 											<TimelineModalContent item={item} />
 										</DialogContent>
@@ -732,7 +840,7 @@ function TimelineRow({
 										>
 											<a href={item.detailsUrl} target="_blank">
 												Learn More
-												<ChevronRight className="ml-2 size-3 group-hover/btn:translate-x-0.5 transition-transform" />
+												<ChevronRight className="size-3 group-hover/btn:translate-x-0.5 transition-transform" />
 											</a>
 										</Button>
 									)
@@ -779,7 +887,7 @@ export default function Timeline({ data }: ComponentProps) {
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
 
 	return (
-		<section className="py-16 md:py-20 relative overflow-hidden">
+		<section className="py-16 lg:py-20 relative overflow-hidden">
 			<div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,var(--primary),transparent_50%)] opacity-10" />
 
 			<div className="max-w-6xl mx-auto">
@@ -790,7 +898,7 @@ export default function Timeline({ data }: ComponentProps) {
 					viewport={{ once: true }}
 					transition={{ duration: 0.8, ease: 'easeOut' }}
 				>
-					<h2 className="font-syne text-5xl md:text-7xl font-bold tracking-tighter mb-6 bg-linear-to-b from-foreground to-foreground/50 bg-clip-text text-transparent">
+					<h2 className="font-syne text-5xl lg:text-7xl font-bold tracking-tighter mb-6 bg-linear-to-b from-foreground to-foreground/50 bg-clip-text text-transparent">
 						Our Journey
 					</h2>
 					{isAdmin && (
@@ -805,11 +913,11 @@ export default function Timeline({ data }: ComponentProps) {
 				</motion.div>
 
 				<div className="relative">
-					<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-1/2 bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 hidden md:block" />
+					<div className="absolute left-8 lg:left-1/2 top-0 bottom-0 w-px lg:-translate-x-1/2 bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 hidden lg:block" />
 
-					<div className="absolute left-6 top-0 bottom-0 w-px bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 md:hidden" />
+					<div className="absolute left-6 top-0 bottom-0 w-px bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 lg:hidden" />
 
-					<div className="space-y-24 md:space-y-32">
+					<div className="space-y-24 lg:space-y-32">
 						{data.timelineItems.map((item, index) => (
 							<TimelineRow
 								key={`${item.year}-${index}`}
