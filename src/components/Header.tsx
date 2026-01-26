@@ -369,8 +369,9 @@ export default function Header({ data }: ComponentProps) {
 					)}
 					{(isAdmin || alertVisible) && (
 						<motion.div
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: 'auto' }}
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.8, delay: 0.3 }}
 							className="max-w-md"
 						>
 							<Alert className="bg-yellow-500/10 backdrop-blur-sm border-yellow-500/20 text-yellow-700 dark:text-yellow-200 py-2 px-3">
@@ -454,13 +455,13 @@ export default function Header({ data }: ComponentProps) {
 			</div>
 
 			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-50 md:opacity-100 scale-50 md:scale-100 origin-bottom-right">
-				<motion.div
-					initial={{ opacity: 0, x: 100 }}
-					animate={{ opacity: 1, x: 0 }}
-					transition={{ duration: 0.8, delay: 0.5 }}
-					className="relative w-175 h-125"
-				>
-					<div className="absolute top-20 right-10 w-3/5 h-3/5 z-10 animate-float">
+				<div className="relative w-175 h-125">
+					<motion.div
+						initial={{ opacity: 0, y: -50 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 1, delay: 0.6, ease: 'easeOut' }}
+						className="absolute top-20 right-10 w-3/5 h-3/5 z-10 animate-float"
+					>
 						<Image
 							fill
 							src="/header/2.png"
@@ -468,9 +469,14 @@ export default function Header({ data }: ComponentProps) {
 							className="object-contain object-bottom"
 							priority
 						/>
-					</div>
+					</motion.div>
 
-					<div className="absolute -bottom-7 left-10 w-1/2 h-4/5 z-20">
+					<motion.div
+						initial={{ opacity: 0, x: 40 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.9, delay: 0.3, ease: 'easeOut' }}
+						className="absolute -bottom-7 left-10 w-1/2 h-4/5 z-20"
+					>
 						<Image
 							fill
 							src="/header/3.png"
@@ -478,9 +484,14 @@ export default function Header({ data }: ComponentProps) {
 							className="object-contain object-bottom"
 							priority
 						/>
-					</div>
+					</motion.div>
 
-					<div className="absolute bottom-0 right-5 w-1/3 h-3/5 z-30">
+					<motion.div
+						initial={{ opacity: 0, x: 60 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.9, delay: 0.5, ease: 'easeOut' }}
+						className="absolute bottom-0 right-5 w-1/3 h-3/5 z-30"
+					>
 						<Image
 							fill
 							src="/header/4.png"
@@ -488,9 +499,14 @@ export default function Header({ data }: ComponentProps) {
 							className="object-contain object-bottom"
 							priority
 						/>
-					</div>
+					</motion.div>
 
-					<div className="absolute bottom-0 right-40 w-1/3 h-3/5 z-40">
+					<motion.div
+						initial={{ opacity: 0, x: 80 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.9, delay: 0.4, ease: 'easeOut' }}
+						className="absolute bottom-0 right-40 w-1/3 h-3/5 z-40"
+					>
 						<Image
 							fill
 							src="/header/1.png"
@@ -498,8 +514,8 @@ export default function Header({ data }: ComponentProps) {
 							className="object-contain object-bottom"
 							priority
 						/>
-					</div>
-				</motion.div>
+					</motion.div>
+				</div>
 			</div>
 		</motion.header>
 	)

@@ -490,10 +490,9 @@ function TimelineEditDialog({
 function TimelineModalContent({
 	item,
 }: {
-	item: ComponentProps['data']['timelineItems'][0]
+	item: TimelineItem
 }) {
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-
 	const selectedImage = item.media?.[selectedImageIndex]
 
 	return (
@@ -560,7 +559,7 @@ function TimelineModalContent({
 												className="object-cover"
 												sizes="150px"
 											/>
-											<div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity">
+											<div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent transition-opacity">
 												<span className="absolute bottom-1 left-1 right-1 text-[10px] text-white/90 truncate">
 													{mediaItem.altText}
 												</span>
@@ -596,7 +595,7 @@ function TimelineRow({
 	index,
 	isAdmin,
 }: {
-	item: ComponentProps['data']['timelineItems'][0]
+	item: TimelineItem
 	index: number
 	isAdmin: boolean
 }) {

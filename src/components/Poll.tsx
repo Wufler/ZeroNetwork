@@ -357,7 +357,12 @@ export default function Poll() {
 	const displayedPolls = isAdmin ? polls : polls.filter(p => p.visible)
 
 	return (
-		<div className="mt-4">
+		<motion.div
+			initial={{ opacity: 0, x: -20 }}
+			animate={{ opacity: 1, x: 0 }}
+			transition={{ duration: 0.8, delay: 0.4 }}
+			className="mt-4"
+		>
 			<AlertDialog>
 				<AlertDialogTrigger asChild>
 					<Button
@@ -945,6 +950,6 @@ export default function Poll() {
 					</div>
 				</AlertDialogContent>
 			</AlertDialog>
-		</div>
+		</motion.div>
 	)
 }

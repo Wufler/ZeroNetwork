@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { useState } from 'react'
 import { updateVisibility } from '@/app/actions/data'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { motion } from 'motion/react'
 
 export default function Login({ data }: ComponentProps) {
 	const { data: session, isPending } = authClient.useSession()
@@ -41,7 +42,12 @@ export default function Login({ data }: ComponentProps) {
 	}
 
 	return (
-		<div className="flex items-center gap-2">
+		<motion.div
+			initial={{ opacity: 0, x: 20 }}
+			animate={{ opacity: 1, x: 0 }}
+			transition={{ duration: 0.8 }}
+			className="flex items-center gap-2"
+		>
 			{isAdmin && (
 				<Button
 					variant="outline"
@@ -120,6 +126,6 @@ export default function Login({ data }: ComponentProps) {
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)}
-		</div>
+		</motion.div>
 	)
 }
