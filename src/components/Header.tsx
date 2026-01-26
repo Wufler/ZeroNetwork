@@ -453,7 +453,7 @@ export default function Header({ data }: ComponentProps) {
 				</div>
 			</div>
 
-			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-25 md:opacity-100 scale-50 md:scale-100 origin-bottom-right">
+			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-50 md:opacity-100 scale-50 md:scale-100 origin-bottom-right">
 				<motion.div
 					initial={{ opacity: 0, x: 100 }}
 					animate={{ opacity: 1, x: 0 }}

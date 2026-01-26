@@ -46,7 +46,7 @@ export default function WithersWrath() {
 						viewport={{ once: true }}
 					>
 						<div className="flex items-center gap-4 mb-6">
-							<div className="relative size-16 rounded-2xl overflow-hidden">
+							<div className="relative size-16 rounded-lg overflow-hidden">
 								<Image
 									src="/witherswrath/icon.png"
 									alt="Withers Wrath Logo"
@@ -54,7 +54,7 @@ export default function WithersWrath() {
 									className="object-cover"
 								/>
 							</div>
-							<h2 className="font-syne text-4xl md:text-5xl font-bold bg-linear-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
+							<h2 className="font-syne text-4xl md:text-5xl font-bold bg-linear-to-r from-[#9333EA] to-[#fd7704] bg-clip-text text-transparent">
 								Withers Wrath
 							</h2>
 						</div>
@@ -68,7 +68,7 @@ export default function WithersWrath() {
 							<Button
 								asChild
 								size="lg"
-								className="bg-purple-600 hover:bg-purple-700 text-white rounded-full px-8"
+								className="bg-[#9333EA] hover:bg-[#7C22CB] text-white rounded-full px-8"
 							>
 								<a
 									href="https://modrinth.com/datapack/witherswrath/"
@@ -93,7 +93,7 @@ export default function WithersWrath() {
 						className="order-1 lg:order-2"
 					>
 						<div
-							className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl ring-1 ring-border group"
+							className="relative aspect-video rounded-lg overflow-hidden group"
 							onMouseEnter={() => setIsHovered(true)}
 							onMouseLeave={() => setIsHovered(false)}
 						>
@@ -120,13 +120,13 @@ export default function WithersWrath() {
 							<div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 								<button
 									onClick={previousImage}
-									className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 backdrop-blur-sm transition-colors"
+									className="p-2 rounded-full bg-[#3C3C46]/80 text-white hover:bg-[#9333EA] backdrop-blur-sm transition-colors"
 								>
 									<ChevronLeft className="size-6" />
 								</button>
 								<button
 									onClick={nextImage}
-									className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 backdrop-blur-sm transition-colors"
+									className="p-2 rounded-full bg-[#3C3C46]/80 text-white hover:bg-[#9333EA] backdrop-blur-sm transition-colors"
 								>
 									<ChevronRight className="size-6" />
 								</button>
@@ -138,8 +138,8 @@ export default function WithersWrath() {
 										key={index}
 										onClick={() => setCurrentImageIndex(index)}
 										className={`h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex
-											? 'w-8 bg-white'
-											: 'w-2 bg-white/50 hover:bg-white/80'
+											? 'w-8 bg-[#9333EA]'
+											: 'w-2 bg-white/50 hover:bg-[#9333EA]/80'
 											}`}
 									/>
 								))}
