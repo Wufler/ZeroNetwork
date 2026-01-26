@@ -16,24 +16,17 @@ export default function Home({ data }: ComponentProps) {
 
 			<Header data={data} />
 
-			<div className="w-full py-12 bg-background/50 backdrop-blur-sm border-y border-border/50">
+			<div className="w-full py-16 bg-background/50 backdrop-blur-sm border-y border-border/50">
 				<Gallery data={data} />
 			</div>
 
-			<div className="relative bg-linear-to-b from-background via-secondary/30 to-background">
-				<Timeline data={data} />
-			</div>
+			<Timeline data={data} />
 
-			<div className="relative">
-				<div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
-				<Features />
-			</div>
+			<Features />
 
 			<WithersWrath />
 
-			<div className="relative bg-linear-to-b from-background to-secondary/20">
-				<Team />
-			</div>
+			<Team />
 
 			<Footer />
 		</main>

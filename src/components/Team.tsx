@@ -28,7 +28,7 @@ const members = [
 
 export default function Team() {
 	return (
-		<section className="py-24 px-4 relative overflow-hidden">
+		<section className="py-16 md:py-20 px-4 relative overflow-hidden">
 			<div className="container mx-auto relative z-10">
 				<motion.div
 					className="text-center mb-16"

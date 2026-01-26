@@ -49,8 +49,8 @@ export default function Header({ data }: ComponentProps) {
 					data.serverIps.map(ip =>
 						ip
 							? fetch(`https://api.mcsrvstat.us/3/${ip}`).then(res => res.json())
-							: ({} as ServerInfo)
-					)
+							: ({} as ServerInfo),
+					),
 				)
 				setServers(api)
 			} catch (error) {
@@ -69,14 +69,14 @@ export default function Header({ data }: ComponentProps) {
 				const updated = await updateServerIps(
 					Number(data.id),
 					index.toString(),
-					newIp
+					newIp,
 				)
 				const response = await fetch(
-					`https://api.mcsrvstat.us/3/${updated.serverIps[index]}`
+					`https://api.mcsrvstat.us/3/${updated.serverIps[index]}`,
 				)
 				const updatedServer = await response.json()
 				setServers(prev =>
-					prev.map((server, i) => (i === index ? updatedServer : server))
+					prev.map((server, i) => (i === index ? updatedServer : server)),
 				)
 				toast.success('Server IP updated successfully!')
 			} catch (error) {
@@ -84,7 +84,7 @@ export default function Header({ data }: ComponentProps) {
 				toast.error('Failed to update server IP')
 			}
 		},
-		[data.id]
+		[data.id],
 	)
 
 	const handleCopyIp = useCallback(async (text: string) => {
@@ -142,7 +142,7 @@ export default function Header({ data }: ComponentProps) {
 				setAlertText(data.alertMessage)
 			}
 		},
-		[data.id, data.alertMessage]
+		[data.id, data.alertMessage],
 	)
 
 	const getFullServerIp = (server: ServerInfo) => {
@@ -176,7 +176,7 @@ export default function Header({ data }: ComponentProps) {
 				transition={{ duration: 0.5, delay: index * 0.1 }}
 				className={cn(
 					'flex flex-col group',
-					isPrimary ? 'gap-3' : 'gap-1 opacity-80 hover:opacity-100'
+					isPrimary ? 'gap-3' : 'gap-1 opacity-80 hover:opacity-100',
 				)}
 			>
 				<div className="flex items-center gap-4">
@@ -184,7 +184,7 @@ export default function Header({ data }: ComponentProps) {
 						<div
 							className={cn(
 								'relative rounded overflow-hidden bg-muted ring-1 ring-border transition-all duration-300',
-								isPrimary ? 'size-14 shadow-lg' : 'size-10 opacity-80'
+								isPrimary ? 'size-14 shadow-lg' : 'size-10 opacity-80',
 							)}
 						>
 							<Image
@@ -197,18 +197,6 @@ export default function Header({ data }: ComponentProps) {
 					)}
 					<div className="flex flex-col justify-center">
 						<div className="flex items-center gap-2">
-							<div className="relative flex size-2.5">
-								<span
-									className={`absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping ${
-										server.online ? 'bg-green-500' : 'bg-red-500'
-									}`}
-								/>
-								<span
-									className={`relative inline-flex rounded-full size-2.5 ${
-										server.online ? 'bg-green-500' : 'bg-red-500'
-									}`}
-								/>
-							</div>
 							<div className="group/ip relative">
 								{isAdmin ? (
 									<Editable.Root
@@ -251,8 +239,8 @@ export default function Header({ data }: ComponentProps) {
 									<Button
 										variant="link"
 										className={cn(
-											'font-syne h-auto p-0 font-bold text-foreground hover:text-primary transition-colors',
-											isPrimary ? 'text-2xl tracking-tight' : 'text-sm font-medium'
+											'font-syne h-auto p-0 font-bold text-foreground hover:text-primary transition-colors pb-0.5',
+											isPrimary ? 'text-2xl tracking-tight' : 'text-sm font-medium',
 										)}
 										onClick={() => handleCopyIp(getFullServerIp(server))}
 									>
@@ -260,7 +248,7 @@ export default function Header({ data }: ComponentProps) {
 										<Clipboard
 											className={cn(
 												'opacity-0 group-hover/ip:opacity-100 transition-opacity text-primary',
-												isPrimary ? 'ml-3 size-5' : 'ml-2 size-3'
+												isPrimary ? 'size-5' : 'size-3',
 											)}
 										/>
 									</Button>
@@ -273,7 +261,7 @@ export default function Header({ data }: ComponentProps) {
 									'bg-muted rounded-full overflow-hidden transition-all',
 									isPrimary
 										? 'h-1.5 w-full max-w-70'
-										: 'h-0.5 w-full max-w-45 opacity-60'
+										: 'h-0.5 w-full max-w-45 opacity-60',
 								)}
 							>
 								<motion.div
@@ -290,7 +278,7 @@ export default function Header({ data }: ComponentProps) {
 							<div
 								className={cn(
 									'text-muted-foreground flex items-center gap-2 font-mono',
-									isPrimary ? 'text-sm mt-0.5' : 'text-[10px]'
+									isPrimary ? 'text-sm mt-0.5' : 'text-[10px]',
 								)}
 							>
 								<span>
@@ -304,7 +292,7 @@ export default function Header({ data }: ComponentProps) {
 					<div
 						className={cn(
 							'text-muted-foreground mt-2',
-							isPrimary ? 'text-sm' : 'text-xs'
+							isPrimary ? 'text-sm' : 'text-xs',
 						)}
 					>
 						{isPrimary ? (
@@ -331,7 +319,11 @@ export default function Header({ data }: ComponentProps) {
 			}}
 			className="relative min-h-[calc(100svh-4rem)] flex flex-col overflow-hidden py-8 px-6 md:px-12 border-border bg-linear-to-br from-background/50 to-transparent backdrop-blur-sm"
 		>
-			<div className="absolute top-4 right-4 z-50">
+			<div className="hidden md:block absolute top-4 right-4 z-50">
+				<Login data={data} />
+			</div>
+
+			<div className="md:hidden flex justify-end mb-4 z-50">
 				<Login data={data} />
 			</div>
 
@@ -461,14 +453,14 @@ export default function Header({ data }: ComponentProps) {
 				</div>
 			</div>
 
-			<div className="absolute bottom-0 right-0 z-30 -mr-6 md:-mr-12 -mb-8 pointer-events-none select-none">
+			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-25 md:opacity-100 scale-50 md:scale-100 origin-bottom-right">
 				<motion.div
 					initial={{ opacity: 0, x: 100 }}
 					animate={{ opacity: 1, x: 0 }}
 					transition={{ duration: 0.8, delay: 0.5 }}
-					className="relative w-125 h-100 md:w-175 md:h-125"
+					className="relative w-175 h-125"
 				>
-					<div className="absolute top-20 right-10 w-3/5 h-3/5 z-10">
+					<div className="absolute top-20 right-10 w-3/5 h-3/5 z-10 animate-float">
 						<Image
 							fill
 							src="/header/2.png"
@@ -478,7 +470,7 @@ export default function Header({ data }: ComponentProps) {
 						/>
 					</div>
 
-					<div className="absolute -bottom-5 left-20 w-1/2 h-4/5 z-20">
+					<div className="absolute -bottom-7 left-10 w-1/2 h-4/5 z-20">
 						<Image
 							fill
 							src="/header/3.png"
@@ -488,7 +480,7 @@ export default function Header({ data }: ComponentProps) {
 						/>
 					</div>
 
-					<div className="absolute bottom-0 right-40 w-1/3 h-3/5 z-30">
+					<div className="absolute bottom-0 right-5 w-1/3 h-3/5 z-30">
 						<Image
 							fill
 							src="/header/4.png"
@@ -498,7 +490,7 @@ export default function Header({ data }: ComponentProps) {
 						/>
 					</div>
 
-					<div className="absolute bottom-0 right-10 w-1/3 h-3/5 z-40">
+					<div className="absolute bottom-0 right-40 w-1/3 h-3/5 z-40">
 						<Image
 							fill
 							src="/header/1.png"

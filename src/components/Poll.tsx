@@ -244,8 +244,8 @@ export default function Poll() {
 							{isToggling[poll.id]
 								? 'Updating...'
 								: poll.visible
-								? 'Hide Poll'
-								: 'Show Poll'}
+									? 'Hide Poll'
+									: 'Show Poll'}
 						</Button>
 						{!poll.endedAt && (
 							<AlertDialog>
@@ -293,7 +293,7 @@ export default function Poll() {
 			const poll = await createNewPoll(
 				newPoll.question,
 				newPoll.answers.filter(Boolean),
-				newPoll.timed && newPoll.until ? newPoll.until : undefined
+				newPoll.timed && newPoll.until ? newPoll.until : undefined,
 			)
 			await handleToggleVisibility(poll.id, true)
 			const updatedPolls = await getAllPolls()
@@ -357,7 +357,7 @@ export default function Poll() {
 	const displayedPolls = isAdmin ? polls : polls.filter(p => p.visible)
 
 	return (
-		<div className="pt-6">
+		<div className="mt-4">
 			<AlertDialog>
 				<AlertDialogTrigger asChild>
 					<Button
@@ -525,7 +525,7 @@ export default function Poll() {
 																		setNewPoll(prev => ({
 																			...prev,
 																			answers: prev.answers.map((a, index) =>
-																				index === i ? e.target.value : a
+																				index === i ? e.target.value : a,
 																			),
 																		}))
 																	}
@@ -675,7 +675,7 @@ export default function Poll() {
 																			setNewPoll(prev => ({
 																				...prev,
 																				answers: prev.answers.map((a, index) =>
-																					index === i ? e.target.value : a
+																					index === i ? e.target.value : a,
 																				),
 																			}))
 																		}
@@ -785,10 +785,16 @@ export default function Poll() {
 									>
 										<ArrowRight className="size-4" />
 									</Button>
+									<AlertDialogCancel
+										className="h-8 w-8 p-0 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground text-foreground shadow-none rounded-md flex items-center justify-center"
+										title="Close"
+									>
+										<X className="size-4" />
+									</AlertDialogCancel>
 								</div>
 							</div>
 
-							<AlertDialogCancel className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 rounded-full bg-background/80 text-foreground hover:bg-background transition-colors backdrop-blur-md border border-border h-auto w-auto has-[>svg]:px-2">
+							<AlertDialogCancel className="hidden md:flex absolute top-2 right-2 sm:top-4 sm:right-4 z-50 rounded-full bg-background/80 text-foreground hover:bg-background transition-colors backdrop-blur-md border border-border h-auto w-auto has-[>svg]:px-2">
 								<X className="size-4 sm:size-5" />
 							</AlertDialogCancel>
 
@@ -875,7 +881,7 @@ export default function Poll() {
 																		style={{
 																			width: `${getVotePercentage(
 																				poll.votes[answerIndex],
-																				getTotalVotes(poll)
+																				getTotalVotes(poll),
 																			)}%`,
 																		}}
 																	/>
@@ -892,8 +898,8 @@ export default function Poll() {
 																				{Math.round(
 																					getVotePercentage(
 																						poll.votes[answerIndex],
-																						getTotalVotes(poll)
-																					)
+																						getTotalVotes(poll),
+																					),
 																				)}
 																				%
 																			</span>
@@ -908,7 +914,7 @@ export default function Poll() {
 												<div>
 													{!hasUserVoted[poll.id]
 														? !poll.endedAt &&
-														  (!poll.until || new Date() <= new Date(poll.until)) && (
+															(!poll.until || new Date() <= new Date(poll.until)) && (
 																<Button
 																	size="lg"
 																	onClick={() => handleVote(poll.id)}
@@ -917,7 +923,7 @@ export default function Poll() {
 																>
 																	{isVoting[poll.id] ? 'Submitting Vote...' : 'Submit Vote'}
 																</Button>
-														  )
+															)
 														: showVoteText[poll.id] && (
 																<motion.div
 																	initial={{ opacity: 0, y: 10 }}
@@ -927,7 +933,7 @@ export default function Poll() {
 																	<CheckCircle2 className="size-4 sm:size-5" />
 																	Thank you for voting!
 																</motion.div>
-														  )}
+															)}
 												</div>
 
 												{isAdmin && <PollAdminActions poll={poll} />}

@@ -102,7 +102,7 @@ function SortableMediaItem({
 			className={cn(
 				'flex items-center gap-2 p-2 border rounded-md bg-background',
 				editingMediaId === media.id && 'ring-2 ring-primary',
-				isDragging && 'opacity-50 shadow-lg'
+				isDragging && 'opacity-50 shadow-lg',
 			)}
 		>
 			<button
@@ -121,7 +121,7 @@ function SortableMediaItem({
 				/>
 			</div>
 			<div className="flex-1 min-w-0">
-				<p className="text-sm truncate">{media.altText}</p>
+				<p className="text-sm wrap-anywhere max-w-96">{media.altText}</p>
 				{media.galleryImage && (
 					<span className="text-xs text-primary">• Gallery</span>
 				)}
@@ -174,7 +174,7 @@ function TimelineEditDialog({
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
 			coordinateGetter: sortableKeyboardCoordinates,
-		})
+		}),
 	)
 
 	const handleSave = async () => {
@@ -235,8 +235,8 @@ function TimelineEditDialog({
 		try {
 			await Promise.all(
 				newItems.map((item, index) =>
-					updateTimelineMedia(item.id, { displayOrder: index })
-				)
+					updateTimelineMedia(item.id, { displayOrder: index }),
+				),
 			)
 			toast.success('Order updated')
 		} catch (error) {
@@ -269,7 +269,7 @@ function TimelineEditDialog({
 				galleryImage: newMediaGalleryImage,
 			})
 			setMediaItems(
-				mediaItems.map(m => (m.id === editingMediaId ? { ...m, ...updated } : m))
+				mediaItems.map(m => (m.id === editingMediaId ? { ...m, ...updated } : m)),
 			)
 			setEditingMediaId(null)
 			setNewMediaUrl('')
@@ -454,7 +454,7 @@ function TimelineEditDialog({
 										disabled={!newMediaUrl || !newMediaAlt}
 										className="flex-1"
 									>
-										<Edit className="size-4 mr-2" />
+										<Edit className="size-4" />
 										Update Media
 									</Button>
 								</div>
@@ -466,7 +466,7 @@ function TimelineEditDialog({
 									disabled={!newMediaUrl || !newMediaAlt}
 									className="w-full"
 								>
-									<Plus className="size-4 mr-2" />
+									<Plus className="size-4" />
 									Add Media
 								</Button>
 							)}
@@ -550,7 +550,7 @@ function TimelineModalContent({
 											onClick={() => setSelectedImageIndex(i)}
 											className={cn(
 												'relative aspect-video rounded-lg overflow-hidden bg-muted ring-2 transition-all hover:ring-primary/50',
-												selectedImageIndex === i ? 'ring-primary' : 'ring-transparent'
+												selectedImageIndex === i ? 'ring-primary' : 'ring-transparent',
 											)}
 										>
 											<Image
@@ -623,7 +623,7 @@ function TimelineRow({
 		<motion.div
 			className={cn(
 				'relative flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-0 group',
-				isEven ? 'md:flex-row-reverse' : ''
+				isEven ? 'md:flex-row-reverse' : '',
 			)}
 			initial={{ opacity: 0, y: 50 }}
 			whileInView={{ opacity: 1, y: 0 }}
@@ -633,7 +633,7 @@ function TimelineRow({
 			<div
 				className={cn(
 					'hidden md:flex w-1/2 flex-col justify-center px-16',
-					isEven ? 'items-start text-left' : 'items-end text-right'
+					isEven ? 'items-start text-left' : 'items-end text-right',
 				)}
 			>
 				<div className="text-8xl font-bold font-syne text-primary/30 select-none transition-colors duration-500 group-hover:text-primary/40">
@@ -648,10 +648,10 @@ function TimelineRow({
 			<div
 				className={cn(
 					'w-full md:w-1/2 pl-16 md:pl-0',
-					isEven ? 'md:pr-16' : 'md:pl-16'
+					isEven ? 'md:pr-16' : 'md:pl-16',
 				)}
 			>
-				<Card className="border-primary/10 bg-background/50 backdrop-blur-md hover:bg-background/80 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl group/card overflow-hidden">
+				<Card className="border-primary/10 backdrop-blur-md hover:border-primary/20 transition-all duration-500 group/card overflow-hidden bg-transparent border-none">
 					<CardContent className="p-6 md:p-8">
 						{isAdmin && (
 							<div className="flex gap-2 mb-4">
@@ -780,7 +780,7 @@ export default function Timeline({ data }: ComponentProps) {
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
 
 	return (
-		<section className="py-24 px-4 relative overflow-hidden">
+		<section className="py-16 md:py-20 relative overflow-hidden">
 			<div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,var(--primary),transparent_50%)] opacity-10" />
 
 			<div className="max-w-6xl mx-auto">
@@ -799,7 +799,7 @@ export default function Timeline({ data }: ComponentProps) {
 							onClick={() => setShowCreateDialog(true)}
 							className="rounded-full shadow-lg shadow-primary/20"
 						>
-							<Plus className="size-4 mr-2" />
+							<Plus className="size-4" />
 							Add Timeline Item
 						</Button>
 					)}

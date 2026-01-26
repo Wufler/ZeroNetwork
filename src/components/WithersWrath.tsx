@@ -37,7 +37,7 @@ export default function WithersWrath() {
 	}
 
 	return (
-		<section className="py-24 px-4 relative overflow-hidden">
+		<section className="py-16 md:py-20 px-4 relative overflow-hidden">
 			<div className="max-w-7xl mx-auto relative z-10">
 				<div className="grid lg:grid-cols-2 gap-12 items-center">
 					<motion.div
@@ -45,12 +45,6 @@ export default function WithersWrath() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true }}
 					>
-						<div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 mb-6">
-							<span className="text-sm font-bold uppercase tracking-wider">
-								Featured Datapack
-							</span>
-						</div>
-
 						<div className="flex items-center gap-4 mb-6">
 							<div className="relative size-16 rounded-2xl overflow-hidden">
 								<Image
@@ -143,11 +137,10 @@ export default function WithersWrath() {
 									<button
 										key={index}
 										onClick={() => setCurrentImageIndex(index)}
-										className={`h-1.5 rounded-full transition-all duration-300 ${
-											index === currentImageIndex
+										className={`h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex
 												? 'w-8 bg-white'
 												: 'w-2 bg-white/50 hover:bg-white/80'
-										}`}
+											}`}
 									/>
 								))}
 							</div>
