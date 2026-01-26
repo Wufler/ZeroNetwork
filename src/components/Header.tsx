@@ -317,13 +317,9 @@ export default function Header({ data }: ComponentProps) {
 				borderRadius: isMobile ? 0 : borderRadius,
 				borderWidth: isMobile ? 0 : borderWidth,
 			}}
-			className="relative min-h-[calc(100svh-4rem)] flex flex-col overflow-hidden py-8 px-6 md:px-12 border-border bg-linear-to-br from-background/50 to-transparent backdrop-blur-sm"
+			className="relative min-h-dvh md:min-h-[calc(100svh-4rem)] flex flex-col overflow-hidden py-8 px-6 md:px-12 border-border bg-linear-to-br from-background/50 to-transparent backdrop-blur-sm"
 		>
-			<div className="hidden md:block absolute top-4 right-4 z-50">
-				<Login data={data} />
-			</div>
-
-			<div className="md:hidden flex justify-end mb-4 z-50">
+			<div className="relative md:absolute md:top-4 md:right-4 flex justify-end mb-4 md:mb-0 z-50">
 				<Login data={data} />
 			</div>
 

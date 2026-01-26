@@ -23,7 +23,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -498,11 +497,16 @@ function TimelineModalContent({
 	return (
 		<div className="flex flex-col-reverse lg:flex-row w-screen h-dvh bg-background/95">
 			{(item.detailsUrl || (item.downloadUrl && item.showDownload)) && (
-				<div className="p-4 border-t border-border/50 bg-background lg:hidden shrink-0 grid grid-cols-2 gap-3 z-10">
+				<div className={cn(
+					"p-4 border-t border-border/50 bg-background lg:hidden shrink-0 gap-3 z-10",
+					item.detailsUrl && item.downloadUrl && item.showDownload
+						? "grid grid-cols-2"
+						: "flex"
+				)}>
 					{item.detailsUrl && (
 						<Button
 							asChild
-							className="w-full h-10 text-sm font-medium rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+							className="w-full h-10 text-sm font-medium rounded-xl"
 						>
 							<a href={item.detailsUrl} target="_blank" rel="noopener noreferrer">
 								Learn More <ExternalLink className="size-4" />
@@ -555,7 +559,7 @@ function TimelineModalContent({
 											prev === 0 ? item.media!.length - 1 : prev - 1
 										)
 									}}
-									className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 hidden lg:block"
+									className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white lg:opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
 								>
 									<ChevronRight className="size-6 rotate-180" />
 								</button>
@@ -566,7 +570,7 @@ function TimelineModalContent({
 											prev === (item.media!.length - 1) ? 0 : prev + 1
 										)
 									}}
-									className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 hidden lg:block"
+									className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white lg:opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
 								>
 									<ChevronRight className="size-6" />
 								</button>
@@ -620,7 +624,7 @@ function TimelineModalContent({
 				</div>
 
 				<div className="flex-1 overflow-y-auto overscroll-contain">
-					<div className="px-4 py-4 lg:px-6 lg:py-0 lg:pt-4 space-y-6">
+					<div className="px-4 py-4 lg:px-6 space-y-6">
 						<div>
 							<DialogTitle className="sr-only">{item.title}</DialogTitle>
 							<h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
@@ -669,11 +673,12 @@ function TimelineModalContent({
 				</div>
 
 				{(item.detailsUrl || (item.downloadUrl && item.showDownload)) && (
-					<div className="hidden lg:grid p-6 border-t border-border/50 bg-muted/10 shrink-0 grid-cols-1 gap-3">
+					<div className="hidden lg:flex items-center justify-center px-6 py-4 border-t border-border/50 bg-muted/10 shrink-0 gap-3">
 						{item.detailsUrl && (
 							<Button
 								asChild
-								className="w-full h-12 text-base font-medium rounded-xl"
+								size="lg"
+								className="text-base font-medium rounded-xl flex-1 max-w-[200px]"
 							>
 								<a href={item.detailsUrl} target="_blank" rel="noopener noreferrer">
 									Learn More <ExternalLink className="size-4" />
@@ -684,10 +689,11 @@ function TimelineModalContent({
 							<Button
 								asChild
 								variant="outline"
-								className="w-full h-12 text-base font-medium rounded-xl hover:bg-muted"
+								size="lg"
+								className="text-base font-medium rounded-xl hover:bg-muted flex-1 max-w-[200px]"
 							>
 								<a href={item.downloadUrl} target="_blank" rel="noopener noreferrer">
-									Download Resources <Download className="size-4" />
+									Download <Download className="size-4" />
 								</a>
 							</Button>
 						)}
@@ -729,8 +735,8 @@ function TimelineRow({
 	return (
 		<motion.div
 			className={cn(
-				'relative flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-0 group',
-				isEven ? 'lg:flex-row-reverse' : '',
+				'relative flex flex-col md:flex-row items-center md:items-center gap-8 md:gap-0 group',
+				isEven ? 'md:flex-row-reverse' : '',
 			)}
 			initial={{ opacity: 0, y: 50 }}
 			whileInView={{ opacity: 1, y: 0 }}
@@ -739,7 +745,7 @@ function TimelineRow({
 		>
 			<div
 				className={cn(
-					'hidden lg:flex w-1/2 flex-col justify-center px-16',
+					'hidden md:flex w-1/2 flex-col justify-center px-16',
 					isEven ? 'items-start text-left' : 'items-end text-right',
 				)}
 			>
@@ -748,20 +754,20 @@ function TimelineRow({
 				</div>
 			</div>
 
-			<div className="absolute left-5.75 lg:left-1/2 lg:-translate-x-1/2 flex items-center justify-center">
+			<div className="absolute left-4 md:left-1/2 md:-translate-x-1/2 flex items-center justify-center">
 				<div className="w-4 h-4 rounded-full bg-background border-2 border-primary ring-4 ring-background shadow-[0_0_20px_rgba(var(--primary),0.3)] z-10 transition-transform duration-500 group-hover:scale-150" />
 			</div>
 
 			<div
 				className={cn(
-					'w-full lg:w-1/2 pl-12 lg:pl-0',
-					isEven ? 'lg:pr-12' : 'lg:pl-12',
+					'w-full md:w-1/2 pl-12 md:pl-0',
+					isEven ? 'md:pr-12' : 'md:pl-12',
 				)}
 			>
-				<Card className="border-primary/10 backdrop-blur-md hover:border-primary/20 transition-all duration-500 group/card overflow-hidden bg-transparent border-none py-0 gap-0">
-					<CardContent className={cn('-mt-1', isEven ? 'lg:text-right' : 'lg:text-left')}>
+				<Card className="bg-transparent border-none py-0 rounded-none">
+					<CardContent className={cn('-mt-1 px-0 pr-4 md:px-4', isEven ? 'md:text-right' : 'md:text-left')}>
 						{isAdmin && (
-							<div className={cn('flex gap-2 mb-4', isEven ? 'lg:justify-end' : '')}>
+							<div className={cn('flex gap-2 mb-4', isEven ? 'md:justify-end' : '')}>
 								<Button
 									variant="outline"
 									size="sm"
@@ -783,19 +789,19 @@ function TimelineRow({
 							</div>
 						)}
 
-						<div className="lg:hidden flex items-center gap-2 text-primary font-bold mb-4 font-mono">
+						<div className="md:hidden flex items-center gap-2 text-primary font-bold mb-4 font-mono">
 							<Calendar className="size-4" />
 							{item.year}
 						</div>
 
-						<h3 className="text-2xl lg:text-3xl font-bold font-syne mb-3 group-hover/card:text-primary transition-colors duration-300">
+						<h3 className="text-2xl md:text-3xl font-bold font-syne mb-3 group-hover/card:text-primary transition-colors duration-300">
 							{item.title}
 						</h3>
 						<p className="text-muted-foreground mb-6 leading-relaxed text-base">
 							{item.subtitle}
 						</p>
 
-						<div className={cn('flex flex-wrap gap-3', isEven ? 'lg:justify-end' : '')}>
+						<div className={cn('flex flex-wrap gap-3', isEven ? 'md:justify-end' : '')}>
 							{item.showDownload && item.downloadUrl && (
 								<Button
 									asChild
@@ -825,7 +831,7 @@ function TimelineRow({
 										</DialogTrigger>
 										<DialogContent
 											showCloseButton={false}
-											className="w-screen h-screen max-w-none max-h-none m-0 p-0 rounded-none border-none bg-background/95 backdrop-blur-3xl"
+											className="w-screen h-screen max-w-none max-h-none m-0 p-0 rounded-none border-none bg-background/95"
 										>
 											<TimelineModalContent item={item} />
 										</DialogContent>
@@ -887,24 +893,22 @@ export default function Timeline({ data }: ComponentProps) {
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
 
 	return (
-		<section className="py-16 lg:py-20 relative overflow-hidden">
-			<div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,var(--primary),transparent_50%)] opacity-10" />
-
+		<section className="py-16 md:py-20 relative overflow-hidden">
 			<div className="max-w-6xl mx-auto">
 				<motion.div
 					className="text-center mb-24"
 					initial={{ opacity: 0, y: 30 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
-					transition={{ duration: 0.8, ease: 'easeOut' }}
+					transition={{ duration: 0.2, ease: 'easeOut' }}
 				>
-					<h2 className="font-syne text-5xl lg:text-7xl font-bold tracking-tighter mb-6 bg-linear-to-b from-foreground to-foreground/50 bg-clip-text text-transparent">
+					<h2 className="font-syne text-5xl md:text-7xl font-bold tracking-tighter md:mb-6 mb-0 bg-linear-to-b from-foreground to-foreground/50 bg-clip-text text-transparent">
 						Our Journey
 					</h2>
 					{isAdmin && (
 						<Button
 							onClick={() => setShowCreateDialog(true)}
-							className="rounded-full shadow-lg shadow-primary/20"
+							className="rounded-full shadow-primary/20"
 						>
 							<Plus className="size-4" />
 							Add Timeline Item
@@ -913,11 +917,11 @@ export default function Timeline({ data }: ComponentProps) {
 				</motion.div>
 
 				<div className="relative">
-					<div className="absolute left-8 lg:left-1/2 top-0 bottom-0 w-px lg:-translate-x-1/2 bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 hidden lg:block" />
+					<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-1/2 bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 hidden md:block" />
 
-					<div className="absolute left-6 top-0 bottom-0 w-px bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 lg:hidden" />
+					<div className="absolute left-6 top-0 bottom-0 w-px bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 md:hidden" />
 
-					<div className="space-y-24 lg:space-y-32">
+					<div className="space-y-24 md:space-y-40">
 						{data.timelineItems.map((item, index) => (
 							<TimelineRow
 								key={`${item.year}-${index}`}

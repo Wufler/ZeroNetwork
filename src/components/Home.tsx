@@ -16,9 +16,7 @@ export default function Home({ data }: ComponentProps) {
 
 			<Header data={data} />
 
-			<div className="w-full py-16 bg-background/50 backdrop-blur-sm border-y border-border/50">
-				<Gallery data={data} />
-			</div>
+			<Gallery data={data} />
 
 			<Timeline data={data} />
 

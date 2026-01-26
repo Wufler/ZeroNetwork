@@ -72,7 +72,7 @@ export default function Features() {
 					<h2 className="font-syne text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-linear-to-b from-foreground via-foreground to-foreground/40 bg-clip-text text-transparent">
 						What are we doing!?
 					</h2>
-					<p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+					<p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
 						We run different kind of servers with lots of fun features for everyone.
 						Whether you like modded or modified vanilla Minecraft, we've got something
 						for you. Suggest modpacks or ideas in our Discord!
@@ -90,7 +90,7 @@ export default function Features() {
 							className={`group relative overflow-hidden rounded-2xl border border-white/5 bg-card/50 hover:bg-card p-8 transition-all duration-300 hover:border-primary/20 ${feature.className} ${feature.border}`}
 						>
 							<div className="relative z-10 h-full flex flex-col justify-between">
-								<div className="mb-8">
+								<div>
 									<div
 										className={`p-4 rounded-xl bg-background/50 w-fit mb-6 border border-white/5 group-hover:scale-105 transition-transform duration-300 ${feature.iconColor}`}
 									>

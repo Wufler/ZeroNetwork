@@ -37,7 +37,7 @@ export default function WithersWrath() {
 	}
 
 	return (
-		<section className="py-16 md:py-20 px-4 relative overflow-hidden">
+		<section className="py-16 lg:py-20 px-4 relative overflow-hidden">
 			<div className="max-w-7xl mx-auto relative z-10">
 				<div className="grid lg:grid-cols-2 gap-12 items-center">
 					<motion.div
@@ -45,8 +45,8 @@ export default function WithersWrath() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true }}
 					>
-						<div className="flex items-center gap-4 mb-6">
-							<div className="relative size-16 rounded-lg overflow-hidden">
+						<div className="flex items-center lg:justify-start justify-center gap-4 mb-6">
+							<div className="relative lg:size-16 size-12 rounded-lg overflow-hidden">
 								<Image
 									src="/witherswrath/icon.png"
 									alt="Withers Wrath Logo"
@@ -54,17 +54,17 @@ export default function WithersWrath() {
 									className="object-cover"
 								/>
 							</div>
-							<h2 className="font-syne text-4xl md:text-5xl font-bold bg-linear-to-r from-[#9333EA] to-[#fd7704] bg-clip-text text-transparent">
+							<h2 className="font-syne text-4xl lg:text-5xl font-bold bg-linear-to-r from-[#9333EA] to-[#fd7704] bg-clip-text text-transparent">
 								Withers Wrath
 							</h2>
 						</div>
 
-						<p className="text-lg text-muted-foreground leading-relaxed mb-8">
+						<p className="text-lg text-muted-foreground leading-relaxed mb-8 lg:text-left text-center">
 							Experience the ultimate challenge in our custom datapack. Push your
 							skills to the limit with enhanced wither battles.
 						</p>
 
-						<div className="flex flex-wrap gap-4">
+						<div className="flex flex-wrap gap-4 lg:justify-start justify-center">
 							<Button
 								asChild
 								size="lg"
@@ -81,7 +81,7 @@ export default function WithersWrath() {
 							</Button>
 						</div>
 
-						<p className="mt-4 text-xs text-muted-foreground uppercase tracking-widest opacity-50">
+						<p className="mt-4 text-xs text-muted-foreground uppercase tracking-widest opacity-50 lg:text-left text-center">
 							#ad
 						</p>
 					</motion.div>
