@@ -1,8 +1,8 @@
 "use server"
-import { prisma } from "@/lib/prisma"
 import { headers } from "next/headers"
 import { hashIdentifier } from "@/lib/fingerprint"
 import { sendWebhook } from "@/lib/webhook"
+import prisma from "@/lib/prisma"
 
 export async function getAllPolls() {
     return await prisma.poll.findMany({

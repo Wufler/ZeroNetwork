@@ -1,6 +1,6 @@
 'use client'
 
-import { LogOut, Eye, EyeOff } from 'lucide-react'
+import { LogOut, Eye, EyeOff, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
 	DropdownMenu,
@@ -9,15 +9,16 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { authClient } from '@/lib/auth-client'
-import Discord from './ui/discord'
+import { Discord } from './ui/discord'
 import { toast } from 'sonner'
 import { useState } from 'react'
-import { updateVisibility } from '@/actions/data'
+import { updateVisibility } from '@/app/actions/data'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default function Login({ data }: ComponentProps) {
 	const { data: session, isPending } = authClient.useSession()
 	const isAdmin = session?.user?.role === 'admin'
-	const [isVisible, setIsVisible] = useState(data.visible[3])
+	const [isVisible, setIsVisible] = useState(data.whitelistVisible)
 
 	const signIn = async () => {
 		await authClient.signIn.social({
@@ -31,9 +32,7 @@ export default function Login({ data }: ComponentProps) {
 
 	const toggleVisibility = async () => {
 		try {
-			const newVisibility = [...data.visible]
-			newVisibility[3] = !isVisible
-			await updateVisibility(Number(data.id), newVisibility)
+			await updateVisibility(Number(data.id), 'whitelistVisible', !isVisible)
 			setIsVisible(!isVisible)
 			toast.success('Login visibility updated')
 		} catch (error) {
@@ -42,23 +41,23 @@ export default function Login({ data }: ComponentProps) {
 	}
 
 	return (
-		<div className="flex flex-col-reverse justify-center items-center p-4 pt-6 gap-4">
+		<div className="flex items-center gap-2">
 			{isAdmin && (
 				<Button
 					variant="outline"
 					size="sm"
 					onClick={toggleVisibility}
-					className="gap-2"
+					className="gap-2 bg-background/50 backdrop-blur-sm"
 				>
 					{isVisible ? (
 						<>
 							<EyeOff className="size-4" />
-							<span>Disable Login</span>
+							<span className="hidden sm:inline">Disable Login</span>
 						</>
 					) : (
 						<>
 							<Eye className="size-4" />
-							<span>Enable Login</span>
+							<span className="hidden sm:inline">Enable Login</span>
 						</>
 					)}
 				</Button>
@@ -67,29 +66,52 @@ export default function Login({ data }: ComponentProps) {
 				<>
 					{isVisible && (
 						<Button
-							variant="ghost"
+							variant="outline"
 							onClick={signIn}
 							disabled={isPending}
-							className="gap-2 text-muted-foreground hover:text-foreground hover:bg-transparent"
+							className="gap-2 bg-background/50 backdrop-blur-sm hover:bg-indigo-500/10 hover:text-indigo-500 hover:border-indigo-500/50 transition-all rounded-full"
 						>
 							<Discord className="size-5" />
 							<span className={isPending ? 'animate-pulse opacity-50' : ''}>
-								Login with Discord
+								Login
 							</span>
 						</Button>
 					)}
 				</>
 			) : (
 				<DropdownMenu>
-					<DropdownMenuTrigger className="text-sm font-medium text-muted-foreground hover:text-foreground">
-						<span className={isPending ? 'animate-pulse opacity-50' : ''}>
-							{session.user?.name}
-						</span>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="ghost"
+							className="relative h-10 w-10 rounded-full p-0 overflow-hidden ring-2 ring-border hover:ring-primary transition-all"
+						>
+							<Avatar className="h-10 w-10">
+								<AvatarImage
+									src={session.user?.image || ''}
+									alt={session.user?.name || ''}
+								/>
+								<AvatarFallback>
+									<User className="size-5" />
+								</AvatarFallback>
+							</Avatar>
+						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent>
+					<DropdownMenuContent align="end" className="w-56">
+						<div className="flex items-center justify-start gap-2 p-2">
+							<div className="flex flex-col space-y-1 leading-none">
+								{session.user?.name && (
+									<p className="font-medium">{session.user.name}</p>
+								)}
+								{session.user?.email && (
+									<p className="w-50 truncate text-xs text-muted-foreground">
+										{session.user.email}
+									</p>
+								)}
+							</div>
+						</div>
 						<DropdownMenuItem
 							onClick={signOut}
-							className="gap-2"
+							className="gap-2 text-red-500 focus:text-red-500 focus:bg-red-500/10 cursor-pointer"
 							disabled={isPending}
 						>
 							<LogOut className="size-4" />

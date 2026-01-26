@@ -2,15 +2,18 @@
 
 import { motion } from 'motion/react'
 import Image from 'next/image'
+import { MapPin } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 const members = [
 	{
 		name: 'ImHer0',
-		role: 'CEO',
+		role: 'CEO & Founder',
 		location: 'United Kingdom',
 		description:
 			'The creator of "The Im Her Zero Network" (ZeroNetwork) and the host of the servers. Does datapacks as a hobby.',
-		image: 'https://wolfey.s-ul.eu/7uOirGrV',
+		image: '/team/imher0.png',
 		url: 'https://github.com/ImHer0',
 	},
 	{
@@ -18,60 +21,80 @@ const members = [
 		role: 'Web Developer',
 		location: 'Finland',
 		description: 'hi i do some web stuff and this site and some mc server stuff',
-		image: 'https://wolfey.s-ul.eu/GdEOHutp',
-		url: 'https://github.com/Wufler',
+		image: '/team/wolfey.png',
+		url: 'https://wolfey.me',
 	},
 ]
 
 export default function Team() {
 	return (
-		<div className="container mx-auto py-12 sm:py-24 px-4">
-			<h2 className="text-center font-syne text-4xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-12">
-				Meet the Team
-			</h2>
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-7xl mx-auto">
-				{members.map((member, i) => (
-					<motion.div
-						key={member.name}
-						initial={{ opacity: 0, y: 20 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true }}
-						transition={{ duration: 0.5, delay: i * 0.1 }}
-						className="flex flex-col items-center rounded-xl p-8"
-					>
-						<a
-							href={member.url}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="group w-full"
+		<section className="py-16 md:py-20 px-4 relative overflow-hidden">
+			<div className="container mx-auto relative z-10">
+				<motion.div
+					className="text-center mb-16"
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true }}
+				>
+					<h2 className="font-syne text-4xl md:text-6xl font-bold tracking-tight mb-6">
+						Meet the Team
+					</h2>
+				</motion.div>
+
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+					{members.map((member, i) => (
+						<motion.div
+							key={member.name}
+							initial={{ opacity: 0, y: 20 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							viewport={{ once: true }}
+							transition={{ duration: 0.5, delay: i * 0.1 }}
 						>
-							<motion.div className="relative mx-auto overflow-hidden rounded-xl aspect-square w-full max-w-[320px]">
-								<Image
-									src={member.image}
-									alt={member.name}
-									fill
-									sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-									className="object-cover"
-									priority
-								/>
-							</motion.div>
-							<h3 className="text-center mt-8 text-2xl md:text-3xl font-bold font-syne leading-tight text-gray-900 dark:text-white group-hover:text-blue-500 transition-colors">
-								{member.name}
-							</h3>
-						</a>
-						<div className="flex items-center gap-2 mt-3">
-							<p className="font-medium text-blue-600 dark:text-blue-500/90">
-								{member.role}
-							</p>
-							<span className="text-gray-400 dark:text-gray-500">•</span>
-							<p className="text-gray-800 dark:text-gray-300/90">{member.location}</p>
-						</div>
-						<p className="text-center text-gray-800 dark:text-gray-300/90 text-base md:text-lg mt-6 leading-relaxed max-w-lg">
-							{member.description}
-						</p>
-					</motion.div>
-				))}
+							<a
+								href={member.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="block h-full"
+							>
+								<Card className="h-full border-0 bg-transparent shadow-none group py-0">
+									<CardContent className="p-0 h-full flex flex-col pt-16">
+										<div className="px-8 pb-8 flex-1 bg-card dark:bg-linear-to-b dark:from-secondary/50 dark:to-background/70 text-card-foreground group-hover:bg-card/80 transition-all duration-300 rounded-2xl group-hover:shadow-2xl group-hover:-translate-y-1 relative">
+											<div className="absolute -top-16 left-8">
+												<div className="relative size-32 rounded-2xl overflow-hidden">
+													<Image
+														src={member.image}
+														alt={member.name}
+														fill
+														className="object-cover transition-transform duration-500 group-hover:scale-110"
+													/>
+												</div>
+											</div>
+
+											<div className="mt-20">
+												<div className="flex items-center justify-between mb-2">
+													<h3 className="text-2xl font-bold font-syne">{member.name}</h3>
+													<Badge variant="secondary" className="font-medium">
+														{member.role}
+													</Badge>
+												</div>
+
+												<div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
+													<MapPin className="size-4" />
+													{member.location}
+												</div>
+
+												<p className="text-muted-foreground leading-relaxed">
+													{member.description}
+												</p>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							</a>
+						</motion.div>
+					))}
+				</div>
 			</div>
-		</div>
+		</section>
 	)
 }

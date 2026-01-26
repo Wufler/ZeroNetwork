@@ -47,7 +47,10 @@ CREATE TABLE "user" (
     "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL,
     "image" TEXT,
-    "role" TEXT NOT NULL DEFAULT 'user',
+    "role" TEXT,
+    "banned" BOOLEAN,
+    "banReason" TEXT,
+    "banExpires" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -63,6 +66,7 @@ CREATE TABLE "session" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "ipAddress" TEXT,
     "userAgent" TEXT,
+    "impersonatedBy" TEXT,
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "session_pkey" PRIMARY KEY ("id")
@@ -105,12 +109,25 @@ CREATE TABLE "poll" (
     "question" TEXT NOT NULL,
     "answers" TEXT[],
     "votes" INTEGER[],
-    "voterIps" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "visible" BOOLEAN NOT NULL DEFAULT false,
+    "until" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "endedAt" TIMESTAMP(3),
 
     CONSTRAINT "poll_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "poll_vote" (
+    "id" SERIAL NOT NULL,
+    "pollId" INTEGER NOT NULL,
+    "ipHash" TEXT NOT NULL,
+    "fingerprint" TEXT NOT NULL,
+    "votedOption" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "poll_vote_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -118,6 +135,9 @@ CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "session_token_key" ON "session"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "poll_vote_pollId_ipHash_fingerprint_key" ON "poll_vote"("pollId", "ipHash", "fingerprint");
 
 -- AddForeignKey
 ALTER TABLE "timeline" ADD CONSTRAINT "timeline_serversId_fkey" FOREIGN KEY ("serversId") REFERENCES "servers"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -130,3 +150,6 @@ ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "poll_vote" ADD CONSTRAINT "poll_vote_pollId_fkey" FOREIGN KEY ("pollId") REFERENCES "poll"("id") ON DELETE CASCADE ON UPDATE CASCADE;
