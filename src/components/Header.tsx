@@ -176,15 +176,17 @@ export default function Header({ data }: ComponentProps) {
 				transition={{ duration: 0.5, delay: index * 0.1 }}
 				className={cn(
 					'flex flex-col group',
-					isPrimary ? 'gap-3' : 'gap-1 opacity-80 hover:opacity-100',
+					isPrimary ? 'gap-2 md:gap-3' : 'gap-1 opacity-80 hover:opacity-100',
 				)}
 			>
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-3 md:gap-4">
 					{server.icon && (
 						<div
 							className={cn(
 								'relative rounded overflow-hidden bg-muted ring-1 ring-border transition-all duration-300',
-								isPrimary ? 'size-16 shadow-lg' : 'size-12 opacity-80',
+								isPrimary
+									? 'size-12 md:size-16 shadow-lg'
+									: 'size-10 md:size-12 opacity-80',
 							)}
 						>
 							<Image
@@ -210,7 +212,9 @@ export default function Header({ data }: ComponentProps) {
 										<div className="flex items-center gap-2">
 											<Editable.Area>
 												<Editable.Preview
-													className={cn(isPrimary ? 'text-2xl' : 'text-base')}
+													className={cn(
+														isPrimary ? 'text-xl md:text-2xl' : 'text-sm md:text-base',
+													)}
 												/>
 												<Editable.Input className="bg-muted border-border text-foreground text-sm h-6 py-0 px-1" />
 											</Editable.Area>
@@ -240,7 +244,9 @@ export default function Header({ data }: ComponentProps) {
 										variant="link"
 										className={cn(
 											'font-syne h-auto p-0 font-bold text-foreground hover:text-primary transition-colors pb-0.5',
-											isPrimary ? 'text-3xl tracking-tight' : 'text-base font-medium',
+											isPrimary
+												? 'text-xl md:text-3xl tracking-tight'
+												: 'text-sm md:text-base font-medium',
 										)}
 										onClick={() => handleCopyIp(getFullServerIp(server))}
 									>
@@ -248,7 +254,7 @@ export default function Header({ data }: ComponentProps) {
 										<Clipboard
 											className={cn(
 												'opacity-0 group-hover/ip:opacity-100 transition-opacity text-primary',
-												isPrimary ? 'size-6' : 'size-4',
+												isPrimary ? 'size-5 md:size-6' : 'size-3 md:size-4',
 											)}
 										/>
 									</Button>
@@ -260,8 +266,8 @@ export default function Header({ data }: ComponentProps) {
 								className={cn(
 									'bg-muted rounded-full overflow-hidden transition-all',
 									isPrimary
-										? 'h-1.5 w-full max-w-70'
-										: 'h-0.5 w-full max-w-45 opacity-60',
+										? 'h-1.5 w-full max-w-56 md:max-w-70'
+										: 'h-0.5 w-full max-w-32 md:max-w-45 opacity-60',
 								)}
 							>
 								<motion.div
@@ -278,7 +284,7 @@ export default function Header({ data }: ComponentProps) {
 							<div
 								className={cn(
 									'text-muted-foreground flex items-center gap-2 font-mono',
-									isPrimary ? 'text-base mt-0.5' : 'text-xs',
+									isPrimary ? 'text-sm md:text-base mt-0.5' : 'text-[10px] md:text-xs',
 								)}
 							>
 								<span>
@@ -292,7 +298,7 @@ export default function Header({ data }: ComponentProps) {
 					<div
 						className={cn(
 							'text-muted-foreground mt-2',
-							isPrimary ? 'text-base' : 'text-xs',
+							isPrimary ? 'text-sm md:text-base' : 'text-[10px] md:text-xs',
 						)}
 					>
 						{isPrimary ? (
@@ -317,7 +323,7 @@ export default function Header({ data }: ComponentProps) {
 				borderRadius: isMobile ? 0 : borderRadius,
 				borderWidth: isMobile ? 0 : borderWidth,
 			}}
-			className="relative min-h-dvh md:min-h-[calc(100svh-4rem)] flex flex-col overflow-hidden py-10 px-8 md:px-12 border-border bg-linear-to-br from-background/50 to-transparent backdrop-blur-sm"
+			className="relative min-h-svh md:min-h-[calc(100svh-4rem)] flex flex-col overflow-hidden py-6 px-5 md:py-10 md:px-12 border-border bg-linear-to-br from-background/50 to-transparent backdrop-blur-sm"
 		>
 			<div className="relative md:absolute md:top-6 md:right-6 flex justify-end mb-4 md:mb-0 z-50">
 				<Login data={data} />
@@ -329,7 +335,7 @@ export default function Header({ data }: ComponentProps) {
 					animate={{ opacity: 1, x: 0 }}
 					transition={{ duration: 0.8 }}
 				>
-					<h1 className="font-syne text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight bg-linear-to-b from-foreground via-foreground to-foreground/50 bg-clip-text text-transparent drop-shadow-sm mb-2 text-left">
+					<h1 className="font-syne text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight bg-linear-to-b from-foreground via-foreground to-foreground/50 bg-clip-text text-transparent drop-shadow-sm mb-2 text-left">
 						The Im Her Zero Network
 					</h1>
 				</motion.div>
@@ -338,7 +344,7 @@ export default function Header({ data }: ComponentProps) {
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ duration: 0.8, delay: 0.2 }}
-					className="text-lg text-muted-foreground font-light max-w-lg text-left"
+					className="text-base md:text-lg text-muted-foreground font-light max-w-md md:max-w-lg text-left"
 				>
 					Join our incredible Minecraft community and experience unique gameplay with
 					friends.
@@ -450,7 +456,7 @@ export default function Header({ data }: ComponentProps) {
 				</div>
 			</div>
 
-			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-50 lg:opacity-100 scale-65 md:scale-110 origin-bottom-right">
+			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-50 lg:opacity-100 scale-50 md:scale-110 origin-bottom-right">
 				<div className="relative w-175 h-125">
 					<motion.div
 						initial={{ opacity: 0, y: -50 }}

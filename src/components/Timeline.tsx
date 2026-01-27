@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
 	ExternalLink,
 	X,
@@ -486,28 +486,33 @@ function TimelineEditDialog({
 	)
 }
 
-function TimelineModalContent({
-	item,
-}: {
-	item: TimelineItemType
-}) {
+function TimelineModalContent({ item }: { item: TimelineItemType }) {
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 	const selectedImage = item.media?.[selectedImageIndex]
+	const mediaRefs = useRef<(HTMLButtonElement | null)[]>([])
+
+	useEffect(() => {
+		if (selectedImageIndex >= 0 && mediaRefs.current[selectedImageIndex]) {
+			mediaRefs.current[selectedImageIndex]?.scrollIntoView({
+				behavior: 'smooth',
+				block: 'nearest',
+			})
+		}
+	}, [selectedImageIndex])
 
 	return (
 		<div className="flex flex-col-reverse lg:flex-row w-screen h-dvh bg-background/95">
 			{(item.detailsUrl || (item.downloadUrl && item.showDownload)) && (
-				<div className={cn(
-					"p-4 border-t border-border/50 bg-background lg:hidden shrink-0 gap-3 z-10",
-					item.detailsUrl && item.downloadUrl && item.showDownload
-						? "grid grid-cols-2"
-						: "flex"
-				)}>
+				<div
+					className={cn(
+						'p-4 border-t border-border/50 bg-background lg:hidden shrink-0 gap-3 z-10',
+						item.detailsUrl && item.downloadUrl && item.showDownload
+							? 'grid grid-cols-2'
+							: 'flex',
+					)}
+				>
 					{item.detailsUrl && (
-						<Button
-							asChild
-							className="w-full h-10 text-sm font-medium rounded-xl"
-						>
+						<Button asChild className="w-full h-10 text-sm font-medium rounded-xl">
 							<a href={item.detailsUrl} target="_blank" rel="noopener noreferrer">
 								Learn More <ExternalLink className="size-4" />
 							</a>
@@ -553,10 +558,10 @@ function TimelineModalContent({
 						{item.media && item.media.length > 1 && (
 							<>
 								<button
-									onClick={(e) => {
+									onClick={e => {
 										e.stopPropagation()
-										setSelectedImageIndex((prev) =>
-											prev === 0 ? item.media!.length - 1 : prev - 1
+										setSelectedImageIndex(prev =>
+											prev === 0 ? item.media!.length - 1 : prev - 1,
 										)
 									}}
 									className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white lg:opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
@@ -564,10 +569,10 @@ function TimelineModalContent({
 									<ChevronRight className="size-6 rotate-180" />
 								</button>
 								<button
-									onClick={(e) => {
+									onClick={e => {
 										e.stopPropagation()
-										setSelectedImageIndex((prev) =>
-											prev === (item.media!.length - 1) ? 0 : prev + 1
+										setSelectedImageIndex(prev =>
+											prev === item.media!.length - 1 ? 0 : prev + 1,
 										)
 									}}
 									className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white lg:opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
@@ -591,7 +596,7 @@ function TimelineModalContent({
 				)}
 			</div>
 
-			<div className="flex-1 lg:flex-none lg:w-[450px] flex flex-col bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b lg:border-b-0 lg:border-l border-border/50 overflow-hidden min-h-0">
+			<div className="flex-1 lg:flex-none lg:w-112.5 flex flex-col bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b lg:border-b-0 lg:border-l border-border/50 overflow-hidden min-h-0">
 				<div className="p-6 border-b border-border/50 hidden lg:flex items-center justify-between shrink-0">
 					<div className="flex items-center gap-3">
 						<div className="h-8 w-1 bg-primary rounded-full" />
@@ -599,7 +604,7 @@ function TimelineModalContent({
 							<div className="text-xs font-bold text-primary uppercase tracking-wider">
 								{item.year}
 							</div>
-							<div className="text-xl font-bold font-syne truncate max-w-[300px]">
+							<div className="text-xl font-bold font-syne truncate max-w-75">
 								{item.title}
 							</div>
 						</div>
@@ -644,12 +649,15 @@ function TimelineModalContent({
 									{item.media.map((mediaItem, i) => (
 										<button
 											key={mediaItem.id}
+											ref={el => {
+												mediaRefs.current[i] = el
+											}}
 											onClick={() => setSelectedImageIndex(i)}
 											className={cn(
 												'relative aspect-video rounded-lg overflow-hidden bg-muted transition-all duration-300',
 												selectedImageIndex === i
 													? 'ring-2 ring-primary z-10'
-													: 'hover:ring-2 hover:ring-primary/50 opacity-70 hover:opacity-100'
+													: 'hover:ring-2 hover:ring-primary/50 opacity-70 hover:opacity-100',
 											)}
 										>
 											<Image
@@ -678,7 +686,7 @@ function TimelineModalContent({
 							<Button
 								asChild
 								size="lg"
-								className="text-base font-medium rounded-xl flex-1 max-w-[200px]"
+								className="text-base font-medium rounded-xl flex-1 max-w-50"
 							>
 								<a href={item.detailsUrl} target="_blank" rel="noopener noreferrer">
 									Learn More <ExternalLink className="size-4" />
@@ -690,7 +698,7 @@ function TimelineModalContent({
 								asChild
 								variant="outline"
 								size="lg"
-								className="text-base font-medium rounded-xl hover:bg-muted flex-1 max-w-[200px]"
+								className="text-base font-medium rounded-xl hover:bg-muted flex-1 max-w-50"
 							>
 								<a href={item.downloadUrl} target="_blank" rel="noopener noreferrer">
 									Download <Download className="size-4" />
@@ -765,7 +773,12 @@ function TimelineRow({
 				)}
 			>
 				<Card className="bg-transparent border-none py-0 rounded-none">
-					<CardContent className={cn('-mt-1 px-0 pr-4 md:px-4', isEven ? 'md:text-right' : 'md:text-left')}>
+					<CardContent
+						className={cn(
+							'-mt-1 px-0 pr-4 md:px-4',
+							isEven ? 'md:text-right' : 'md:text-left',
+						)}
+					>
 						{isAdmin && (
 							<div className={cn('flex gap-2 mb-4', isEven ? 'md:justify-end' : '')}>
 								<Button
@@ -801,7 +814,9 @@ function TimelineRow({
 							{item.subtitle}
 						</p>
 
-						<div className={cn('flex flex-wrap gap-3', isEven ? 'md:justify-end' : '')}>
+						<div
+							className={cn('flex flex-wrap gap-3', isEven ? 'md:justify-end' : '')}
+						>
 							{item.showDownload && item.downloadUrl && (
 								<Button
 									asChild
