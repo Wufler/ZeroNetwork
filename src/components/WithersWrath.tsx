@@ -7,11 +7,11 @@ import { Button } from './ui/button'
 import { motion, AnimatePresence } from 'motion/react'
 
 const images = [
-	'/witherswrath/charge.webp',
-	'/witherswrath/dying.webp',
 	'/witherswrath/spawn.webp',
-	'/witherswrath/dying.webp',
 	'/witherswrath/half.gif',
+	'/witherswrath/charge.webp',
+	'/witherswrath/homing.webp',
+	'/witherswrath/dying.webp',
 ]
 
 export default function WithersWrath() {
@@ -137,10 +137,11 @@ export default function WithersWrath() {
 									<button
 										key={index}
 										onClick={() => setCurrentImageIndex(index)}
-										className={`h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex
-											? 'w-8 bg-[#9333EA]'
-											: 'w-2 bg-white/50 hover:bg-[#9333EA]/80'
-											}`}
+										className={`h-1.5 rounded-full transition-all duration-300 ${
+											index === currentImageIndex
+												? 'w-8 bg-[#9333EA]'
+												: 'w-2 bg-white/50 hover:bg-[#9333EA]/80'
+										}`}
 									/>
 								))}
 							</div>
