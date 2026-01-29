@@ -183,9 +183,9 @@ export default function Header({ data }: ComponentProps) {
 					{server.icon && (
 						<div
 							className={cn(
-								'relative rounded overflow-hidden bg-muted ring-1 ring-border transition-all duration-300',
+								'relative rounded overflow-hidden bg-muted border border-border transition-all duration-300',
 								isPrimary
-									? 'size-12 md:size-16 shadow-lg'
+									? 'size-12 md:size-16 shadow-md'
 									: 'size-10 md:size-12 opacity-80',
 							)}
 						>
@@ -325,6 +325,11 @@ export default function Header({ data }: ComponentProps) {
 			}}
 			className="relative min-h-svh md:min-h-[calc(100svh-4rem)] flex flex-col overflow-hidden py-6 px-5 md:py-10 md:px-12 border-border bg-linear-to-br from-background/50 to-transparent backdrop-blur-sm"
 		>
+			<div className="absolute inset-0 z-[-1]">
+				<div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_0%_0%,rgba(59,130,246,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_0%_0%,rgba(59,130,246,0.1),transparent)]" />
+				<div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.1),transparent)]" />
+			</div>
+
 			<div className="relative md:absolute md:top-6 md:right-6 flex justify-end mb-4 md:mb-0 z-50">
 				<Login data={data} />
 			</div>
@@ -350,7 +355,7 @@ export default function Header({ data }: ComponentProps) {
 					friends.
 				</motion.p>
 
-				<div className="mt-4 flex flex-col items-start gap-2">
+				<div className="mt-4 flex flex-col items-start">
 					{isAdmin && (
 						<Button
 							onClick={handleToggleAlert}
@@ -376,7 +381,7 @@ export default function Header({ data }: ComponentProps) {
 							transition={{ duration: 0.8, delay: 0.3 }}
 							className="max-w-md"
 						>
-							<Alert className="bg-yellow-500/10 backdrop-blur-sm border-yellow-500/20 text-yellow-700 dark:text-yellow-200 py-2 px-3">
+							<Alert className="bg-yellow-100/90 dark:bg-yellow-500/10 backdrop-blur-sm border-yellow-500/40 dark:border-yellow-500/20 text-yellow-900 dark:text-yellow-200 py-2 px-3 shadow-sm">
 								<AlertDescription className="flex items-center gap-2 text-sm">
 									<AlertCircle className="size-4 text-yellow-500 shrink-0" />
 									{isAdmin ? (
@@ -391,14 +396,14 @@ export default function Header({ data }: ComponentProps) {
 											<div className="flex items-center gap-2 w-full">
 												<Editable.Area className="w-full">
 													<Editable.Preview className="text-left" />
-													<Editable.Input className="bg-black/20 border-yellow-500/30 text-yellow-700 dark:text-yellow-200 text-sm h-6 py-0" />
+													<Editable.Input className="bg-yellow-50 dark:bg-black/20 border-yellow-500/50 dark:border-yellow-500/30 text-yellow-900 dark:text-yellow-200 text-sm h-6 py-0" />
 												</Editable.Area>
 												<Editable.Toolbar className="flex gap-1">
 													<Editable.Cancel asChild>
 														<Button
 															variant="outline"
 															size="sm"
-															className="h-6 w-6 p-0 bg-black/20 border-yellow-500/30 text-yellow-700 dark:text-yellow-200 hover:bg-yellow-500/20"
+															className="h-6 w-6 p-0 bg-yellow-50 dark:bg-black/20 border-yellow-500/50 dark:border-yellow-500/30 text-yellow-900 dark:text-yellow-200 hover:bg-yellow-200/50 dark:hover:bg-yellow-500/20"
 														>
 															<X className="size-3" />
 														</Button>
@@ -406,7 +411,7 @@ export default function Header({ data }: ComponentProps) {
 													<Editable.Submit asChild>
 														<Button
 															size="sm"
-															className="h-6 w-6 p-0 bg-yellow-500 text-black hover:bg-yellow-400"
+															className="h-6 w-6 p-0 bg-yellow-600 dark:bg-yellow-500 text-white dark:text-black hover:bg-yellow-700 dark:hover:bg-yellow-400"
 														>
 															<Check className="size-3" />
 														</Button>
@@ -419,9 +424,9 @@ export default function Header({ data }: ComponentProps) {
 									)}
 								</AlertDescription>
 							</Alert>
-							<Poll />
 						</motion.div>
 					)}
+					<Poll />
 				</div>
 			</div>
 

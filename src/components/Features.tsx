@@ -87,12 +87,12 @@ export default function Features() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true }}
 							transition={{ duration: 0.5, delay: feature.delay }}
-							className={`group relative overflow-hidden rounded-2xl border border-white/5 bg-card/50 hover:bg-card p-8 transition-all duration-300 hover:border-primary/20 ${feature.className} ${feature.border}`}
+							className={`group relative overflow-hidden rounded-2xl border border-border/50 bg-card/70 hover:bg-card p-8 transition-all duration-300 hover:border-primary/30 shadow-sm hover:shadow-md ${feature.className} ${feature.border}`}
 						>
 							<div className="relative z-10 h-full flex flex-col justify-between">
 								<div>
 									<div
-										className={`p-4 rounded-xl bg-background/50 w-fit mb-6 border border-white/5 group-hover:scale-105 transition-transform duration-300 ${feature.iconColor}`}
+										className={`p-4 rounded-xl bg-background/80 w-fit mb-6 border border-border/50 shadow-sm group-hover:scale-105 transition-transform duration-300 ${feature.iconColor}`}
 									>
 										<feature.icon className="size-8" />
 									</div>

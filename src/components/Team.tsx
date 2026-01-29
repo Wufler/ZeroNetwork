@@ -58,7 +58,7 @@ export default function Team() {
 							>
 								<Card className="h-full border-0 bg-transparent shadow-none group py-0">
 									<CardContent className="p-0 h-full flex flex-col pt-16">
-										<div className="px-8 pb-8 flex-1 bg-card dark:bg-linear-to-b dark:from-secondary/50 dark:to-background/70 text-card-foreground group-hover:bg-card/80 transition-all duration-300 rounded-2xl group-hover:shadow-2xl group-hover:-translate-y-1 relative">
+										<div className="px-8 pb-8 flex-1 bg-card dark:bg-linear-to-b dark:from-secondary/50 dark:to-background/70 text-card-foreground border border-border/50 group-hover:border-border transition-all duration-300 rounded-2xl shadow-md group-hover:shadow-xl group-hover:-translate-y-1 relative">
 											<div className="absolute -top-16 left-8">
 												<div className="relative size-32 rounded-2xl overflow-hidden">
 													<Image

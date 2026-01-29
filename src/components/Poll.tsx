@@ -842,18 +842,18 @@ export default function Poll() {
 
 												{(poll.endedAt ||
 													(!poll.endedAt && poll.until && isPast(poll.until))) && (
-														<div className="bg-yellow-500/10 dark:bg-yellow-500/20 border border-yellow-500/20 dark:border-yellow-500/30 rounded-lg p-3 sm:p-4 text-yellow-700 dark:text-yellow-200 text-xs sm:text-sm flex items-center gap-2">
-															<Clock className="size-4 shrink-0" />
-															<span>This poll has ended. Voting is closed.</span>
-														</div>
-													)}
+													<div className="bg-yellow-100/90 dark:bg-yellow-500/20 border border-yellow-500/40 dark:border-yellow-500/30 rounded-lg p-3 sm:p-4 text-yellow-900 dark:text-yellow-200 text-xs sm:text-sm flex items-center gap-2 shadow-sm">
+														<Clock className="size-4 shrink-0" />
+														<span>This poll has ended. Voting is closed.</span>
+													</div>
+												)}
 
 												<div className="space-y-3">
 													{poll.answers.map((answer: string, answerIndex: number) => (
 														<div key={answerIndex} className="relative">
 															{!hasUserVoted[poll.id] &&
-																!poll.endedAt &&
-																(!poll.until || !isPast(poll.until)) ? (
+															!poll.endedAt &&
+															(!poll.until || !isPast(poll.until)) ? (
 																<RadioGroup
 																	value={selectedOption?.toString()}
 																	onValueChange={value => setSelectedOption(Number(value))}
@@ -861,9 +861,10 @@ export default function Poll() {
 																	<div
 																		className={`
 																			relative flex items-center p-3 sm:p-4 rounded-xl border transition-all cursor-pointer
-																			${selectedOption === answerIndex
-																				? 'bg-primary/10 border-primary/50 ring-1 ring-primary/50'
-																				: 'bg-muted border-border hover:bg-muted/80 hover:border-border'
+																			${
+																				selectedOption === answerIndex
+																					? 'bg-primary/10 border-primary/50 ring-1 ring-primary/50'
+																					: 'bg-muted border-border hover:bg-muted/80 hover:border-border'
 																			}
 																		`}
 																		onClick={() => setSelectedOption(answerIndex)}
@@ -918,26 +919,26 @@ export default function Poll() {
 												<div>
 													{!hasUserVoted[poll.id]
 														? !poll.endedAt &&
-														(!poll.until || new Date() <= new Date(poll.until)) && (
-															<Button
-																size="lg"
-																onClick={() => handleVote(poll.id)}
-																disabled={selectedOption === null || isVoting[poll.id]}
-																className="w-full font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 text-sm sm:text-base py-5 sm:py-6"
-															>
-																{isVoting[poll.id] ? 'Submitting Vote...' : 'Submit Vote'}
-															</Button>
-														)
+															(!poll.until || new Date() <= new Date(poll.until)) && (
+																<Button
+																	size="lg"
+																	onClick={() => handleVote(poll.id)}
+																	disabled={selectedOption === null || isVoting[poll.id]}
+																	className="w-full font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 text-sm sm:text-base py-5 sm:py-6"
+																>
+																	{isVoting[poll.id] ? 'Submitting Vote...' : 'Submit Vote'}
+																</Button>
+															)
 														: showVoteText[poll.id] && (
-															<motion.div
-																initial={{ opacity: 0, y: 10 }}
-																animate={{ opacity: 1, y: 0 }}
-																className="flex items-center justify-center gap-2 text-green-400 font-medium p-3 sm:p-4 bg-green-500/10 rounded-xl border border-green-500/20 text-sm sm:text-base"
-															>
-																<CheckCircle2 className="size-4 sm:size-5" />
-																Thank you for voting!
-															</motion.div>
-														)}
+																<motion.div
+																	initial={{ opacity: 0, y: 10 }}
+																	animate={{ opacity: 1, y: 0 }}
+																	className="flex items-center justify-center gap-2 text-green-700 dark:text-green-400 font-medium p-3 sm:p-4 bg-green-100/90 dark:bg-green-500/10 rounded-xl border border-green-500/40 dark:border-green-500/20 text-sm sm:text-base shadow-sm"
+																>
+																	<CheckCircle2 className="size-4 sm:size-5" />
+																	Thank you for voting!
+																</motion.div>
+															)}
 												</div>
 
 												{isAdmin && <PollAdminActions poll={poll} />}

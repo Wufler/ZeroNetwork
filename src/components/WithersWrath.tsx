@@ -120,13 +120,13 @@ export default function WithersWrath() {
 							<div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 								<button
 									onClick={previousImage}
-									className="p-2 rounded-full bg-[#3C3C46]/80 text-white hover:bg-[#9333EA] backdrop-blur-sm transition-colors"
+									className="p-2 rounded-full bg-background/90 text-foreground hover:bg-[#9333EA] hover:text-white border border-border/50 backdrop-blur-sm transition-colors"
 								>
 									<ChevronLeft className="size-6" />
 								</button>
 								<button
 									onClick={nextImage}
-									className="p-2 rounded-full bg-[#3C3C46]/80 text-white hover:bg-[#9333EA] backdrop-blur-sm transition-colors"
+									className="p-2 rounded-full bg-background/90 text-foreground hover:bg-[#9333EA] hover:text-white border border-border/50 backdrop-blur-sm transition-colors"
 								>
 									<ChevronRight className="size-6" />
 								</button>

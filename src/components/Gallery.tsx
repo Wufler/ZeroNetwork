@@ -5,12 +5,18 @@ import Marquee from 'react-fast-marquee'
 
 export default function Gallery({ data }: ComponentProps) {
 	return (
-		<div className="relative w-full overflow-hidden md:py-16 py-8 bg-background/50 backdrop-blur-sm border-y border-border/50">
-			<Marquee speed={50} gradient gradientColor="black" gradientWidth={64} pauseOnHover>
+		<div className="relative w-full overflow-hidden md:py-16 py-8 bg-background/80 backdrop-blur-sm border-y border-border">
+			<Marquee
+				speed={50}
+				gradient
+				gradientColor="hsl(var(--background))"
+				gradientWidth={64}
+				pauseOnHover
+			>
 				{data.galleryImages.map((item, index) => (
 					<div
 						key={`${item.imageUrl}-${index}`}
-						className="group md:min-w-80 min-w-60 md:min-h-50 min-h-35 relative rounded-xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm mx-3"
+						className="group md:min-w-80 min-w-60 md:min-h-50 min-h-35 relative rounded-xl overflow-hidden border border-border/50 bg-muted/30 backdrop-blur-sm mx-3"
 					>
 						<Image
 							src={item.imageUrl}
@@ -27,7 +33,7 @@ export default function Gallery({ data }: ComponentProps) {
 								</span>
 							</div>
 						</div>
-						<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-xl pointer-events-none group-hover:ring-primary/50 transition-colors duration-300" />
+						<div className="absolute inset-0 ring-1 ring-inset ring-border/30 rounded-xl pointer-events-none group-hover:ring-primary/50 transition-colors duration-300" />
 					</div>
 				))}
 			</Marquee>

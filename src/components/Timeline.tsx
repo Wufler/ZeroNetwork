@@ -99,9 +99,9 @@ function SortableMediaItem({
 			ref={setNodeRef}
 			style={style}
 			className={cn(
-				'flex items-center gap-2 p-2 border rounded-md bg-background',
-				editingMediaId === media.id && 'ring-2 ring-primary',
-				isDragging && 'opacity-50 shadow-lg',
+				'flex items-center gap-2 p-2 border border-border rounded-md bg-card shadow-sm',
+				editingMediaId === media.id && 'ring-2 ring-primary border-primary',
+				isDragging && 'opacity-50 shadow-xl',
 			)}
 		>
 			<button
@@ -505,7 +505,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 			{(item.detailsUrl || (item.downloadUrl && item.showDownload)) && (
 				<div
 					className={cn(
-						'p-4 border-t border-border/50 bg-background lg:hidden shrink-0 gap-3 z-10',
+						'p-4 border-t border-border bg-muted/30 lg:hidden shrink-0 gap-3 z-10',
 						item.detailsUrl && item.downloadUrl && item.showDownload
 							? 'grid grid-cols-2'
 							: 'flex',
@@ -596,8 +596,8 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 				)}
 			</div>
 
-			<div className="flex-1 lg:flex-none lg:w-112.5 flex flex-col bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b lg:border-b-0 lg:border-l border-border/50 overflow-hidden min-h-0">
-				<div className="p-6 border-b border-border/50 hidden lg:flex items-center justify-between shrink-0">
+			<div className="flex-1 lg:flex-none lg:w-112.5 flex flex-col bg-background/95 dark:bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 border-b lg:border-b-0 lg:border-l border-border overflow-hidden min-h-0">
+				<div className="p-6 border-b border-border hidden lg:flex items-center justify-between shrink-0 bg-muted/50">
 					<div className="flex items-center gap-3">
 						<div className="h-8 w-1 bg-primary rounded-full" />
 						<div>
@@ -614,7 +614,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 					</DialogClose>
 				</div>
 
-				<div className="p-4 lg:hidden border-b border-border/50 bg-muted/30 flex items-start justify-between gap-4">
+				<div className="p-4 lg:hidden border-b border-border bg-muted/50 flex items-start justify-between gap-4">
 					<div>
 						<div className="flex items-center gap-2 mb-1">
 							<span className="text-xs font-bold text-primary px-2 py-0.5 rounded-full bg-primary/10">
@@ -657,7 +657,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 												'relative aspect-video rounded-lg overflow-hidden bg-muted transition-all duration-300',
 												selectedImageIndex === i
 													? 'ring-2 ring-primary z-10'
-													: 'hover:ring-2 hover:ring-primary/50 opacity-70 hover:opacity-100',
+													: 'hover:ring-2 hover:ring-primary/50',
 											)}
 										>
 											<Image
@@ -681,7 +681,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 				</div>
 
 				{(item.detailsUrl || (item.downloadUrl && item.showDownload)) && (
-					<div className="hidden lg:flex items-center justify-center px-6 py-4 border-t border-border/50 bg-muted/10 shrink-0 gap-3">
+					<div className="hidden lg:flex items-center justify-center px-6 py-4 border-t border-border bg-muted/30 shrink-0 gap-3">
 						{item.detailsUrl && (
 							<Button
 								asChild
@@ -763,7 +763,7 @@ function TimelineRow({
 			</div>
 
 			<div className="absolute left-4 md:left-1/2 md:-translate-x-1/2 flex items-center justify-center">
-				<div className="w-4 h-4 rounded-full bg-background border-2 border-primary ring-4 ring-background shadow-[0_0_20px_rgba(var(--primary),0.3)] z-10 transition-transform duration-500 group-hover:scale-150" />
+				<div className="w-4 h-4 rounded-full bg-background border-2 border-primary ring-4 ring-background shadow-[0_0_20px_rgba(120,119,198,0.4)] dark:shadow-[0_0_20px_rgba(var(--primary),0.3)] z-10 transition-transform duration-500 group-hover:scale-150" />
 			</div>
 
 			<div
@@ -772,7 +772,7 @@ function TimelineRow({
 					isEven ? 'md:pr-12' : 'md:pl-12',
 				)}
 			>
-				<Card className="bg-transparent border-none py-0 rounded-none">
+				<Card className="bg-transparent border-none py-0 rounded-none shadow-none">
 					<CardContent
 						className={cn(
 							'-mt-1 px-0 pr-4 md:px-4',

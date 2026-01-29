@@ -53,7 +53,7 @@ export default function Login({ data }: ComponentProps) {
 					variant="outline"
 					size="sm"
 					onClick={toggleVisibility}
-					className="gap-2 bg-background/50 backdrop-blur-sm"
+					className="gap-2 bg-background/80 backdrop-blur-sm border-border shadow-sm"
 				>
 					{isVisible ? (
 						<>
@@ -75,7 +75,7 @@ export default function Login({ data }: ComponentProps) {
 							variant="outline"
 							onClick={signIn}
 							disabled={isPending}
-							className="gap-2 bg-background/50 backdrop-blur-sm hover:bg-indigo-500/10 hover:text-indigo-500 hover:border-indigo-500/50 transition-all rounded-full"
+							className="gap-2 bg-background/80 backdrop-blur-sm border-border shadow-sm hover:bg-indigo-500/10 hover:text-indigo-500 hover:border-indigo-500/50 transition-all rounded-full"
 						>
 							<Discord className="size-5" />
 							<span className={isPending ? 'animate-pulse opacity-50' : ''}>
