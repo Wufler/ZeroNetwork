@@ -330,7 +330,8 @@ export default function Header({ data }: ComponentProps) {
 				<div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.1),transparent)]" />
 			</div>
 
-			<div className="relative md:absolute md:top-6 md:right-6 flex justify-end mb-4 md:mb-0 z-50">
+			<div className="relative md:absolute md:top-6 md:right-6 flex justify-end mb-4 md:mb-0 z-50 gap-3">
+				<Poll />
 				<Login data={data} />
 			</div>
 
@@ -355,7 +356,7 @@ export default function Header({ data }: ComponentProps) {
 					friends.
 				</motion.p>
 
-				<div className="mt-4 flex flex-col items-start">
+				<div className="flex flex-col items-start">
 					{isAdmin && (
 						<Button
 							onClick={handleToggleAlert}
@@ -379,7 +380,7 @@ export default function Header({ data }: ComponentProps) {
 							initial={{ opacity: 0, x: -20 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ duration: 0.8, delay: 0.3 }}
-							className="max-w-md"
+							className="max-w-md mt-3"
 						>
 							<Alert className="bg-yellow-100/90 dark:bg-yellow-500/10 backdrop-blur-sm border-yellow-500/40 dark:border-yellow-500/20 text-yellow-900 dark:text-yellow-200 py-2 px-3 shadow-sm">
 								<AlertDescription className="flex items-center gap-2 text-sm">
@@ -426,7 +427,6 @@ export default function Header({ data }: ComponentProps) {
 							</Alert>
 						</motion.div>
 					)}
-					<Poll />
 				</div>
 			</div>
 

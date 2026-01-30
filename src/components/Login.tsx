@@ -75,7 +75,7 @@ export default function Login({ data }: ComponentProps) {
 							variant="outline"
 							onClick={signIn}
 							disabled={isPending}
-							className="gap-2 bg-background/80 backdrop-blur-sm border-border shadow-sm hover:bg-indigo-500/10 hover:text-indigo-500 hover:border-indigo-500/50 transition-all rounded-full"
+							className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
 						>
 							<Discord className="size-5" />
 							<span className={isPending ? 'animate-pulse opacity-50' : ''}>
