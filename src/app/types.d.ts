@@ -31,6 +31,7 @@ type GalleryImage = {
     altText: string
     createdAt: Date
     updatedAt: Date
+    blurDataUrl?: string
 }
 
 type TimelineMediaItem = BaseItem & {
@@ -39,6 +40,7 @@ type TimelineMediaItem = BaseItem & {
     displayOrder: number
     galleryImage: boolean
     timelineItemId: number
+    blurDataUrl?: string
 }
 
 type TimelineItem = BaseItem & {

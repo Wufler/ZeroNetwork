@@ -365,7 +365,7 @@ export default function Poll() {
 			<AlertDialog>
 				<AlertDialogTrigger asChild>
 					<Button
-						variant="ghost"
+						variant="outline"
 						className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-6"
 					>
 						<span className="relative z-10">Community Polls</span>

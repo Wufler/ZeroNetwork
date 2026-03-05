@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { AlertCircle, Clipboard, Check, X, Eye, EyeOff } from 'lucide-react'
+import { AlertCircle, Clipboard, Check, X, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -13,7 +13,12 @@ import { updateAlert } from '@/app/actions/alert'
 import { authClient } from '@/lib/auth-client'
 import Poll from './Poll'
 import Login from './Login'
-import { motion, useScroll, useTransform } from 'motion/react'
+import {
+	motion,
+	useScroll,
+	useTransform,
+	useMotionValueEvent,
+} from 'motion/react'
 import { cn } from '@/lib/utils'
 
 export default function Header({ data }: ComponentProps) {
@@ -21,8 +26,10 @@ export default function Header({ data }: ComponentProps) {
 	const margin = useTransform(scrollY, [0, 100], [32, 0])
 	const borderRadius = useTransform(scrollY, [0, 100], [24, 0])
 	const borderWidth = useTransform(scrollY, [0, 100], [1, 0])
+	const arrowOpacity = useTransform(scrollY, [0, 50], [1, 0])
 
 	const [isMobile, setIsMobile] = useState(false)
+	const [hasScrolled, setHasScrolled] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
 	const [servers, setServers] = useState<ServerInfo[]>([])
 	const [alertVisible, setAlertVisible] = useState(data.alertVisible)
@@ -40,6 +47,12 @@ export default function Header({ data }: ComponentProps) {
 		window.addEventListener('resize', checkMobile)
 		return () => window.removeEventListener('resize', checkMobile)
 	}, [])
+
+	useMotionValueEvent(scrollY, 'change', latest => {
+		if (latest > 50 && !hasScrolled) {
+			setHasScrolled(true)
+		}
+	})
 
 	useEffect(() => {
 		const fetchServers = async () => {
@@ -330,7 +343,7 @@ export default function Header({ data }: ComponentProps) {
 				<div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.1),transparent)]" />
 			</div>
 
-			<div className="relative md:absolute md:top-6 md:right-6 flex justify-end mb-4 md:mb-0 z-50 gap-3">
+			<div className="relative md:absolute md:top-10 md:right-8 flex justify-start mb-4 md:mb-0 z-50 gap-2">
 				<Poll />
 				<Login data={data} />
 			</div>
@@ -362,17 +375,9 @@ export default function Header({ data }: ComponentProps) {
 							onClick={handleToggleAlert}
 							variant="outline"
 							size="sm"
-							className="bg-secondary/50 border-border text-foreground hover:bg-secondary h-7 text-xs"
+							className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
 						>
-							{alertVisible ? (
-								<>
-									<EyeOff className="size-3 mr-1" /> Hide Alert
-								</>
-							) : (
-								<>
-									<Eye className="size-3 mr-1" /> Show Alert
-								</>
-							)}
+							{alertVisible ? 'Hide Alert' : 'Show Alert'}
 						</Button>
 					)}
 					{(isAdmin || alertVisible) && (
@@ -435,19 +440,19 @@ export default function Header({ data }: ComponentProps) {
 					<div className="flex gap-2 mb-2">
 						<Button
 							onClick={handleToggleServer1}
-							variant="ghost"
+							variant="outline"
 							size="sm"
-							className="text-muted-foreground hover:text-foreground h-6 text-xs p-0 px-2"
+							className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
 						>
-							{server1Visible ? 'Hide S1' : 'Show S1'}
+							{server1Visible ? 'Hide bottom server' : 'Show bottom server'}
 						</Button>
 						<Button
 							onClick={handleToggleServer2}
-							variant="ghost"
+							variant="outline"
 							size="sm"
-							className="text-muted-foreground hover:text-foreground h-6 text-xs p-0 px-2"
+							className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
 						>
-							{server2Visible ? 'Hide S2' : 'Show S2'}
+							{server2Visible ? 'Hide top server' : 'Show top server'}
 						</Button>
 					</div>
 				)}
@@ -524,6 +529,26 @@ export default function Header({ data }: ComponentProps) {
 					</motion.div>
 				</div>
 			</div>
+
+			{!hasScrolled && (
+				<motion.div
+					style={{ opacity: arrowOpacity }}
+					className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 text-foreground pointer-events-none"
+				>
+					<motion.div
+						initial={{ y: -5 }}
+						animate={{ y: 5 }}
+						transition={{
+							duration: 1.5,
+							repeat: Infinity,
+							repeatType: 'reverse',
+							ease: 'easeInOut',
+						}}
+					>
+						<ChevronDown className="size-8 opacity-70" />
+					</motion.div>
+				</motion.div>
+			)}
 		</motion.header>
 	)
 }

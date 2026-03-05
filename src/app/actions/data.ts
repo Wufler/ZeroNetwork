@@ -2,8 +2,9 @@
 
 import prisma from '@/lib/prisma';
 import { sendWebhook } from '@/lib/webhook';
+import { getBase64 } from '@/lib/base64';
 
-export async function fetchData(): Promise<ServerConfig | null> {
+export async function fetchData() {
     const serverConfig = await prisma.serverConfig.findFirst({
         include: {
             timelineItems: {
@@ -24,7 +25,20 @@ export async function fetchData(): Promise<ServerConfig | null> {
 
     if (!serverConfig) return null;
 
-    const galleryImages = await prisma.timelineMediaItem.findMany({
+    // Attach blurDataUrl to timeline media
+    const timelineItems = await Promise.all(
+        serverConfig.timelineItems.map(async (item) => {
+            const media = await Promise.all(
+                item.media.map(async (m) => {
+                    const blurDataUrl = await getBase64(m.imageUrl);
+                    return { ...m, blurDataUrl };
+                })
+            );
+            return { ...item, media };
+        })
+    );
+
+    const galleryImagesRaw = await prisma.timelineMediaItem.findMany({
         where: {
             galleryImage: true,
             timelineItem: {
@@ -43,8 +57,16 @@ export async function fetchData(): Promise<ServerConfig | null> {
         },
     });
 
+    const galleryImages = await Promise.all(
+        galleryImagesRaw.map(async (m) => {
+            const blurDataUrl = await getBase64(m.imageUrl);
+            return { ...m, blurDataUrl };
+        })
+    );
+
     return {
         ...serverConfig,
+        timelineItems,
         galleryImages,
     };
 }

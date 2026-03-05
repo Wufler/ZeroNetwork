@@ -1,6 +1,6 @@
 'use client'
 
-import { LogOut, Eye, EyeOff, User } from 'lucide-react'
+import { LogOut, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
 	DropdownMenu,
@@ -51,20 +51,13 @@ export default function Login({ data }: ComponentProps) {
 			{isAdmin && (
 				<Button
 					variant="outline"
-					size="sm"
 					onClick={toggleVisibility}
-					className="gap-2 bg-background/80 backdrop-blur-sm border-border shadow-sm"
+					className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
 				>
 					{isVisible ? (
-						<>
-							<EyeOff className="size-4" />
-							<span className="hidden sm:inline">Disable Login</span>
-						</>
+						<span className="hidden sm:inline">Disable Login</span>
 					) : (
-						<>
-							<Eye className="size-4" />
-							<span className="hidden sm:inline">Enable Login</span>
-						</>
+						<span className="hidden sm:inline">Enable Login</span>
 					)}
 				</Button>
 			)}

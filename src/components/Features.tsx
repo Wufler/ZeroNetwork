@@ -74,8 +74,8 @@ export default function Features() {
 					</h2>
 					<p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
 						We run different kind of servers with lots of fun features for everyone.
-						Whether you like modded or modified vanilla Minecraft, we've got something
-						for you. Suggest modpacks or ideas in our Discord!
+						Whether you like modded or modified vanilla Minecraft, we&apos;ve got
+						something for you. Suggest modpacks or ideas in our Discord!
 					</p>
 				</motion.div>
 

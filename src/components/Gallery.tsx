@@ -25,6 +25,8 @@ export default function Gallery({ data }: ComponentProps) {
 							className="object-cover transition-transform duration-500 group-hover:scale-110"
 							priority
 							sizes="(max-width: 768px) 100vw, 33vw"
+							placeholder={item.blurDataUrl ? 'blur' : 'empty'}
+							blurDataURL={item.blurDataUrl || undefined}
 						/>
 						<div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 							<div className="absolute bottom-0 left-0 w-full p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">

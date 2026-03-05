@@ -12,6 +12,7 @@ import {
 	Plus,
 	Image as ImageIcon,
 	GripVertical,
+	Loader2,
 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useSession } from '@/lib/auth-client'
@@ -117,6 +118,8 @@ function SortableMediaItem({
 					alt={media.altText}
 					fill
 					className="object-cover"
+					placeholder={media.blurDataUrl ? 'blur' : 'empty'}
+					blurDataURL={media.blurDataUrl || undefined}
 				/>
 			</div>
 			<div className="flex-1 min-w-0">
@@ -488,6 +491,8 @@ function TimelineEditDialog({
 
 function TimelineModalContent({ item }: { item: TimelineItemType }) {
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+	const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
+	const [hasInteracted, setHasInteracted] = useState(false)
 	const selectedImage = item.media?.[selectedImageIndex]
 	const mediaRefs = useRef<(HTMLButtonElement | null)[]>([])
 
@@ -532,26 +537,51 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 				</div>
 			)}
 
-			<div className="relative w-full h-[35vh] lg:h-full lg:flex-1 bg-black flex items-center justify-center overflow-hidden group shrink-0">
+			<div
+				className={cn(
+					'relative w-full h-[35vh] lg:h-full shrink-0 lg:flex-1 bg-black flex items-center justify-center overflow-hidden group',
+					!hasInteracted && 'hidden lg:flex',
+				)}
+			>
 				{selectedImage ? (
 					<>
 						<div className="absolute inset-0">
 							<Image
+								key={`bg-${selectedImage.imageUrl}`}
 								src={selectedImage.imageUrl}
 								alt={selectedImage.altText}
 								fill
 								className="object-contain lg:object-cover blur-3xl opacity-30"
 								priority
+								onLoad={() =>
+									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
+								}
+								placeholder={
+									selectedImage.blurDataUrl && !loadedImages.has(selectedImage.imageUrl)
+										? 'blur'
+										: 'empty'
+								}
+								blurDataURL={selectedImage.blurDataUrl || undefined}
 							/>
 							<div className="absolute inset-0 bg-black/40" />
 						</div>
 						<div className="relative w-full h-full p-4 lg:p-12">
+							{!loadedImages.has(selectedImage.imageUrl) && (
+								<div className="absolute inset-0 flex items-center justify-center">
+									<Loader2 className="size-12 animate-spin text-primary/50" />
+								</div>
+							)}
 							<Image
+								key={`fg-${selectedImage.imageUrl}`}
 								src={selectedImage.imageUrl}
 								alt={selectedImage.altText}
 								fill
 								className="object-contain"
 								priority
+								onLoad={() =>
+									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
+								}
+								placeholder={'empty'}
 							/>
 						</div>
 
@@ -652,7 +682,10 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 											ref={el => {
 												mediaRefs.current[i] = el
 											}}
-											onClick={() => setSelectedImageIndex(i)}
+											onClick={() => {
+												setSelectedImageIndex(i)
+												setHasInteracted(true)
+											}}
 											className={cn(
 												'relative aspect-video rounded-lg overflow-hidden bg-muted transition-all duration-300',
 												selectedImageIndex === i
@@ -666,6 +699,8 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 												fill
 												className="object-cover"
 												sizes="(max-width: 768px) 33vw, 50vw"
+												placeholder={mediaItem.blurDataUrl ? 'blur' : 'empty'}
+												blurDataURL={mediaItem.blurDataUrl || undefined}
 											/>
 											<div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent transition-opacity">
 												<span className="absolute bottom-1 left-1 right-1 text-[10px] text-white/90 truncate">
@@ -882,8 +917,8 @@ function TimelineRow({
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete Timeline Item?</AlertDialogTitle>
 						<AlertDialogDescription>
-							Are you sure you want to delete "{item.title}"? This action cannot be
-							undone.
+							Are you sure you want to delete &quot;{item.title}&quot;? This action
+							cannot be undone.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -922,8 +957,9 @@ export default function Timeline({ data }: ComponentProps) {
 					</h2>
 					{isAdmin && (
 						<Button
+							variant="outline"
 							onClick={() => setShowCreateDialog(true)}
-							className="rounded-full shadow-primary/20"
+							className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
 						>
 							<Plus className="size-4" />
 							Add Timeline Item
