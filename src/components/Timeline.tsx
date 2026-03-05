@@ -586,7 +586,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 						</div>
 
 						{item.media && item.media.length > 1 && (
-							<>
+							<div className="z-50">
 								<button
 									onClick={e => {
 										e.stopPropagation()
@@ -609,11 +609,11 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 								>
 									<ChevronRight className="size-6" />
 								</button>
-							</>
+							</div>
 						)}
 
 						<div className="absolute bottom-0 w-full p-4 bg-linear-to-t from-black/90 via-black/50 to-transparent pt-16">
-							<p className="text-white/90 lg:text-lg text-base font-medium wrap-anywhere text-center">
+							<p className="text-white/90 lg:text-lg text-sm font-medium wrap-anywhere text-center">
 								{selectedImage.altText}
 							</p>
 						</div>
