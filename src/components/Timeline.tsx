@@ -612,8 +612,8 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 							</>
 						)}
 
-						<div className="absolute bottom-0 left-0 right-0 p-4 bg-linear-to-t from-black/90 via-black/50 to-transparent pt-12">
-							<p className="text-white/90 text-sm font-medium wrap-anywhere">
+						<div className="absolute bottom-0 w-full p-4 bg-linear-to-t from-black/90 via-black/50 to-transparent pt-16">
+							<p className="text-white/90 lg:text-lg text-base font-medium wrap-anywhere text-center">
 								{selectedImage.altText}
 							</p>
 						</div>

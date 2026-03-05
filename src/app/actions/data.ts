@@ -25,7 +25,6 @@ export async function fetchData() {
 
     if (!serverConfig) return null;
 
-    // Attach blurDataUrl to timeline media
     const timelineItems = await Promise.all(
         serverConfig.timelineItems.map(async (item) => {
             const media = await Promise.all(
