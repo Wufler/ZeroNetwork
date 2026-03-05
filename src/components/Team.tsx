@@ -12,7 +12,7 @@ const members = [
 		role: 'CEO & Founder',
 		location: 'United Kingdom',
 		description:
-			'The creator of "The Im Her Zero Network" (ZeroNetwork) and the host of the servers. Does datapacks as a hobby.',
+			'The creator of "The Im Her Zero Network" (ZeroNetwork). Does datapack development and sometimes manages the Minecraft servers.',
 		image: '/team/imher0.png',
 		url: 'https://github.com/ImHer0',
 	},
@@ -20,7 +20,7 @@ const members = [
 		name: 'Wolfey',
 		role: 'Web Developer',
 		location: 'Finland',
-		description: 'hi i do some web stuff and this site and some mc server stuff',
+		description: 'hi i do the website and do the game server hosting',
 		image: '/team/wolfey.png',
 		url: 'https://wolfey.me',
 	},
@@ -41,7 +41,7 @@ export default function Team() {
 					</h2>
 				</motion.div>
 
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
 					{members.map((member, i) => (
 						<motion.div
 							key={member.name}
