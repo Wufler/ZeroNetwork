@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 import Home from '@/components/Home'
 import Dev from '@/components/Dev'
 import { fetchData } from './actions/data'

@@ -7,9 +7,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'up.wolfey.me',
+        pathname: '/*',
       },
     ],
-    minimumCacheTTL: 2678400,
+    minimumCacheTTL: 86400,
   },
 };
 

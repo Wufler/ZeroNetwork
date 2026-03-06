@@ -3,7 +3,6 @@
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { Discord } from './ui/discord'
 
 export default function Footer() {
@@ -22,14 +21,14 @@ export default function Footer() {
 							variant="ghost"
 							className="rounded-full hover:bg-indigo-500/10 hover:text-indigo-500 transition-colors"
 						>
-							<Link
+							<a
 								href="https://discord.gg/a6JrZMa"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
 								<Discord className="size-5" />
 								<span className="sr-only">Discord</span>
-							</Link>
+							</a>
 						</Button>
 						<div className="h-6 w-px bg-border" />
 						<Button

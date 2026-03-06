@@ -12,7 +12,9 @@ export default function NotFound() {
 					This page either doesn&apos;t exist or got changed. 🤔
 				</p>
 				<Button size="lg" asChild>
-					<Link href={'/'}>Back to Home</Link>
+					<Link href={'/'} prefetch={false}>
+						Back to Home
+					</Link>
 				</Button>
 			</div>
 		</main>

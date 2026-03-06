@@ -124,10 +124,10 @@ function SortableMediaItem({
 					src={media.imageUrl}
 					alt={media.altText}
 					fill
+					sizes="48px"
 					className="object-cover"
 					placeholder="empty"
 					onLoad={() => setIsLoaded(true)}
-					onError={() => setIsLoaded(true)}
 				/>
 			</div>
 			<div className="flex-1 min-w-0">
@@ -560,11 +560,9 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 								alt={selectedImage.altText}
 								fill
 								className="object-contain lg:object-cover blur-3xl opacity-30"
+								sizes="(max-width: 1024px) 100vw, 70vw"
 								priority
 								onLoad={() =>
-									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
-								}
-								onError={() =>
 									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
 								}
 								placeholder="empty"
@@ -583,11 +581,9 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 								alt={selectedImage.altText}
 								fill
 								className="object-contain"
+								sizes="(max-width: 1024px) 100vw, 70vw"
 								priority
 								onLoad={() =>
-									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
-								}
-								onError={() =>
 									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
 								}
 								placeholder={'empty'}
@@ -715,13 +711,6 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 												sizes="(max-width: 768px) 33vw, 50vw"
 												placeholder="empty"
 												onLoad={() =>
-													setLoadedImages(prev => {
-														const next = new Set(prev)
-														next.add(mediaItem.imageUrl)
-														return next
-													})
-												}
-												onError={() =>
 													setLoadedImages(prev => {
 														const next = new Set(prev)
 														next.add(mediaItem.imageUrl)

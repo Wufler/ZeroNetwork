@@ -58,6 +58,7 @@ export default function WithersWrath() {
 									src="/witherswrath/icon.png"
 									alt="Withers Wrath Logo"
 									fill
+									sizes="64px"
 									className="object-cover"
 									onLoad={() =>
 										setLoadedImages(prev => {
@@ -130,6 +131,7 @@ export default function WithersWrath() {
 										src={images[currentImageIndex]}
 										alt="Withers Wrath Gameplay"
 										fill
+										sizes="(max-width: 1024px) 100vw, 50vw"
 										className="object-cover"
 										unoptimized
 										onLoad={() =>
