@@ -42,9 +42,10 @@ export default function WithersWrath() {
 			<div className="max-w-7xl mx-auto relative z-10">
 				<div className="grid lg:grid-cols-2 lg:gap-12 gap-6 items-center">
 					<motion.div
-						initial={{ opacity: 0, x: -50 }}
-						whileInView={{ opacity: 1, x: 0 }}
+						initial={{ opacity: 0, y: 20 }}
+						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true }}
+						transition={{ duration: 0.5, delay: 0.3 }}
 					>
 						<div className="flex lg:flex-row flex-col items-center lg:justify-start justify-center gap-4 lg:mb-4 mb-2">
 							<div className="relative size-16 rounded-lg overflow-hidden">
@@ -68,7 +69,7 @@ export default function WithersWrath() {
 								/>
 							</div>
 							<h2 className="font-syne text-4xl lg:text-5xl font-bold bg-linear-to-r from-[#9333EA] to-[#fd7704] bg-clip-text text-transparent">
-								Withers Wrath
+								Wither&apos;s Wrath
 							</h2>
 						</div>
 
@@ -100,9 +101,10 @@ export default function WithersWrath() {
 					</motion.div>
 
 					<motion.div
-						initial={{ opacity: 0, x: 50 }}
-						whileInView={{ opacity: 1, x: 0 }}
+						initial={{ opacity: 0, y: 20 }}
+						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true }}
+						transition={{ duration: 0.5, delay: 0.3 }}
 						className="order-1 lg:order-2"
 					>
 						<div

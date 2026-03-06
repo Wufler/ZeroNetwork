@@ -43,9 +43,9 @@ export default function Login({ data }: ComponentProps) {
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, x: 20 }}
+			initial={{ opacity: 0, x: 10 }}
 			animate={{ opacity: 1, x: 0 }}
-			transition={{ duration: 0.8 }}
+			transition={{ duration: 0.8, delay: 0.3 }}
 			className="flex items-center gap-2"
 		>
 			{isAdmin && (

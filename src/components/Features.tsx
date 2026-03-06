@@ -86,7 +86,7 @@ export default function Features() {
 							initial={{ opacity: 0, y: 20 }}
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true }}
-							transition={{ duration: 0.5, delay: feature.delay }}
+							transition={{ duration: 0.4, delay: feature.delay }}
 							className={`group relative overflow-hidden rounded-2xl border border-border/50 bg-card/70 hover:bg-card p-8 transition-all duration-300 hover:border-primary/30 shadow-sm hover:shadow-md ${feature.className} ${feature.border}`}
 						>
 							<div className="relative z-10 h-full flex flex-col justify-between">

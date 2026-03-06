@@ -628,7 +628,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 				)}
 			</div>
 
-			<div className="flex-1 lg:flex-none lg:w-112.5 flex flex-col bg-background/95 dark:bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 border-b lg:border-b-0 lg:border-l border-border overflow-hidden min-h-0">
+			<div className="flex-1 lg:flex-none lg:w-110 xl:w-170 flex flex-col bg-background/95 dark:bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 border-b lg:border-b-0 lg:border-l border-border overflow-hidden min-h-0">
 				<div className="p-6 border-b border-border hidden lg:flex items-center justify-between shrink-0 bg-muted/50">
 					<div className="flex items-center gap-3">
 						<div className="h-8 w-1 bg-primary rounded-full" />
@@ -677,7 +677,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 								<h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
 									Gallery ({item.media.length})
 								</h3>
-								<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3">
+								<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
 									{item.media.map((mediaItem, i) => (
 										<button
 											key={mediaItem.id}
@@ -734,7 +734,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 							<Button
 								asChild
 								size="lg"
-								className="text-base font-medium rounded-xl flex-1 max-w-50"
+								className="text-base font-medium rounded-xl flex-1"
 							>
 								<a href={item.detailsUrl} target="_blank" rel="noopener noreferrer">
 									Learn More <ExternalLink className="size-4" />
@@ -746,7 +746,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 								asChild
 								variant="outline"
 								size="lg"
-								className="text-base font-medium rounded-xl hover:bg-muted flex-1 max-w-50"
+								className="text-base font-medium rounded-xl hover:bg-muted flex-1"
 							>
 								<a href={item.downloadUrl} target="_blank" rel="noopener noreferrer">
 									Download <Download className="size-4" />
@@ -796,8 +796,8 @@ function TimelineRow({
 			)}
 			initial={{ opacity: 0, y: 50 }}
 			whileInView={{ opacity: 1, y: 0 }}
-			viewport={{ once: true, margin: '-10% 0px' }}
-			transition={{ duration: 0.6, delay: index * 0.1 }}
+			viewport={{ once: true, margin: '-2% 0px' }}
+			transition={{ duration: 0.4, delay: index * 0.04 }}
 		>
 			<div
 				className={cn(

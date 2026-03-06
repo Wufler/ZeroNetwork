@@ -256,7 +256,7 @@ export default function Header({ data }: ComponentProps) {
 									<Button
 										variant="link"
 										className={cn(
-											'font-syne h-auto p-0 font-bold text-foreground hover:text-primary transition-colors pb-0.5',
+											'font-syne h-auto p-0 font-bold text-foreground hover:text-primary transition-colors pb-0.5 relative',
 											isPrimary
 												? 'text-xl md:text-3xl tracking-tight'
 												: 'text-sm md:text-base font-medium',
@@ -266,8 +266,10 @@ export default function Header({ data }: ComponentProps) {
 										{getFullServerIp(server)}
 										<Clipboard
 											className={cn(
-												'opacity-0 group-hover/ip:opacity-100 transition-opacity text-primary',
-												isPrimary ? 'size-5 md:size-6' : 'size-3 md:size-4',
+												'absolute opacity-0 group-hover/ip:opacity-100 transition-opacity text-primary',
+												isPrimary
+													? 'size-5 md:size-6 -right-8 top-1/2 -translate-y-1/2'
+													: 'size-3 md:size-4 -right-5 top-1/2 -translate-y-1/2',
 											)}
 										/>
 									</Button>
@@ -279,8 +281,8 @@ export default function Header({ data }: ComponentProps) {
 								className={cn(
 									'bg-muted rounded-full overflow-hidden transition-all',
 									isPrimary
-										? 'h-1.5 w-full max-w-56 md:max-w-70'
-										: 'h-0.5 w-full max-w-32 md:max-w-45 opacity-60',
+										? 'h-1.5 w-full max-w-56 md:max-w-70 my-1'
+										: 'h-1 w-full max-w-32 md:max-w-45 mt-0.5 mb-1',
 								)}
 							>
 								<motion.div
