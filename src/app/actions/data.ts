@@ -2,7 +2,6 @@
 
 import prisma from '@/lib/prisma';
 import { sendWebhook } from '@/lib/webhook';
-import { getBase64 } from '@/lib/base64';
 
 export async function fetchData() {
     const serverConfig = await prisma.serverConfig.findFirst({
@@ -25,17 +24,7 @@ export async function fetchData() {
 
     if (!serverConfig) return null;
 
-    const timelineItems = await Promise.all(
-        serverConfig.timelineItems.map(async (item) => {
-            const media = await Promise.all(
-                item.media.map(async (m) => {
-                    const blurDataUrl = await getBase64(m.imageUrl);
-                    return { ...m, blurDataUrl };
-                })
-            );
-            return { ...item, media };
-        })
-    );
+    const timelineItems = serverConfig.timelineItems;
 
     const galleryImagesRaw = await prisma.timelineMediaItem.findMany({
         where: {
@@ -56,12 +45,7 @@ export async function fetchData() {
         },
     });
 
-    const galleryImages = await Promise.all(
-        galleryImagesRaw.map(async (m) => {
-            const blurDataUrl = await getBase64(m.imageUrl);
-            return { ...m, blurDataUrl };
-        })
-    );
+    const galleryImages = galleryImagesRaw;
 
     return {
         ...serverConfig,

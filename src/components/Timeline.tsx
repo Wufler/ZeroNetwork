@@ -81,6 +81,8 @@ function SortableMediaItem({
 	onEdit: (media: MediaItemType) => void
 	onDelete: (id: number) => void
 }) {
+	const [isLoaded, setIsLoaded] = useState(false)
+
 	const {
 		attributes,
 		listeners,
@@ -113,13 +115,18 @@ function SortableMediaItem({
 				<GripVertical className="size-4 text-muted-foreground" />
 			</button>
 			<div className="relative size-12 rounded overflow-hidden bg-muted shrink-0">
+				{!isLoaded && (
+					<div className="absolute inset-0 z-10 flex items-center justify-center bg-background/40">
+						<Loader2 className="size-4 animate-spin text-primary/50" />
+					</div>
+				)}
 				<Image
 					src={media.imageUrl}
 					alt={media.altText}
 					fill
 					className="object-cover"
-					placeholder={media.blurDataUrl ? 'blur' : 'empty'}
-					blurDataURL={media.blurDataUrl || undefined}
+					placeholder="empty"
+					onLoad={() => setIsLoaded(true)}
 				/>
 			</div>
 			<div className="flex-1 min-w-0">
@@ -556,12 +563,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 								onLoad={() =>
 									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
 								}
-								placeholder={
-									selectedImage.blurDataUrl && !loadedImages.has(selectedImage.imageUrl)
-										? 'blur'
-										: 'empty'
-								}
-								blurDataURL={selectedImage.blurDataUrl || undefined}
+								placeholder="empty"
 							/>
 							<div className="absolute inset-0 bg-black/40" />
 						</div>
@@ -693,14 +695,25 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 													: 'hover:ring-2 hover:ring-primary/50',
 											)}
 										>
+											{!loadedImages.has(mediaItem.imageUrl) && (
+												<div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
+													<Loader2 className="size-5 animate-spin text-primary/50" />
+												</div>
+											)}
 											<Image
 												src={mediaItem.imageUrl}
 												alt={mediaItem.altText}
 												fill
 												className="object-cover"
 												sizes="(max-width: 768px) 33vw, 50vw"
-												placeholder={mediaItem.blurDataUrl ? 'blur' : 'empty'}
-												blurDataURL={mediaItem.blurDataUrl || undefined}
+												placeholder="empty"
+												onLoad={() =>
+													setLoadedImages(prev => {
+														const next = new Set(prev)
+														next.add(mediaItem.imageUrl)
+														return next
+													})
+												}
 											/>
 											<div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent transition-opacity">
 												<span className="absolute bottom-1 left-1 right-1 text-[10px] text-white/90 truncate">

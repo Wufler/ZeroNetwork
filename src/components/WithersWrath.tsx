@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ExternalLink, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { Button } from './ui/button'
 import { motion, AnimatePresence } from 'motion/react'
 
@@ -17,6 +17,7 @@ const images = [
 export default function WithersWrath() {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0)
 	const [isHovered, setIsHovered] = useState(false)
+	const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
 
 	useEffect(() => {
 		if (isHovered) return
@@ -39,19 +40,31 @@ export default function WithersWrath() {
 	return (
 		<section className="py-16 lg:py-20 px-4 relative overflow-hidden">
 			<div className="max-w-7xl mx-auto relative z-10">
-				<div className="grid lg:grid-cols-2 gap-12 items-center">
+				<div className="grid lg:grid-cols-2 lg:gap-12 gap-6 items-center">
 					<motion.div
 						initial={{ opacity: 0, x: -50 }}
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true }}
 					>
-						<div className="flex lg:flex-row flex-col items-center lg:justify-start justify-center gap-4 mb-6">
+						<div className="flex lg:flex-row flex-col items-center lg:justify-start justify-center gap-4 lg:mb-4 mb-2">
 							<div className="relative size-16 rounded-lg overflow-hidden">
+								{!loadedImages.has('/witherswrath/icon.png') && (
+									<div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
+										<Loader2 className="size-5 animate-spin text-primary/50" />
+									</div>
+								)}
 								<Image
 									src="/witherswrath/icon.png"
 									alt="Withers Wrath Logo"
 									fill
 									className="object-cover"
+									onLoad={() =>
+										setLoadedImages(prev => {
+											const next = new Set(prev)
+											next.add('/witherswrath/icon.png')
+											return next
+										})
+									}
 								/>
 							</div>
 							<h2 className="font-syne text-4xl lg:text-5xl font-bold bg-linear-to-r from-[#9333EA] to-[#fd7704] bg-clip-text text-transparent">
@@ -59,7 +72,7 @@ export default function WithersWrath() {
 							</h2>
 						</div>
 
-						<p className="text-lg text-muted-foreground leading-relaxed mb-8 lg:text-left text-center">
+						<p className="text-lg text-muted-foreground leading-relaxed lg:mb-8 mb-4 lg:text-left text-center">
 							Experience the ultimate challenge in our custom datapack. Push your
 							skills to the limit with enhanced wither battles.
 						</p>
@@ -81,7 +94,7 @@ export default function WithersWrath() {
 							</Button>
 						</div>
 
-						<p className="mt-4 text-xs text-muted-foreground uppercase tracking-widest opacity-50 lg:text-left text-center">
+						<p className="lg:mt-4 mt-2 text-xs text-muted-foreground uppercase tracking-widest opacity-50 lg:text-left text-center">
 							#ad
 						</p>
 					</motion.div>
@@ -106,12 +119,24 @@ export default function WithersWrath() {
 									transition={{ duration: 0.5 }}
 									className="absolute inset-0"
 								>
+									{!loadedImages.has(images[currentImageIndex]) && (
+										<div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
+											<Loader2 className="size-8 animate-spin text-primary/50" />
+										</div>
+									)}
 									<Image
 										src={images[currentImageIndex]}
 										alt="Withers Wrath Gameplay"
 										fill
 										className="object-cover"
 										unoptimized
+										onLoad={() =>
+											setLoadedImages(prev => {
+												const next = new Set(prev)
+												next.add(images[currentImageIndex])
+												return next
+											})
+										}
 									/>
 									<div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 								</motion.div>

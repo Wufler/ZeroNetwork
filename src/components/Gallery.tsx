@@ -1,9 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import Marquee from 'react-fast-marquee'
+import { Loader2 } from 'lucide-react'
 
 export default function Gallery({ data }: ComponentProps) {
+	const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
+
 	return (
 		<div className="relative w-full overflow-hidden md:py-16 py-8 bg-background/80 backdrop-blur-sm border-y border-border">
 			<Marquee
@@ -18,6 +22,11 @@ export default function Gallery({ data }: ComponentProps) {
 						key={`${item.imageUrl}-${index}`}
 						className="group md:min-w-80 min-w-60 md:min-h-50 min-h-35 relative rounded-xl overflow-hidden border border-border/50 bg-muted/30 backdrop-blur-sm mx-3"
 					>
+						{!loadedImages.has(item.imageUrl) && (
+							<div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
+								<Loader2 className="size-8 animate-spin text-primary/50" />
+							</div>
+						)}
 						<Image
 							src={item.imageUrl}
 							alt={item.altText}
@@ -25,8 +34,14 @@ export default function Gallery({ data }: ComponentProps) {
 							className="object-cover transition-transform duration-500 group-hover:scale-110"
 							priority
 							sizes="(max-width: 768px) 100vw, 33vw"
-							placeholder={item.blurDataUrl ? 'blur' : 'empty'}
-							blurDataURL={item.blurDataUrl || undefined}
+							placeholder="empty"
+							onLoad={() =>
+								setLoadedImages(prev => {
+									const next = new Set(prev)
+									next.add(item.imageUrl)
+									return next
+								})
+							}
 						/>
 						<div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 							<div className="absolute bottom-0 left-0 w-full p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
