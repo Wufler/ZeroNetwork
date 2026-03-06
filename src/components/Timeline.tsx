@@ -127,6 +127,7 @@ function SortableMediaItem({
 					className="object-cover"
 					placeholder="empty"
 					onLoad={() => setIsLoaded(true)}
+					onError={() => setIsLoaded(true)}
 				/>
 			</div>
 			<div className="flex-1 min-w-0">
@@ -563,6 +564,9 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 								onLoad={() =>
 									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
 								}
+								onError={() =>
+									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
+								}
 								placeholder="empty"
 							/>
 							<div className="absolute inset-0 bg-black/40" />
@@ -581,6 +585,9 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 								className="object-contain"
 								priority
 								onLoad={() =>
+									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
+								}
+								onError={() =>
 									setLoadedImages(prev => new Set(prev).add(selectedImage.imageUrl))
 								}
 								placeholder={'empty'}
@@ -708,6 +715,13 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 												sizes="(max-width: 768px) 33vw, 50vw"
 												placeholder="empty"
 												onLoad={() =>
+													setLoadedImages(prev => {
+														const next = new Set(prev)
+														next.add(mediaItem.imageUrl)
+														return next
+													})
+												}
+												onError={() =>
 													setLoadedImages(prev => {
 														const next = new Set(prev)
 														next.add(mediaItem.imageUrl)

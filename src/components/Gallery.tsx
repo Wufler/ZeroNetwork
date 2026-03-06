@@ -47,7 +47,6 @@ export default function Gallery({ data }: ComponentProps) {
 							sizes="(max-width: 768px) 100vw, 33vw"
 							placeholder="empty"
 							loading="lazy"
-							unoptimized
 							onLoad={() => markImageAsSettled(item.imageUrl)}
 							onError={() => markImageAsSettled(item.imageUrl)}
 						/>
