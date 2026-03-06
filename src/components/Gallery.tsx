@@ -8,6 +8,18 @@ import { Loader2 } from 'lucide-react'
 export default function Gallery({ data }: ComponentProps) {
 	const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
 
+	const markImageAsSettled = (imageUrl: string) => {
+		setLoadedImages(prev => {
+			if (prev.has(imageUrl)) {
+				return prev
+			}
+
+			const next = new Set(prev)
+			next.add(imageUrl)
+			return next
+		})
+	}
+
 	return (
 		<div className="relative w-full overflow-hidden md:py-16 py-8 bg-background/80 backdrop-blur-sm border-y border-border">
 			<Marquee
@@ -32,16 +44,12 @@ export default function Gallery({ data }: ComponentProps) {
 							alt={item.altText}
 							fill
 							className="object-cover transition-transform duration-500 group-hover:scale-110"
-							priority
 							sizes="(max-width: 768px) 100vw, 33vw"
 							placeholder="empty"
-							onLoad={() =>
-								setLoadedImages(prev => {
-									const next = new Set(prev)
-									next.add(item.imageUrl)
-									return next
-								})
-							}
+							loading="lazy"
+							unoptimized
+							onLoad={() => markImageAsSettled(item.imageUrl)}
+							onError={() => markImageAsSettled(item.imageUrl)}
 						/>
 						<div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 							<div className="absolute bottom-0 left-0 w-full p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">

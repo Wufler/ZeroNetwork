@@ -373,7 +373,7 @@ export default function Poll() {
 				</AlertDialogTrigger>
 				<AlertDialogContent className="w-full max-w-[calc(100vw-2rem)] sm:max-w-4xl p-0 bg-popover backdrop-blur-xl border-border shadow-2xl overflow-hidden">
 					<AlertDialogTitle className="hidden" />
-					<div className="flex h-[90vh] sm:h-150 relative z-10">
+					<div className="flex h-[60vh] sm:h-150 relative z-10">
 						<div className="hidden md:flex w-64 border-r border-border bg-muted/50 flex-col">
 							<div className="p-4 border-b border-border flex items-center justify-between">
 								<h3 className="font-syne font-bold text-foreground flex items-center gap-2">
