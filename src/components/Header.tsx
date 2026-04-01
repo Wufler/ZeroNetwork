@@ -21,7 +21,7 @@ import {
 } from 'motion/react'
 import { cn } from '@/lib/utils'
 
-export default function Header({ data }: ComponentProps) {
+export default function Header({ data, aga }: ComponentProps) {
 	const { scrollY } = useScroll()
 	const margin = useTransform(scrollY, [0, 100], [32, 0])
 	const borderRadius = useTransform(scrollY, [0, 100], [24, 0])
@@ -479,7 +479,7 @@ export default function Header({ data }: ComponentProps) {
 					>
 						<Image
 							fill
-							src="/header/2.png"
+							src={aga ? '/temp/2.png' : '/header/2.png'}
 							alt="Wither"
 							sizes="(max-width: 768px) 35vw, 420px"
 							className="object-contain object-bottom"
@@ -495,7 +495,7 @@ export default function Header({ data }: ComponentProps) {
 					>
 						<Image
 							fill
-							src="/header/3.png"
+							src={aga ? '/temp/3.png' : '/header/3.png'}
 							alt="Golem"
 							sizes="(max-width: 768px) 30vw, 350px"
 							className="object-contain object-bottom"
@@ -511,7 +511,7 @@ export default function Header({ data }: ComponentProps) {
 					>
 						<Image
 							fill
-							src="/header/4.png"
+							src={aga ? '/temp/4.png' : '/header/4.png'}
 							alt="ImHer0"
 							sizes="(max-width: 768px) 20vw, 233px"
 							className="object-contain object-bottom"
@@ -527,7 +527,7 @@ export default function Header({ data }: ComponentProps) {
 					>
 						<Image
 							fill
-							src="/header/1.png"
+							src={aga ? '/temp/1.png' : '/header/1.png'}
 							alt="Wolfey"
 							sizes="(max-width: 768px) 20vw, 233px"
 							className="object-contain object-bottom"
