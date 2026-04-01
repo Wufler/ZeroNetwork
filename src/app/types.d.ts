@@ -67,6 +67,7 @@ type ServerConfig = BaseItem & {
 
 type ComponentProps = {
     data: ServerConfig
+    aga?: boolean
 }
 
 type ImageDialogProps = {
