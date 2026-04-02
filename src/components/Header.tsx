@@ -21,7 +21,7 @@ import {
 } from 'motion/react'
 import { cn } from '@/lib/utils'
 
-export default function Header({ data, aga }: ComponentProps) {
+export default function Header({ data }: ComponentProps) {
 	const { scrollY } = useScroll()
 	const margin = useTransform(scrollY, [0, 100], [32, 0])
 	const borderRadius = useTransform(scrollY, [0, 100], [24, 0])
@@ -36,7 +36,6 @@ export default function Header({ data, aga }: ComponentProps) {
 	const [server1Visible, setServer1Visible] = useState(data.server1Visible)
 	const [server2Visible, setServer2Visible] = useState(data.server2Visible)
 	const [alertText, setAlertText] = useState(data.alertMessage)
-	const [wuh, setwuh] = useState<ServerInfo | null>(null)
 	const { data: session } = authClient.useSession()
 	const isAdmin = session?.user?.role === 'admin'
 
@@ -67,16 +66,6 @@ export default function Header({ data, aga }: ComponentProps) {
 					),
 				)
 				setServers(api)
-
-				try {
-					const res = await fetch('https://api.mcsrvstat.us/3/play.wolfey.me:25567')
-					if (res.ok) {
-						const data = await res.json()
-						setwuh(data)
-					}
-				} catch (e) {
-					console.error('Failed to fetch limited time server:', e)
-				}
 			} catch (error) {
 				console.error('Error fetching servers:', error)
 			} finally {
@@ -288,15 +277,16 @@ export default function Header({ data, aga }: ComponentProps) {
 								)}
 							</div>
 						</div>
-						{server.online && server.players && (
-							<div
-								className={cn(
-									'bg-muted rounded-full overflow-hidden transition-all',
-									isPrimary
-										? 'h-1.5 w-full max-w-56 md:max-w-70 my-1'
-										: 'h-1 w-full max-w-32 md:max-w-45 mt-0.5 mb-1',
-								)}
-							>
+						<div
+							className={cn(
+								'rounded-full overflow-hidden transition-all',
+								server.online ? 'bg-muted' : 'bg-muted/30',
+								isPrimary
+									? 'h-1.5 w-full max-w-56 md:max-w-70 my-1'
+									: 'h-1 w-full max-w-32 md:max-w-45 mt-0.5 mb-1',
+							)}
+						>
+							{server.online && server.players && (
 								<motion.div
 									initial={{ width: 0 }}
 									animate={{
@@ -305,27 +295,42 @@ export default function Header({ data, aga }: ComponentProps) {
 									transition={{ duration: 1, ease: 'easeOut' }}
 									className="h-full bg-primary"
 								/>
-							</div>
-						)}
-						{server.online && server.players && (
-							<div
-								className={cn(
-									'text-muted-foreground flex items-center gap-2 font-mono',
-									isPrimary ? 'text-sm md:text-base mt-0.5' : 'text-[10px] md:text-xs',
-								)}
-							>
-								<span>
-									{server.players.online} / {server.players.max} Players
-								</span>
-							</div>
-						)}
+							)}
+						</div>
+						<div
+							className={cn(
+								'text-muted-foreground flex items-center gap-2 font-mono',
+								isPrimary ? 'text-sm md:text-base mt-0.5' : 'text-[10px] md:text-xs',
+							)}
+						>
+							{server.version && typeof server.version === 'string' && (
+								<>
+									<span className="truncate max-w-30 md:max-w-50" title={server.version}>
+										{server.version.replace(/^Requires MC /i, '')}
+									</span>
+								</>
+							)}
+							{server.online ? (
+								server.players && (
+									<>
+										<span className="text-muted-foreground/30 text-[10px]">•</span>
+										<span>
+											{server.players.online} / {server.players.max} Player
+											{server.players.online === 1 ? '' : 's'}
+										</span>
+									</>
+								)
+							) : (
+								<span className="text-destructive/80 font-medium">Offline</span>
+							)}
+						</div>
 					</div>
 				</div>
 				{server.motd && server.motd.clean && server.motd.clean.length > 0 && (
 					<div
 						className={cn(
-							'text-muted-foreground mt-2',
-							isPrimary ? 'text-sm md:text-base' : 'text-[10px] md:text-xs',
+							'text-muted-foreground',
+							isPrimary ? 'text-sm md:text-base' : 'mt-1.5 text-[10px] md:text-xs',
 						)}
 					>
 						{isPrimary ? (
@@ -470,130 +475,7 @@ export default function Header({ data, aga }: ComponentProps) {
 						</Button>
 					</div>
 				)}
-				<div className="flex flex-col gap-6">
-					{aga && (
-						<motion.div
-							initial={{ opacity: 0, x: -20 }}
-							animate={{
-								opacity: 1,
-								x: 0,
-								background: [
-									'linear-gradient(45deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15))',
-									'linear-gradient(45deg, rgba(249, 115, 22, 0.15), rgba(234, 179, 8, 0.15))',
-									'linear-gradient(45deg, rgba(234, 179, 8, 0.15), rgba(34, 197, 94, 0.15))',
-									'linear-gradient(45deg, rgba(34, 197, 94, 0.15), rgba(59, 130, 246, 0.15))',
-									'linear-gradient(45deg, rgba(59, 130, 246, 0.15), rgba(168, 85, 247, 0.15))',
-									'linear-gradient(45deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15))',
-									'linear-gradient(45deg, rgba(236, 72, 153, 0.15), rgba(239, 68, 68, 0.15))',
-								],
-							}}
-							transition={{
-								opacity: { duration: 0.5, delay: 0.2 },
-								x: { duration: 0.5, delay: 0.2 },
-								background: { duration: 10, repeat: Infinity, ease: 'linear' },
-							}}
-							className="absolute top-130 left-20 flex flex-col group gap-1 opacity-80 hover:opacity-100 animate-bounce scale-110"
-						>
-							<motion.div
-								animate={{ opacity: [1, 0.2, 1] }}
-								transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-								className="absolute pointer-events-none z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-70 h-20 scale-200"
-							>
-								<Image src="/temp/circle.png" alt="circle" fill />
-							</motion.div>
-							<motion.div
-								animate={{ x: [8, -40, 8], y: [-8, 6, -8] }}
-								transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
-								className="absolute pointer-events-none z-50 -top-10 -left-30 w-40 h-40 rotate-180"
-							>
-								<Image
-									src="/temp/arrow.png"
-									alt="arrow"
-									fill
-									className="object-contain"
-								/>
-							</motion.div>
-							<motion.div
-								animate={{ x: [8, -1, 8], y: [-8, 1, -8] }}
-								transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
-								className="absolute pointer-events-none z-50 top-0 -right-10 w-40 h-40 rotate-150"
-							>
-								<Image
-									src="/temp/arrow.png"
-									alt="arrow"
-									fill
-									className="object-contain"
-								/>
-							</motion.div>
-							<motion.div
-								animate={{ x: [8, -6, 8], y: [-8, 6, -8] }}
-								transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
-								className="absolute pointer-events-none z-50 -top-30 -right-30 w-40 h-40"
-							>
-								<Image
-									src="/temp/arrow.png"
-									alt="arrow"
-									fill
-									className="object-contain"
-								/>
-							</motion.div>
-
-							<span className="text-2xl font-bold text-foreground/70 uppercase tracking-widest mb-1">
-								only for today!! YAY!!
-							</span>
-							<div className="flex items-center gap-3 md:gap-4">
-								{wuh?.icon && (
-									<div className="relative rounded overflow-hidden bg-muted border border-border transition-all duration-300 size-10 md:size-12 opacity-80">
-										<Image
-											src={wuh.icon}
-											alt="aga"
-											fill
-											sizes="(max-width: 768px) 40px, 64px"
-											className="object-cover"
-										/>
-									</div>
-								)}
-								<div className="flex flex-col justify-center">
-									<div className="flex items-center gap-2">
-										<div className="group/ip relative">
-											<Button
-												variant="link"
-												className="font-syne h-auto p-0 font-bold text-foreground hover:text-primary transition-colors pb-0.5 relative text-sm md:text-base"
-												onClick={() => handleCopyIp('play.wolfey.me:25567')}
-											>
-												play.wolfey.me:25567
-												<Clipboard className="absolute opacity-0 group-hover/ip:opacity-100 transition-opacity text-primary size-3 md:size-4 -right-5 top-1/2 -translate-y-1/2" />
-											</Button>
-										</div>
-									</div>
-									{wuh?.online && wuh?.players && (
-										<div className="bg-muted rounded-full overflow-hidden transition-all h-1 w-full max-w-32 md:max-w-45 mt-0.5 mb-1">
-											<motion.div
-												initial={{ width: 0 }}
-												animate={{
-													width: `${(wuh.players.online / wuh.players.max) * 100}%`,
-												}}
-												transition={{ duration: 1, ease: 'easeOut' }}
-												className="h-full bg-primary"
-											/>
-										</div>
-									)}
-									{wuh?.online && wuh?.players && (
-										<div className="text-muted-foreground flex items-center gap-2 font-mono text-[10px] md:text-xs">
-											<span>
-												{wuh.players.online} / {wuh.players.max} Players
-											</span>
-										</div>
-									)}
-								</div>
-							</div>
-							{wuh?.motd?.clean && wuh.motd.clean.length > 0 && (
-								<div className="text-muted-foreground mt-2 text-[10px] md:text-xs">
-									<span dangerouslySetInnerHTML={{ __html: wuh.motd.html[0] }} />
-								</div>
-							)}
-						</motion.div>
-					)}
+				<div className="flex flex-col gap-6 sm:mb-0 mb-30">
 					{(isAdmin || server2Visible) &&
 						(isLoading || servers[1]) &&
 						renderServerInfo(servers[1], 1)}
@@ -603,7 +485,7 @@ export default function Header({ data, aga }: ComponentProps) {
 				</div>
 			</div>
 
-			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-50 lg:opacity-100 scale-50 md:scale-110 origin-bottom-right">
+			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-100 md:opacity-35 lg:opacity-100 scale-60 md:scale-110 origin-bottom-right">
 				<div className="relative w-175 h-125">
 					<motion.div
 						initial={{ opacity: 0, y: -50 }}
@@ -613,7 +495,7 @@ export default function Header({ data, aga }: ComponentProps) {
 					>
 						<Image
 							fill
-							src={aga ? '/temp/2.png' : '/header/2.png'}
+							src="/header/2.png"
 							alt="Wither"
 							sizes="(max-width: 768px) 35vw, 420px"
 							className="object-contain object-bottom"
@@ -629,7 +511,7 @@ export default function Header({ data, aga }: ComponentProps) {
 					>
 						<Image
 							fill
-							src={aga ? '/temp/3.png' : '/header/3.png'}
+							src="/header/3.png"
 							alt="Golem"
 							sizes="(max-width: 768px) 30vw, 350px"
 							className="object-contain object-bottom"
@@ -645,7 +527,7 @@ export default function Header({ data, aga }: ComponentProps) {
 					>
 						<Image
 							fill
-							src={aga ? '/temp/4.png' : '/header/4.png'}
+							src="/header/4.png"
 							alt="ImHer0"
 							sizes="(max-width: 768px) 20vw, 233px"
 							className="object-contain object-bottom"
@@ -661,7 +543,7 @@ export default function Header({ data, aga }: ComponentProps) {
 					>
 						<Image
 							fill
-							src={aga ? '/temp/1.png' : '/header/1.png'}
+							src="/header/1.png"
 							alt="Wolfey"
 							sizes="(max-width: 768px) 20vw, 233px"
 							className="object-contain object-bottom"
