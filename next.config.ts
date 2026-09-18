@@ -5,9 +5,9 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'up.wolfey.me',
-        pathname: '/*',
+        protocol: "https",
+        hostname: "up.wolfey.me",
+        pathname: "/*",
       },
     ],
     minimumCacheTTL: 86400,
