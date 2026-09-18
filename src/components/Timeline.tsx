@@ -916,13 +916,12 @@ function TimelineRow({
                   rel="noopener noreferrer"
                   className={buttonVariants({
                     variant: "outline",
-                    size: "sm",
-                    className:
-                      "rounded-full hover:bg-primary dark:hover:text-white hover:text-primary-foreground transition-all duration-300 group/btn",
+                    size: "lg",
+                    className: "rounded-full! px-4 group/btn",
                   })}
                 >
                   Download
-                  <Download className="ml-1 size-3 group-hover/btn:translate-y-0.5 transition-transform" />
+                  <Download className="ml-1 size-4 group-hover/btn:translate-y-0.5 transition-transform" />
                 </a>
               )}
 
@@ -932,11 +931,11 @@ function TimelineRow({
                     <DialogTrigger asChild>
                       <Button
                         variant="default"
-                        size="sm"
-                        className="rounded-full group/btn shadow-none"
+                        size="lg"
+                        className="rounded-full px-4 group/btn"
                       >
                         View Details
-                        <ChevronRight className="ml-1 size-3 group-hover/btn:translate-x-0.5 transition-transform" />
+                        <ChevronRight className="ml-1 size-4 group-hover/btn:translate-x-0.5 transition-transform" />
                       </Button>
                     </DialogTrigger>
                     <DialogContent
@@ -954,12 +953,13 @@ function TimelineRow({
                       rel="noopener noreferrer"
                       className={buttonVariants({
                         variant: "default",
-                        size: "sm",
-                        className: "rounded-full group/btn shadow-none",
+                        size: "lg",
+                        className:
+                          "h-9 rounded-full! px-4 text-sm group/btn shadow-none",
                       })}
                     >
                       Learn More
-                      <ChevronRight className="size-3 group-hover/btn:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="size-4 group-hover/btn:translate-x-0.5 transition-transform" />
                     </a>
                   )
                 ))}

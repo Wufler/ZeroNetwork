@@ -373,6 +373,7 @@ export default function Poll() {
         <AlertDialogTrigger asChild>
           <Button
             variant="outline"
+            size="lg"
             className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-6"
           >
             <span className="relative z-10">Community Polls</span>
@@ -841,8 +842,8 @@ export default function Poll() {
                 </div>
               </div>
 
-              <AlertDialogCancel className="hidden md:flex absolute top-2 right-2 sm:top-4 sm:right-4 z-50 size-10 items-center justify-center rounded-full border border-border bg-background/80 p-0 text-foreground shadow-none backdrop-blur-md transition-colors hover:bg-background has-[>svg]:px-0">
-                <X className="size-6" />
+              <AlertDialogCancel className="hidden md:flex absolute top-2 right-2 sm:top-4 sm:right-4 z-50 size-9 items-center justify-center rounded-full border border-border bg-background/80 p-0 text-foreground shadow-none backdrop-blur-md transition-colors hover:bg-background has-[>svg]:px-0">
+                <X className="size-5" />
               </AlertDialogCancel>
 
               <ScrollArea className="flex-1 h-full min-h-0 p-4 sm:p-6 md:p-8">
