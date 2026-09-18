@@ -25,22 +25,22 @@ Copy the `env.example` file and rename it to `.env`:
 pnpm db:start
 ```
 
-4. **Run database migrations and seed it**
+4. **Push the Drizzle schema and seed the database**
 
 ```bash
-pnpm prisma
+pnpm db:push
 ```
 
 ```bash
 pnpm db:seed
 ```
 
-5. **Start the development server and prisma studio**
+5. **Start the development server and Drizzle Studio**
 
 ```bash
 pnpm dev
 ```
 
 ```bash
-pnpm studio or npx prisma studio
+pnpm studio
 ```

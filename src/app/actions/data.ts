@@ -1,94 +1,107 @@
-'use server'
+"use server";
 
-import prisma from '@/lib/prisma';
-import { sendWebhook } from '@/lib/webhook';
+import { and, asc, desc, eq } from "drizzle-orm";
+import { db } from "@/db";
+import { serverConfigs, timelineItems, timelineMedia } from "@/db/schema";
+import { sendWebhook } from "@/lib/webhook";
 
 export async function fetchData() {
-    const serverConfig = await prisma.serverConfig.findFirst({
-        include: {
-            timelineItems: {
-                include: {
-                    media: {
-                        orderBy: {
-                            displayOrder: 'asc',
-                        }
-                    }
-                },
-                orderBy: [
-                    { year: 'desc' },
-                    { id: 'desc' },
-                ]
-            },
+  const serverConfig = await db.query.serverConfigs.findFirst({
+    with: {
+      timelineItems: {
+        with: {
+          media: {
+            orderBy: [asc(timelineMedia.displayOrder)],
+          },
         },
-    });
+        orderBy: [desc(timelineItems.year), desc(timelineItems.id)],
+      },
+    },
+  });
 
-    if (!serverConfig) return null;
+  if (!serverConfig) return null;
 
-    const timelineItems = serverConfig.timelineItems;
+  const timelineData = serverConfig.timelineItems;
 
-    const galleryImagesRaw = await prisma.timelineMediaItem.findMany({
-        where: {
-            galleryImage: true,
-            timelineItem: {
-                serverConfigId: serverConfig.id,
-            },
-        },
-        orderBy: {
-            createdAt: 'desc',
-        },
-        select: {
-            id: true,
-            imageUrl: true,
-            altText: true,
-            createdAt: true,
-            updatedAt: true,
-        },
-    });
+  const galleryImagesRaw = await db
+    .select({
+      id: timelineMedia.id,
+      imageUrl: timelineMedia.imageUrl,
+      altText: timelineMedia.altText,
+      createdAt: timelineMedia.createdAt,
+      updatedAt: timelineMedia.updatedAt,
+    })
+    .from(timelineMedia)
+    .innerJoin(
+      timelineItems,
+      eq(timelineMedia.timelineItemId, timelineItems.id),
+    )
+    .where(
+      and(
+        eq(timelineMedia.galleryImage, true),
+        eq(timelineItems.serverConfigId, serverConfig.id),
+      ),
+    )
+    .orderBy(desc(timelineMedia.createdAt));
 
-    const galleryImages = galleryImagesRaw;
+  const galleryImages = galleryImagesRaw;
 
-    return {
-        ...serverConfig,
-        timelineItems,
-        galleryImages,
-    };
+  return {
+    ...serverConfig,
+    timelineItems: timelineData,
+    galleryImages,
+  };
 }
 
 export async function updateServerIps(id: number, index: string, ip: string) {
-    const data = await prisma.serverConfig.findUnique({
-        where: { id },
-        select: { serverIps: true },
-    })
+  const data = await db.query.serverConfigs.findFirst({
+    where: eq(serverConfigs.id, id),
+    columns: { serverIps: true },
+  });
 
-    if (!data) throw new Error('Server config not found')
+  if (!data) throw new Error("Server config not found");
 
-    const updatedIps = [...data.serverIps]
-    updatedIps[parseInt(index)] = ip
+  const updatedIps = [...data.serverIps];
+  updatedIps[parseInt(index)] = ip;
 
-    await sendWebhook({
-        embeds: [{
-            title: "Server IPs Updated",
-            color: 0x3deb34,
-            fields: updatedIps.map((ip, index) => ({
-                name: `IP ${index + 1}`,
-                value: ip,
-                inline: true
-            })),
-            timestamp: new Date().toISOString()
-        }]
-    });
+  await sendWebhook({
+    embeds: [
+      {
+        title: "Server IPs Updated",
+        color: 0x3deb34,
+        fields: updatedIps.map((ip, index) => ({
+          name: `IP ${index + 1}`,
+          value: ip,
+          inline: true,
+        })),
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  });
 
-    return prisma.serverConfig.update({
-        where: { id },
-        data: { serverIps: updatedIps },
-    })
+  const [serverConfig] = await db
+    .update(serverConfigs)
+    .set({ serverIps: updatedIps })
+    .where(eq(serverConfigs.id, id))
+    .returning();
+  return serverConfig;
 }
 
-type VisibilityField = 'alertVisible' | 'server1Visible' | 'server2Visible' | 'whitelistVisible'
+type VisibilityField =
+  | "alertVisible"
+  | "server1Visible"
+  | "server2Visible"
+  | "whitelistVisible";
 
-export async function updateVisibility(id: number, field: VisibilityField, value: boolean) {
-    return prisma.serverConfig.update({
-        where: { id },
-        data: { [field]: value },
-    })
+export async function updateVisibility(
+  id: number,
+  field: VisibilityField,
+  value: boolean,
+) {
+  const [serverConfig] = await db
+    .update(serverConfigs)
+    .set({ [field]: value })
+    .where(eq(serverConfigs.id, id))
+    .returning();
+  return serverConfig;
 }

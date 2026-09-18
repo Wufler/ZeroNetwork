@@ -1,577 +1,604 @@
-'use client'
+"use client";
 
-import { useCallback, useEffect, useState } from 'react'
-import Image from 'next/image'
-import { toast } from 'sonner'
-import { AlertCircle, Clipboard, Check, X, ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import * as Editable from '@/components/ui/editable'
-import { updateServerIps, updateVisibility } from '@/app/actions/data'
-import { updateAlert } from '@/app/actions/alert'
-import { authClient } from '@/lib/auth-client'
-import Poll from './Poll'
-import Login from './Login'
+import { AlertCircle, Check, ChevronDown, Clipboard, X } from "lucide-react";
 import {
-	motion,
-	useScroll,
-	useTransform,
-	useMotionValueEvent,
-} from 'motion/react'
-import { cn } from '@/lib/utils'
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from "motion/react";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { updateAlert } from "@/app/actions/alert";
+import { updateServerIps, updateVisibility } from "@/app/actions/data";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import * as Editable from "@/components/ui/editable";
+import { Skeleton } from "@/components/ui/skeleton";
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
+import Login from "./Login";
+import Poll from "./Poll";
 
 export default function Header({ data }: ComponentProps) {
-	const { scrollY } = useScroll()
-	const margin = useTransform(scrollY, [0, 100], [32, 0])
-	const borderRadius = useTransform(scrollY, [0, 100], [24, 0])
-	const borderWidth = useTransform(scrollY, [0, 100], [1, 0])
-	const arrowOpacity = useTransform(scrollY, [0, 50], [1, 0])
+  const { scrollY } = useScroll();
+  const margin = useTransform(scrollY, [0, 100], [32, 0]);
+  const borderRadius = useTransform(scrollY, [0, 100], [24, 0]);
+  const borderWidth = useTransform(scrollY, [0, 100], [1, 0]);
+  const arrowOpacity = useTransform(scrollY, [0, 50], [1, 0]);
 
-	const [isMobile, setIsMobile] = useState(false)
-	const [hasScrolled, setHasScrolled] = useState(false)
-	const [isLoading, setIsLoading] = useState(true)
-	const [servers, setServers] = useState<ServerInfo[]>([])
-	const [alertVisible, setAlertVisible] = useState(data.alertVisible)
-	const [server1Visible, setServer1Visible] = useState(data.server1Visible)
-	const [server2Visible, setServer2Visible] = useState(data.server2Visible)
-	const [alertText, setAlertText] = useState(data.alertMessage)
-	const { data: session } = authClient.useSession()
-	const isAdmin = session?.user?.role === 'admin'
+  const [isMobile, setIsMobile] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [servers, setServers] = useState<ServerInfo[]>([]);
+  const [alertVisible, setAlertVisible] = useState(data.alertVisible);
+  const [server1Visible, setServer1Visible] = useState(data.server1Visible);
+  const [server2Visible, setServer2Visible] = useState(data.server2Visible);
+  const [alertText, setAlertText] = useState(data.alertMessage);
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
 
-	useEffect(() => {
-		const checkMobile = () => {
-			setIsMobile(window.innerWidth < 768)
-		}
-		checkMobile()
-		window.addEventListener('resize', checkMobile)
-		return () => window.removeEventListener('resize', checkMobile)
-	}, [])
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
-	useMotionValueEvent(scrollY, 'change', latest => {
-		if (latest > 50 && !hasScrolled) {
-			setHasScrolled(true)
-		}
-	})
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 50 && !hasScrolled) {
+      setHasScrolled(true);
+    }
+  });
 
-	useEffect(() => {
-		const fetchServers = async () => {
-			setIsLoading(true)
-			try {
-				const api = await Promise.all(
-					data.serverIps.map(ip =>
-						ip
-							? fetch(`https://api.mcsrvstat.us/3/${ip}`).then(res => res.json())
-							: ({} as ServerInfo),
-					),
-				)
-				setServers(api)
-			} catch (error) {
-				console.error('Error fetching servers:', error)
-			} finally {
-				setIsLoading(false)
-			}
-		}
+  useEffect(() => {
+    const fetchServers = async () => {
+      setIsLoading(true);
+      try {
+        const api = await Promise.all(
+          data.serverIps.map((ip) =>
+            ip
+              ? fetch(`https://api.mcsrvstat.us/3/${ip}`).then((res) =>
+                  res.json(),
+                )
+              : ({} as ServerInfo),
+          ),
+        );
+        setServers(api);
+      } catch (error) {
+        console.error("Error fetching servers:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-		fetchServers()
-	}, [data.serverIps])
+    fetchServers();
+  }, [data.serverIps]);
 
-	const handleIpChange = useCallback(
-		async (index: number, newIp: string) => {
-			try {
-				const updated = await updateServerIps(
-					Number(data.id),
-					index.toString(),
-					newIp,
-				)
-				const response = await fetch(
-					`https://api.mcsrvstat.us/3/${updated.serverIps[index]}`,
-				)
-				const updatedServer = await response.json()
-				setServers(prev =>
-					prev.map((server, i) => (i === index ? updatedServer : server)),
-				)
-				toast.success('Server IP updated successfully!')
-			} catch (error) {
-				console.error('Failed to update IP:', error)
-				toast.error('Failed to update server IP')
-			}
-		},
-		[data.id],
-	)
+  const handleIpChange = useCallback(
+    async (index: number, newIp: string) => {
+      try {
+        const updated = await updateServerIps(
+          Number(data.id),
+          index.toString(),
+          newIp,
+        );
+        const response = await fetch(
+          `https://api.mcsrvstat.us/3/${updated.serverIps[index]}`,
+        );
+        const updatedServer = await response.json();
+        setServers((prev) =>
+          prev.map((server, i) => (i === index ? updatedServer : server)),
+        );
+        toast.success("Server IP updated successfully!");
+      } catch (error) {
+        console.error("Failed to update IP:", error);
+        toast.error("Failed to update server IP");
+      }
+    },
+    [data.id],
+  );
 
-	const handleCopyIp = useCallback(async (text: string) => {
-		try {
-			await navigator.clipboard.writeText(text)
-			toast.success('Server IP copied to clipboard!')
-		} catch (err) {
-			console.error('Failed to copy:', err)
-			toast.error('Failed to copy server IP')
-		}
-	}, [])
+  const handleCopyIp = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Server IP copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      toast.error("Failed to copy server IP");
+    }
+  }, []);
 
-	const handleToggleAlert = useCallback(async () => {
-		try {
-			await updateVisibility(Number(data.id), 'alertVisible', !alertVisible)
-			setAlertVisible(!alertVisible)
-			toast.success('Alert visibility updated!')
-		} catch (error) {
-			console.error('Failed to update visibility:', error)
-			toast.error('Failed to update visibility')
-		}
-	}, [data.id, alertVisible])
+  const handleToggleAlert = useCallback(async () => {
+    try {
+      await updateVisibility(Number(data.id), "alertVisible", !alertVisible);
+      setAlertVisible(!alertVisible);
+      toast.success("Alert visibility updated!");
+    } catch (error) {
+      console.error("Failed to update visibility:", error);
+      toast.error("Failed to update visibility");
+    }
+  }, [data.id, alertVisible]);
 
-	const handleToggleServer1 = useCallback(async () => {
-		try {
-			await updateVisibility(Number(data.id), 'server1Visible', !server1Visible)
-			setServer1Visible(!server1Visible)
-			toast.success('Server 1 visibility updated!')
-		} catch (error) {
-			console.error('Failed to update visibility:', error)
-			toast.error('Failed to update visibility')
-		}
-	}, [data.id, server1Visible])
+  const handleToggleServer1 = useCallback(async () => {
+    try {
+      await updateVisibility(
+        Number(data.id),
+        "server1Visible",
+        !server1Visible,
+      );
+      setServer1Visible(!server1Visible);
+      toast.success("Server 1 visibility updated!");
+    } catch (error) {
+      console.error("Failed to update visibility:", error);
+      toast.error("Failed to update visibility");
+    }
+  }, [data.id, server1Visible]);
 
-	const handleToggleServer2 = useCallback(async () => {
-		try {
-			await updateVisibility(Number(data.id), 'server2Visible', !server2Visible)
-			setServer2Visible(!server2Visible)
-			toast.success('Server 2 visibility updated!')
-		} catch (error) {
-			console.error('Failed to update visibility:', error)
-			toast.error('Failed to update visibility')
-		}
-	}, [data.id, server2Visible])
+  const handleToggleServer2 = useCallback(async () => {
+    try {
+      await updateVisibility(
+        Number(data.id),
+        "server2Visible",
+        !server2Visible,
+      );
+      setServer2Visible(!server2Visible);
+      toast.success("Server 2 visibility updated!");
+    } catch (error) {
+      console.error("Failed to update visibility:", error);
+      toast.error("Failed to update visibility");
+    }
+  }, [data.id, server2Visible]);
 
-	const handleAlertChange = useCallback(
-		async (newAlert: string) => {
-			try {
-				await updateAlert(Number(data.id), newAlert)
-				setAlertText(newAlert)
-				toast.success('Alert message updated successfully!')
-			} catch (error) {
-				console.error('Failed to update alert:', error)
-				toast.error('Failed to update alert message')
-				setAlertText(data.alertMessage)
-			}
-		},
-		[data.id, data.alertMessage],
-	)
+  const handleAlertChange = useCallback(
+    async (newAlert: string) => {
+      try {
+        await updateAlert(Number(data.id), newAlert);
+        setAlertText(newAlert);
+        toast.success("Alert message updated successfully!");
+      } catch (error) {
+        console.error("Failed to update alert:", error);
+        toast.error("Failed to update alert message");
+        setAlertText(data.alertMessage);
+      }
+    },
+    [data.id, data.alertMessage],
+  );
 
-	const getFullServerIp = (server: ServerInfo) => {
-		if (!server.hostname) return 'Missing IP'
-		const port = server.port || 25565
-		return port === 25565 ? server.hostname : `${server.hostname}:${port}`
-	}
+  const getFullServerIp = (server: ServerInfo) => {
+    if (!server.hostname) return "Missing IP";
+    const port = server.port || 25565;
+    return port === 25565 ? server.hostname : `${server.hostname}:${port}`;
+  };
 
-	const renderServerInfo = (server: ServerInfo | undefined, index: number) => {
-		const isPrimary = index === 0
+  const renderServerInfo = (server: ServerInfo | undefined, index: number) => {
+    const isPrimary = index === 0;
 
-		if (isLoading) {
-			return (
-				<div className="flex flex-col gap-2 w-64">
-					<Skeleton
-						className={cn('bg-muted', isPrimary ? 'h-8 w-48' : 'h-6 w-32 opacity-50')}
-					/>
-					<Skeleton
-						className={cn('bg-muted', isPrimary ? 'h-5 w-64' : 'h-3 w-40 opacity-50')}
-					/>
-				</div>
-			)
-		}
+    if (isLoading) {
+      return (
+        <div className="flex flex-col gap-2 w-64">
+          <Skeleton
+            className={cn(
+              "bg-muted",
+              isPrimary ? "h-8 w-48" : "h-6 w-32 opacity-50",
+            )}
+          />
+          <Skeleton
+            className={cn(
+              "bg-muted",
+              isPrimary ? "h-5 w-64" : "h-3 w-40 opacity-50",
+            )}
+          />
+        </div>
+      );
+    }
 
-		if (!server) return null
+    if (!server) return null;
 
-		return (
-			<motion.div
-				initial={{ opacity: 0, x: -20 }}
-				animate={{ opacity: 1, x: 0 }}
-				transition={{ duration: 0.5, delay: index * 0.1 }}
-				className={cn(
-					'flex flex-col group',
-					isPrimary ? 'gap-2 md:gap-3' : 'gap-1 opacity-80 hover:opacity-100',
-				)}
-			>
-				<div className="flex items-center gap-3 md:gap-4">
-					{server.icon && (
-						<div
-							className={cn(
-								'relative rounded overflow-hidden bg-muted border border-border transition-all duration-300',
-								isPrimary
-									? 'size-12 md:size-16 shadow-md'
-									: 'size-10 md:size-12 opacity-80',
-							)}
-						>
-							<Image
-								src={server.icon}
-								alt={`${server.hostname} icon`}
-								fill
-								sizes="(max-width: 768px) 40px, 64px"
-								className="object-cover"
-							/>
-						</div>
-					)}
-					<div className="flex flex-col justify-center">
-						<div className="flex items-center gap-2">
-							<div className="group/ip relative">
-								{isAdmin ? (
-									<Editable.Root
-										defaultValue={getFullServerIp(server)}
-										placeholder="Missing IP"
-										triggerMode="dblclick"
-										dismissible={false}
-										onSubmit={newIp => handleIpChange(index, newIp)}
-										className="font-syne font-bold gap-0 text-foreground"
-									>
-										<div className="flex items-center gap-2">
-											<Editable.Area>
-												<Editable.Preview
-													className={cn(
-														isPrimary ? 'text-xl md:text-2xl' : 'text-sm md:text-base',
-													)}
-												/>
-												<Editable.Input className="bg-muted border-border text-foreground text-sm h-6 py-0 px-1" />
-											</Editable.Area>
-											<Editable.Toolbar className="flex gap-1">
-												<Editable.Cancel asChild>
-													<Button
-														variant="outline"
-														size="sm"
-														className="h-6 w-6 p-0 bg-muted border-border text-foreground hover:bg-muted/80"
-													>
-														<X className="size-3" />
-													</Button>
-												</Editable.Cancel>
-												<Editable.Submit asChild>
-													<Button
-														size="sm"
-														className="h-6 w-6 p-0 bg-primary text-primary-foreground hover:bg-primary/90"
-													>
-														<Check className="size-3" />
-													</Button>
-												</Editable.Submit>
-											</Editable.Toolbar>
-										</div>
-									</Editable.Root>
-								) : (
-									<Button
-										variant="link"
-										className={cn(
-											'font-syne h-auto p-0 font-bold text-foreground hover:text-primary transition-colors pb-0.5 relative',
-											isPrimary
-												? 'text-xl md:text-3xl tracking-tight'
-												: 'text-sm md:text-base font-medium',
-										)}
-										onClick={() => handleCopyIp(getFullServerIp(server))}
-									>
-										{getFullServerIp(server)}
-										<Clipboard
-											className={cn(
-												'absolute opacity-0 group-hover/ip:opacity-100 transition-opacity text-primary',
-												isPrimary
-													? 'size-5 md:size-6 -right-8 top-1/2 -translate-y-1/2'
-													: 'size-3 md:size-4 -right-5 top-1/2 -translate-y-1/2',
-											)}
-										/>
-									</Button>
-								)}
-							</div>
-						</div>
-						<div
-							className={cn(
-								'rounded-full overflow-hidden transition-all',
-								server.online ? 'bg-muted' : 'bg-muted/30',
-								isPrimary
-									? 'h-1.5 w-full max-w-56 md:max-w-70 my-1'
-									: 'h-1 w-full max-w-32 md:max-w-45 mt-0.5 mb-1',
-							)}
-						>
-							{server.online && server.players && (
-								<motion.div
-									initial={{ width: 0 }}
-									animate={{
-										width: `${(server.players.online / server.players.max) * 100}%`,
-									}}
-									transition={{ duration: 1, ease: 'easeOut' }}
-									className="h-full bg-primary"
-								/>
-							)}
-						</div>
-						<div
-							className={cn(
-								'text-muted-foreground flex items-center gap-2 font-mono',
-								isPrimary ? 'text-sm md:text-base mt-0.5' : 'text-[10px] md:text-xs',
-							)}
-						>
-							{server.version && typeof server.version === 'string' && (
-								<>
-									<span className="truncate max-w-30 md:max-w-50" title={server.version}>
-										{server.version.replace(/^Requires MC /i, '')}
-									</span>
-								</>
-							)}
-							{server.online ? (
-								server.players && (
-									<>
-										<span className="text-muted-foreground/30 text-[10px]">•</span>
-										<span>
-											{server.players.online} / {server.players.max} Player
-											{server.players.online === 1 ? '' : 's'}
-										</span>
-									</>
-								)
-							) : (
-								<span className="text-destructive/80 font-medium">Offline</span>
-							)}
-						</div>
-					</div>
-				</div>
-				{server.motd && server.motd.clean && server.motd.clean.length > 0 && (
-					<div
-						className={cn(
-							'text-muted-foreground',
-							isPrimary ? 'text-sm md:text-base' : 'mt-1.5 text-[10px] md:text-xs',
-						)}
-					>
-						{isPrimary ? (
-							<div className="flex flex-col gap-1">
-								{server.motd.html.map((line, idx) => (
-									<span key={idx} dangerouslySetInnerHTML={{ __html: line }} />
-								))}
-							</div>
-						) : (
-							<span dangerouslySetInnerHTML={{ __html: server.motd.html[0] }} />
-						)}
-					</div>
-				)}
-			</motion.div>
-		)
-	}
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        className={cn(
+          "flex flex-col group",
+          isPrimary ? "gap-2 md:gap-3" : "gap-1 opacity-80 hover:opacity-100",
+        )}
+      >
+        <div className="flex items-center gap-3 md:gap-4">
+          {server.icon && (
+            <div
+              className={cn(
+                "relative rounded overflow-hidden bg-muted border border-border transition-all duration-300",
+                isPrimary
+                  ? "size-12 md:size-16 shadow-md"
+                  : "size-10 md:size-12 opacity-80",
+              )}
+            >
+              <Image
+                src={server.icon}
+                alt={`${server.hostname} icon`}
+                fill
+                sizes="(max-width: 768px) 40px, 64px"
+                className="object-cover"
+              />
+            </div>
+          )}
+          <div className="flex flex-col justify-center">
+            <div className="flex items-center gap-2">
+              <div className="group/ip relative">
+                {isAdmin ? (
+                  <Editable.Root
+                    defaultValue={getFullServerIp(server)}
+                    placeholder="Missing IP"
+                    triggerMode="dblclick"
+                    dismissible={false}
+                    onSubmit={(newIp) => handleIpChange(index, newIp)}
+                    className="font-syne font-bold gap-0 text-foreground"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Editable.Area>
+                        <Editable.Preview
+                          className={cn(
+                            isPrimary
+                              ? "text-xl md:text-2xl"
+                              : "text-sm md:text-base",
+                          )}
+                        />
+                        <Editable.Input className="bg-muted border-border text-foreground text-sm h-6 py-0 px-1" />
+                      </Editable.Area>
+                      <Editable.Toolbar className="flex gap-1">
+                        <Editable.Cancel asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-6 w-6 p-0 bg-muted border-border text-foreground hover:bg-muted/80"
+                          >
+                            <X className="size-3" />
+                          </Button>
+                        </Editable.Cancel>
+                        <Editable.Submit asChild>
+                          <Button
+                            size="sm"
+                            className="h-6 w-6 p-0 bg-primary text-primary-foreground hover:bg-primary/90"
+                          >
+                            <Check className="size-3" />
+                          </Button>
+                        </Editable.Submit>
+                      </Editable.Toolbar>
+                    </div>
+                  </Editable.Root>
+                ) : (
+                  <Button
+                    variant="link"
+                    className={cn(
+                      "font-syne h-auto p-0 font-bold text-foreground hover:text-primary transition-colors pb-0.5 relative",
+                      isPrimary
+                        ? "text-xl md:text-3xl tracking-tight"
+                        : "text-sm md:text-base font-medium",
+                    )}
+                    onClick={() => handleCopyIp(getFullServerIp(server))}
+                  >
+                    {getFullServerIp(server)}
+                    <Clipboard
+                      className={cn(
+                        "absolute opacity-0 group-hover/ip:opacity-100 transition-opacity text-primary",
+                        isPrimary
+                          ? "size-5 md:size-6 -right-8 top-1/2 -translate-y-1/2"
+                          : "size-3 md:size-4 -right-5 top-1/2 -translate-y-1/2",
+                      )}
+                    />
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div
+              className={cn(
+                "rounded-full overflow-hidden transition-all",
+                server.online ? "bg-muted" : "bg-muted/30",
+                isPrimary
+                  ? "h-1.5 w-full max-w-56 md:max-w-70 my-1"
+                  : "h-1 w-full max-w-32 md:max-w-45 mt-0.5 mb-1",
+              )}
+            >
+              {server.online && server.players && (
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${(server.players.online / server.players.max) * 100}%`,
+                  }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="h-full bg-primary"
+                />
+              )}
+            </div>
+            <div
+              className={cn(
+                "text-muted-foreground flex items-center gap-2 font-mono",
+                isPrimary
+                  ? "text-sm md:text-base mt-0.5"
+                  : "text-[10px] md:text-xs",
+              )}
+            >
+              {server.version && typeof server.version === "string" && (
+                <>
+                  <span
+                    className="truncate max-w-30 md:max-w-50"
+                    title={server.version}
+                  >
+                    {server.version.replace(/^Requires MC /i, "")}
+                  </span>
+                </>
+              )}
+              {server.online ? (
+                server.players && (
+                  <>
+                    <span className="text-muted-foreground/30 text-[10px]">
+                      •
+                    </span>
+                    <span>
+                      {server.players.online} / {server.players.max} Player
+                      {server.players.online === 1 ? "" : "s"}
+                    </span>
+                  </>
+                )
+              ) : (
+                <span className="text-destructive/80 font-medium">Offline</span>
+              )}
+            </div>
+          </div>
+        </div>
+        {server.motd && server.motd.clean && server.motd.clean.length > 0 && (
+          <div
+            className={cn(
+              "text-muted-foreground",
+              isPrimary
+                ? "text-sm md:text-base"
+                : "mt-1.5 text-[10px] md:text-xs",
+            )}
+          >
+            {isPrimary ? (
+              <div className="flex flex-col gap-1">
+                {server.motd.html.map((line, idx) => (
+                  <span key={idx} dangerouslySetInnerHTML={{ __html: line }} />
+                ))}
+              </div>
+            ) : (
+              <span dangerouslySetInnerHTML={{ __html: server.motd.html[0] }} />
+            )}
+          </div>
+        )}
+      </motion.div>
+    );
+  };
 
-	return (
-		<motion.header
-			style={{
-				margin: isMobile ? 0 : margin,
-				borderRadius: isMobile ? 0 : borderRadius,
-				borderWidth: isMobile ? 0 : borderWidth,
-			}}
-			className="relative min-h-svh md:min-h-[calc(100svh-4rem)] flex flex-col overflow-hidden py-6 px-5 md:py-10 md:px-12 border-border bg-linear-to-br from-background/50 to-transparent backdrop-blur-sm"
-		>
-			<div className="absolute inset-0 z-[-1]">
-				<div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_0%_0%,rgba(59,130,246,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_0%_0%,rgba(59,130,246,0.1),transparent)]" />
-				<div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.1),transparent)]" />
-			</div>
+  return (
+    <motion.header
+      style={{
+        margin: isMobile ? 0 : margin,
+        borderRadius: isMobile ? 0 : borderRadius,
+        borderWidth: isMobile ? 0 : borderWidth,
+      }}
+      className="relative min-h-svh md:min-h-[calc(100svh-4rem)] flex flex-col overflow-hidden py-6 px-5 md:py-10 md:px-12 border-border bg-linear-to-br from-background/50 to-transparent backdrop-blur-sm"
+    >
+      <div className="absolute inset-0 z-[-1]">
+        <div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_0%_0%,rgba(59,130,246,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_0%_0%,rgba(59,130,246,0.1),transparent)]" />
+        <div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.1),transparent)]" />
+      </div>
 
-			<div className="relative md:absolute md:top-10 md:right-8 flex justify-start mb-4 md:mb-0 z-50 gap-2">
-				<Poll />
-				<Login data={data} />
-			</div>
+      <div className="relative md:absolute md:top-10 md:right-8 flex justify-start mb-4 md:mb-0 z-50 gap-2">
+        <Poll />
+        <Login data={data} />
+      </div>
 
-			<div className="z-30 flex flex-col items-start max-w-3xl">
-				<motion.div
-					initial={{ opacity: 0, x: -20 }}
-					animate={{ opacity: 1, x: 0 }}
-					transition={{ duration: 0.8 }}
-				>
-					<h1 className="font-syne text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight bg-linear-to-b from-foreground via-foreground to-foreground/50 bg-clip-text text-transparent drop-shadow-sm mb-2 text-left">
-						The Im Her Zero Network
-					</h1>
-				</motion.div>
+      <div className="z-30 flex flex-col items-start max-w-3xl">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <h1 className="font-syne text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight bg-linear-to-b from-foreground via-foreground to-foreground/50 bg-clip-text text-transparent drop-shadow-sm mb-2 text-left">
+            The Im Her Zero Network
+          </h1>
+        </motion.div>
 
-				<motion.p
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{ duration: 0.8, delay: 0.2 }}
-					className="text-base md:text-lg text-muted-foreground font-light max-w-md md:max-w-lg text-left"
-				>
-					Join our incredible Minecraft community and experience unique gameplay with
-					friends.
-				</motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-base md:text-lg text-muted-foreground font-light max-w-md md:max-w-lg text-left"
+        >
+          Join our incredible Minecraft community and experience unique gameplay
+          with friends.
+        </motion.p>
 
-				<div className="flex flex-col items-start">
-					{isAdmin && (
-						<Button
-							onClick={handleToggleAlert}
-							variant="outline"
-							size="sm"
-							className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
-						>
-							{alertVisible ? 'Hide Alert' : 'Show Alert'}
-						</Button>
-					)}
-					{(isAdmin || alertVisible) && (
-						<motion.div
-							initial={{ opacity: 0, x: -20 }}
-							animate={{ opacity: 1, x: 0 }}
-							transition={{ duration: 0.8, delay: 0.3 }}
-							className="max-w-md mt-3"
-						>
-							<Alert className="bg-yellow-100/90 dark:bg-yellow-500/10 backdrop-blur-sm border-yellow-500/40 dark:border-yellow-500/20 text-yellow-900 dark:text-yellow-200 py-2 px-3 shadow-sm">
-								<AlertDescription className="flex items-center gap-2 text-sm">
-									<AlertCircle className="size-4 text-yellow-500 shrink-0" />
-									{isAdmin ? (
-										<Editable.Root
-											defaultValue={alertText}
-											placeholder="Enter alert message"
-											triggerMode="dblclick"
-											dismissible={false}
-											onSubmit={handleAlertChange}
-											className="w-full"
-										>
-											<div className="flex items-center gap-2 w-full">
-												<Editable.Area className="w-full">
-													<Editable.Preview className="text-left" />
-													<Editable.Input className="bg-yellow-50 dark:bg-black/20 border-yellow-500/50 dark:border-yellow-500/30 text-yellow-900 dark:text-yellow-200 text-sm h-6 py-0" />
-												</Editable.Area>
-												<Editable.Toolbar className="flex gap-1">
-													<Editable.Cancel asChild>
-														<Button
-															variant="outline"
-															size="sm"
-															className="h-6 w-6 p-0 bg-yellow-50 dark:bg-black/20 border-yellow-500/50 dark:border-yellow-500/30 text-yellow-900 dark:text-yellow-200 hover:bg-yellow-200/50 dark:hover:bg-yellow-500/20"
-														>
-															<X className="size-3" />
-														</Button>
-													</Editable.Cancel>
-													<Editable.Submit asChild>
-														<Button
-															size="sm"
-															className="h-6 w-6 p-0 bg-yellow-600 dark:bg-yellow-500 text-white dark:text-black hover:bg-yellow-700 dark:hover:bg-yellow-400"
-														>
-															<Check className="size-3" />
-														</Button>
-													</Editable.Submit>
-												</Editable.Toolbar>
-											</div>
-										</Editable.Root>
-									) : (
-										<span>{alertText}</span>
-									)}
-								</AlertDescription>
-							</Alert>
-						</motion.div>
-					)}
-				</div>
-			</div>
+        <div className="flex flex-col items-start">
+          {isAdmin && (
+            <Button
+              onClick={handleToggleAlert}
+              variant="outline"
+              size="sm"
+              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
+            >
+              {alertVisible ? "Hide Alert" : "Show Alert"}
+            </Button>
+          )}
+          {(isAdmin || alertVisible) && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="max-w-md mt-3"
+            >
+              <Alert className="bg-yellow-100/90 dark:bg-yellow-500/10 backdrop-blur-sm border-yellow-500/40 dark:border-yellow-500/20 text-yellow-900 dark:text-yellow-200 py-2 px-3 shadow-sm">
+                <AlertDescription className="flex items-center gap-2 text-sm">
+                  <AlertCircle className="size-4 text-yellow-500 shrink-0" />
+                  {isAdmin ? (
+                    <Editable.Root
+                      defaultValue={alertText}
+                      placeholder="Enter alert message"
+                      triggerMode="dblclick"
+                      dismissible={false}
+                      onSubmit={handleAlertChange}
+                      className="w-full"
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <Editable.Area className="w-full">
+                          <Editable.Preview className="text-left" />
+                          <Editable.Input className="bg-yellow-50 dark:bg-black/20 border-yellow-500/50 dark:border-yellow-500/30 text-yellow-900 dark:text-yellow-200 text-sm h-6 py-0" />
+                        </Editable.Area>
+                        <Editable.Toolbar className="flex gap-1">
+                          <Editable.Cancel asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-6 w-6 p-0 bg-yellow-50 dark:bg-black/20 border-yellow-500/50 dark:border-yellow-500/30 text-yellow-900 dark:text-yellow-200 hover:bg-yellow-200/50 dark:hover:bg-yellow-500/20"
+                            >
+                              <X className="size-3" />
+                            </Button>
+                          </Editable.Cancel>
+                          <Editable.Submit asChild>
+                            <Button
+                              size="sm"
+                              className="h-6 w-6 p-0 bg-yellow-600 dark:bg-yellow-500 text-white dark:text-black hover:bg-yellow-700 dark:hover:bg-yellow-400"
+                            >
+                              <Check className="size-3" />
+                            </Button>
+                          </Editable.Submit>
+                        </Editable.Toolbar>
+                      </div>
+                    </Editable.Root>
+                  ) : (
+                    <span>{alertText}</span>
+                  )}
+                </AlertDescription>
+              </Alert>
+            </motion.div>
+          )}
+        </div>
+      </div>
 
-			<div className="z-30 mt-auto flex flex-col items-start gap-4">
-				{isAdmin && (
-					<div className="flex gap-2 mb-2">
-						<Button
-							onClick={handleToggleServer1}
-							variant="outline"
-							size="sm"
-							className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
-						>
-							{server1Visible ? 'Hide bottom server' : 'Show bottom server'}
-						</Button>
-						<Button
-							onClick={handleToggleServer2}
-							variant="outline"
-							size="sm"
-							className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
-						>
-							{server2Visible ? 'Hide top server' : 'Show top server'}
-						</Button>
-					</div>
-				)}
-				<div className="flex flex-col gap-6 sm:mb-0 mb-30">
-					{(isAdmin || server2Visible) &&
-						(isLoading || servers[1]) &&
-						renderServerInfo(servers[1], 1)}
-					{(isAdmin || server1Visible) &&
-						(isLoading || servers[0]) &&
-						renderServerInfo(servers[0], 0)}
-				</div>
-			</div>
+      <div className="z-30 mt-auto flex flex-col items-start gap-4">
+        {isAdmin && (
+          <div className="flex gap-2 mb-2">
+            <Button
+              onClick={handleToggleServer1}
+              variant="outline"
+              size="sm"
+              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
+            >
+              {server1Visible ? "Hide bottom server" : "Show bottom server"}
+            </Button>
+            <Button
+              onClick={handleToggleServer2}
+              variant="outline"
+              size="sm"
+              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
+            >
+              {server2Visible ? "Hide top server" : "Show top server"}
+            </Button>
+          </div>
+        )}
+        <div className="flex flex-col gap-6 sm:mb-0 mb-30">
+          {(isAdmin || server2Visible) &&
+            (isLoading || servers[1]) &&
+            renderServerInfo(servers[1], 1)}
+          {(isAdmin || server1Visible) &&
+            (isLoading || servers[0]) &&
+            renderServerInfo(servers[0], 0)}
+        </div>
+      </div>
 
-			<div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-100 md:opacity-35 lg:opacity-100 scale-60 md:scale-110 origin-bottom-right">
-				<div className="relative w-175 h-125">
-					<motion.div
-						initial={{ opacity: 0, y: -50 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 1, delay: 0.6, ease: 'easeOut' }}
-						className="absolute top-20 right-10 w-3/5 h-3/5 z-10 animate-float"
-					>
-						<Image
-							fill
-							src="/header/2.png"
-							alt="Wither"
-							sizes="(max-width: 768px) 35vw, 420px"
-							className="object-contain object-bottom"
-							priority
-						/>
-					</motion.div>
+      <div className="absolute bottom-0 right-0 z-0 -mr-4 -mb-4 md:-mb-7 md:-mr-12 pointer-events-none select-none opacity-100 md:opacity-35 lg:opacity-100 scale-60 md:scale-110 origin-bottom-right">
+        <div className="relative w-175 h-125">
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+            className="absolute top-20 right-10 w-3/5 h-3/5 z-10 animate-float"
+          >
+            <Image
+              fill
+              src="/header/2.png"
+              alt="Wither"
+              sizes="(max-width: 768px) 35vw, 420px"
+              className="object-contain object-bottom"
+              priority
+            />
+          </motion.div>
 
-					<motion.div
-						initial={{ opacity: 0, x: 40 }}
-						animate={{ opacity: 1, x: 0 }}
-						transition={{ duration: 0.9, delay: 0.3, ease: 'easeOut' }}
-						className="absolute -bottom-7 left-10 w-1/2 h-4/5 z-20"
-					>
-						<Image
-							fill
-							src="/header/3.png"
-							alt="Golem"
-							sizes="(max-width: 768px) 30vw, 350px"
-							className="object-contain object-bottom"
-							priority
-						/>
-					</motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, delay: 0.3, ease: "easeOut" }}
+            className="absolute -bottom-7 left-10 w-1/2 h-4/5 z-20"
+          >
+            <Image
+              fill
+              src="/header/3.png"
+              alt="Golem"
+              sizes="(max-width: 768px) 30vw, 350px"
+              className="object-contain object-bottom"
+              priority
+            />
+          </motion.div>
 
-					<motion.div
-						initial={{ opacity: 0, x: 60 }}
-						animate={{ opacity: 1, x: 0 }}
-						transition={{ duration: 0.9, delay: 0.5, ease: 'easeOut' }}
-						className="absolute bottom-0 right-5 w-1/3 h-3/5 z-30"
-					>
-						<Image
-							fill
-							src="/header/4.png"
-							alt="ImHer0"
-							sizes="(max-width: 768px) 20vw, 233px"
-							className="object-contain object-bottom"
-							priority
-						/>
-					</motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, delay: 0.5, ease: "easeOut" }}
+            className="absolute bottom-0 right-5 w-1/3 h-3/5 z-30"
+          >
+            <Image
+              fill
+              src="/header/4.png"
+              alt="ImHer0"
+              sizes="(max-width: 768px) 20vw, 233px"
+              className="object-contain object-bottom"
+              priority
+            />
+          </motion.div>
 
-					<motion.div
-						initial={{ opacity: 0, x: 80 }}
-						animate={{ opacity: 1, x: 0 }}
-						transition={{ duration: 0.9, delay: 0.4, ease: 'easeOut' }}
-						className="absolute bottom-0 right-40 w-1/3 h-3/5 z-40"
-					>
-						<Image
-							fill
-							src="/header/1.png"
-							alt="Wolfey"
-							sizes="(max-width: 768px) 20vw, 233px"
-							className="object-contain object-bottom"
-							priority
-						/>
-					</motion.div>
-				</div>
-			</div>
+          <motion.div
+            initial={{ opacity: 0, x: 80 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, delay: 0.4, ease: "easeOut" }}
+            className="absolute bottom-0 right-40 w-1/3 h-3/5 z-40"
+          >
+            <Image
+              fill
+              src="/header/1.png"
+              alt="Wolfey"
+              sizes="(max-width: 768px) 20vw, 233px"
+              className="object-contain object-bottom"
+              priority
+            />
+          </motion.div>
+        </div>
+      </div>
 
-			{!hasScrolled && (
-				<motion.div
-					style={{ opacity: arrowOpacity }}
-					className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 text-foreground pointer-events-none"
-				>
-					<motion.div
-						initial={{ y: -5 }}
-						animate={{ y: 5 }}
-						transition={{
-							duration: 1.5,
-							repeat: Infinity,
-							repeatType: 'reverse',
-							ease: 'easeInOut',
-						}}
-					>
-						<ChevronDown className="size-8 opacity-70" />
-					</motion.div>
-				</motion.div>
-			)}
-		</motion.header>
-	)
+      {!hasScrolled && (
+        <motion.div
+          style={{ opacity: arrowOpacity }}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 text-foreground pointer-events-none"
+        >
+          <motion.div
+            initial={{ y: -5 }}
+            animate={{ y: 5 }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            }}
+          >
+            <ChevronDown className="size-8 opacity-70" />
+          </motion.div>
+        </motion.div>
+      )}
+    </motion.header>
+  );
 }

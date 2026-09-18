@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -143,7 +144,6 @@
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0);
@@ -155,7 +155,6 @@
 }
 
 @keyframes float-opposite {
-
   0%,
   100% {
     transform: translateY(0);
