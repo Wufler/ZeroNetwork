@@ -933,7 +933,7 @@ function TimelineRow({
                       <Button
                         variant="default"
                         size="sm"
-                        className="rounded-full group/btn shadow-lg shadow-primary/20"
+                        className="rounded-full group/btn shadow-none"
                       >
                         View Details
                         <ChevronRight className="ml-1 size-3 group-hover/btn:translate-x-0.5 transition-transform" />
@@ -955,8 +955,7 @@ function TimelineRow({
                       className={buttonVariants({
                         variant: "default",
                         size: "sm",
-                        className:
-                          "rounded-full group/btn shadow-lg shadow-primary/20",
+                        className: "rounded-full group/btn shadow-none",
                       })}
                     >
                       Learn More

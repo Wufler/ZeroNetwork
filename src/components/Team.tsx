@@ -58,7 +58,7 @@ export default function Team() {
               >
                 <Card className="h-full border-0 bg-transparent shadow-none group py-0">
                   <CardContent className="p-0 h-full flex flex-col pt-16">
-                    <div className="px-8 pb-8 flex-1 bg-card dark:bg-linear-to-b dark:from-secondary/50 dark:to-background/70 text-card-foreground transition-all duration-300 rounded-2xl shadow-md group-hover:shadow-xl group-hover:-translate-y-1 relative">
+                    <div className="px-8 pb-8 flex-1 bg-linear-to-br from-neutral-100 to-neutral-200/70 dark:from-secondary/70 dark:to-background/80 text-card-foreground transition-all duration-300 rounded-2xl shadow-none group-hover:-translate-y-1 relative">
                       <div className="absolute -top-16 left-8">
                         <div className="relative size-32 rounded-2xl overflow-hidden">
                           <Image
@@ -76,7 +76,10 @@ export default function Team() {
                           <h3 className="text-2xl font-bold font-syne">
                             {member.name}
                           </h3>
-                          <Badge variant="secondary" className="font-medium">
+                          <Badge
+                            variant="secondary"
+                            className="bg-background/90 font-medium text-foreground dark:bg-secondary"
+                          >
                             {member.role}
                           </Badge>
                         </div>

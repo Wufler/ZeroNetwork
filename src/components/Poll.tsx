@@ -836,13 +836,13 @@ export default function Poll() {
                     className="h-8 w-8 p-0 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground text-foreground shadow-none rounded-md flex items-center justify-center"
                     title="Close"
                   >
-                    <X className="size-4" />
+                    <X className="size-5" />
                   </AlertDialogCancel>
                 </div>
               </div>
 
-              <AlertDialogCancel className="hidden md:flex absolute top-2 right-2 sm:top-4 sm:right-4 z-50 rounded-full bg-background/80 text-foreground hover:bg-background transition-colors backdrop-blur-md border border-border h-auto w-auto has-[>svg]:px-2">
-                <X className="size-4 sm:size-5" />
+              <AlertDialogCancel className="hidden md:flex absolute top-2 right-2 sm:top-4 sm:right-4 z-50 size-10 items-center justify-center rounded-full border border-border bg-background/80 p-0 text-foreground shadow-none backdrop-blur-md transition-colors hover:bg-background has-[>svg]:px-0">
+                <X className="size-6" />
               </AlertDialogCancel>
 
               <ScrollArea className="flex-1 h-full min-h-0 p-4 sm:p-6 md:p-8">
@@ -902,7 +902,7 @@ export default function Poll() {
                                 !poll.endedAt &&
                                 (!poll.until || !isPast(poll.until)) ? (
                                   <RadioGroup
-                                    value={selectedOption?.toString()}
+                                    value={selectedOption?.toString() ?? ""}
                                     onValueChange={(value) =>
                                       setSelectedOption(Number(value))
                                     }
@@ -912,7 +912,7 @@ export default function Poll() {
 																			relative flex items-center p-3 sm:p-4 rounded-xl border transition-all cursor-pointer
 																			${
                                         selectedOption === answerIndex
-                                          ? "bg-primary/10 border-primary/50 ring-1 ring-primary/50"
+                                          ? "bg-primary/10 border-primary/60"
                                           : "bg-muted border-border hover:bg-muted/80 hover:border-border"
                                       }
 																		`}
@@ -981,7 +981,7 @@ export default function Poll() {
                                   disabled={
                                     selectedOption === null || isVoting[poll.id]
                                   }
-                                  className="w-full font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 text-sm sm:text-base py-5 sm:py-6"
+                                  className="w-full font-medium bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base py-5 sm:py-6"
                                 >
                                   {isVoting[poll.id]
                                     ? "Submitting Vote..."

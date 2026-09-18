@@ -176,6 +176,12 @@ export default function Header({ data }: ComponentProps) {
     return port === 25565 ? server.hostname : `${server.hostname}:${port}`;
   };
 
+  const lightMOTD = (html: string) =>
+    html.replace(
+      /color:\s*(?:white|#fff(?:fff)?)/gi,
+      "color: var(--foreground)",
+    );
+
   const renderServerInfo = (server: ServerInfo | undefined, index: number) => {
     const isPrimary = index === 0;
 
@@ -365,11 +371,20 @@ export default function Header({ data }: ComponentProps) {
             {isPrimary ? (
               <div className="flex flex-col gap-1">
                 {server.motd.html.map((line, idx) => (
-                  <span key={idx} dangerouslySetInnerHTML={{ __html: line }} />
+                  <span
+                    key={idx}
+                    dangerouslySetInnerHTML={{
+                      __html: lightMOTD(line),
+                    }}
+                  />
                 ))}
               </div>
             ) : (
-              <span dangerouslySetInnerHTML={{ __html: server.motd.html[0] }} />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: lightMOTD(server.motd.html[0]),
+                }}
+              />
             )}
           </div>
         )}
@@ -391,7 +406,7 @@ export default function Header({ data }: ComponentProps) {
         <div className="absolute top-0 left-0 right-0 h-125 bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.15),transparent)] dark:bg-[radial-gradient(circle_500px_at_100%_0%,rgba(249,115,22,0.1),transparent)]" />
       </div>
 
-      <div className="relative md:absolute md:top-10 md:right-8 flex justify-start mb-4 md:mb-0 z-50 gap-2">
+      <div className="relative md:absolute md:top-10 md:right-8 flex items-center justify-start mb-4 md:mb-0 z-50 gap-2">
         <Poll />
         <Login data={data} />
       </div>
