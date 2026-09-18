@@ -1,12 +1,16 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import { useInView, useReducedMotion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Marquee from "react-fast-marquee";
 
 export default function Gallery({ data }: ComponentProps) {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { margin: "150px 0px" });
+  const reduceMotion = useReducedMotion();
 
   const markImageAsSettled = (imageUrl: string) => {
     setLoadedImages((prev) => {
@@ -21,9 +25,13 @@ export default function Gallery({ data }: ComponentProps) {
   };
 
   return (
-    <div className="relative w-full overflow-hidden md:py-16 py-8 bg-background/80 backdrop-blur-sm border-y border-border">
+    <div
+      ref={sectionRef}
+      className="relative w-full overflow-hidden md:py-16 py-8 bg-background border-y border-border"
+    >
       <Marquee
-        speed={50}
+        play={isInView && !reduceMotion}
+        speed={32}
         gradient
         gradientColor="hsl(var(--background))"
         gradientWidth={64}
@@ -32,11 +40,13 @@ export default function Gallery({ data }: ComponentProps) {
         {data.galleryImages.map((item, index) => (
           <div
             key={`${item.imageUrl}-${index}`}
-            className="group md:min-w-80 min-w-60 md:min-h-50 min-h-35 relative rounded-xl overflow-hidden border border-border/50 bg-muted/30 backdrop-blur-sm mx-3"
+            className="group md:min-w-80 min-w-60 md:min-h-50 min-h-35 relative rounded-xl overflow-hidden border border-border/50 bg-muted mx-3"
           >
             {!loadedImages.has(item.imageUrl) && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
-                <Loader2 className="size-8 animate-spin text-primary/50" />
+                <Loader2
+                  className={`size-8 text-primary/50 ${isInView ? "animate-spin" : ""}`}
+                />
               </div>
             )}
             <Image

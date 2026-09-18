@@ -4,6 +4,7 @@ import { AlertCircle, Check, ChevronDown, Clipboard, X } from "lucide-react";
 import {
   motion,
   useMotionValueEvent,
+  useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react";
@@ -22,6 +23,7 @@ import Login from "./Login";
 import Poll from "./Poll";
 
 export default function Header({ data }: ComponentProps) {
+  const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const margin = useTransform(scrollY, [0, 100], [32, 0]);
   const borderRadius = useTransform(scrollY, [0, 100], [24, 0]);
@@ -518,16 +520,27 @@ export default function Header({ data }: ComponentProps) {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-            className="absolute top-20 right-10 w-3/5 h-3/5 z-10 animate-float"
+            className="absolute top-20 right-10 w-3/5 h-3/5 z-10"
           >
-            <Image
-              fill
-              src="/header/2.png"
-              alt="Wither"
-              sizes="(max-width: 768px) 35vw, 420px"
-              className="object-contain object-bottom"
-              priority
-            />
+            <motion.div
+              className="relative size-full"
+              whileInView={reduceMotion ? undefined : { y: [0, -20, 0] }}
+              viewport={{ amount: 0.1 }}
+              transition={{
+                duration: 6,
+                ease: "easeInOut",
+                repeat: Infinity,
+              }}
+            >
+              <Image
+                fill
+                src="/header/2.png"
+                alt="Wither"
+                sizes="(max-width: 768px) 35vw, 420px"
+                className="object-contain object-bottom"
+                priority
+              />
+            </motion.div>
           </motion.div>
 
           <motion.div

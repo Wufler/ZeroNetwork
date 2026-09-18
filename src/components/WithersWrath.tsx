@@ -1,9 +1,14 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, ExternalLink, Loader2 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useReducedMotion,
+} from "motion/react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { buttonVariants } from "./ui/button";
 
 const images = [
@@ -18,16 +23,19 @@ export default function WithersWrath() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { margin: "150px 0px" });
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (isHovered) return;
+    if (isHovered || !isInView || reduceMotion) return;
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isHovered]);
+  }, [isHovered, isInView, reduceMotion]);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -38,7 +46,10 @@ export default function WithersWrath() {
   };
 
   return (
-    <section className="py-16 lg:py-20 px-4 relative overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="py-16 lg:py-20 px-4 relative overflow-hidden"
+    >
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid lg:grid-cols-2 lg:gap-12 gap-6 items-center">
           <motion.div
@@ -51,7 +62,9 @@ export default function WithersWrath() {
               <div className="relative size-16 rounded-lg overflow-hidden">
                 {!loadedImages.has("/witherswrath/icon.png") && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
-                    <Loader2 className="size-5 animate-spin text-primary/50" />
+                    <Loader2
+                      className={`size-5 text-primary/50 ${isInView ? "animate-spin" : ""}`}
+                    />
                   </div>
                 )}
                 <Image
@@ -87,7 +100,7 @@ export default function WithersWrath() {
                 className={buttonVariants({
                   size: "lg",
                   className:
-                    "bg-[#9333EA] hover:bg-[#7C22CB] text-white rounded-full px-8",
+                    "bg-[#9333EA]! hover:bg-[#7C22CB]! text-white! rounded-full px-8",
                 })}
               >
                 <span>View on Modrinth</span>
@@ -123,7 +136,9 @@ export default function WithersWrath() {
                 >
                   {!loadedImages.has(images[currentImageIndex]) && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
-                      <Loader2 className="size-8 animate-spin text-primary/50" />
+                      <Loader2
+                        className={`size-8 text-primary/50 ${isInView ? "animate-spin" : ""}`}
+                      />
                     </div>
                   )}
                   <Image

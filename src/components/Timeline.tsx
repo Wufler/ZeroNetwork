@@ -941,7 +941,7 @@ function TimelineRow({
                     </DialogTrigger>
                     <DialogContent
                       showCloseButton={false}
-                      className="w-screen h-dvh max-w-none max-h-none m-0 p-0 rounded-none border-none bg-background/95"
+                      className="w-screen! h-dvh! max-w-none! max-h-none m-0 p-0 rounded-none border-none bg-background/95"
                     >
                       <TimelineModalContent item={item} />
                     </DialogContent>
