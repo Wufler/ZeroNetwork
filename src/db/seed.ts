@@ -206,14 +206,12 @@ async function main() {
         (image) => !imageUrls.has(image.imageUrl),
       );
       if (missingMedia.length > 0) {
-        await tx
-          .insert(timelineMedia)
-          .values(
-            missingMedia.map((image) => ({
-              ...image,
-              timelineItemId: item.id,
-            })),
-          );
+        await tx.insert(timelineMedia).values(
+          missingMedia.map((image) => ({
+            ...image,
+            timelineItemId: item.id,
+          })),
+        );
       }
     }
 
