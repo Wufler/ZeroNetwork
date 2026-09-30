@@ -1,111 +1,213 @@
 "use client";
 
-import { CheckCircle2, Clock, Gamepad2, Zap } from "lucide-react";
-import { motion } from "motion/react";
+import { CheckCircle2, Clock, Gamepad2, Pause, Play, Zap } from "lucide-react";
+import { useInView, useReducedMotion } from "motion/react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { Discord } from "./ui/discord";
 
-const features = [
+type FeatureMedia = {
+  /** Public image path; also serves as the video's poster and fallback. */
+  image: string;
+  video?: string;
+  position?: string;
+};
+
+type Feature = {
+  title: string;
+  description: string;
+  icon: typeof Clock | typeof Discord;
+  className: string;
+  media: FeatureMedia;
+};
+
+// Replace these existing server shots with each card's final media.
+// Video example: { image: "/features/uptime.webp", video: "/features/uptime.mp4" }
+const features: Feature[] = [
   {
     title: "24/7 Uptime",
     description:
       "Our servers are always online, so you can play whenever you want.",
     icon: Clock,
-    className: "md:col-span-1 md:row-span-2",
-    gradient: "from-orange-500/20 via-orange-500/5 to-transparent",
-    border: "group-hover:border-orange-500/50",
-    iconColor: "text-orange-500",
-    delay: 0.1,
+    className: "md:col-span-3 lg:col-span-7",
+    media: { image: "/header/1.png" },
   },
   {
     title: "Lag Free Experience",
     description: "Optimized performance for smooth gameplay.",
     icon: Zap,
-    className: "md:col-span-2",
-    gradient: "from-yellow-500/20 via-yellow-500/5 to-transparent",
-    border: "group-hover:border-yellow-500/50",
-    iconColor: "text-yellow-500",
-    delay: 0.2,
+    className: "md:col-span-3 lg:col-span-5",
+    media: { image: "/header/2.png" },
   },
   {
     title: "Vibrant Community",
     description: "Join our active Discord to chat, and suggest new features!",
     icon: Discord,
-    className: "md:col-span-2",
-    gradient: "from-indigo-500/20 via-indigo-500/5 to-transparent",
-    border: "group-hover:border-indigo-500/50",
-    iconColor: "text-indigo-500",
-    delay: 0.3,
+    className: "md:col-span-2 lg:col-span-4",
+    media: { image: "/header/3.png" },
   },
   {
     title: "Always Updated",
     description:
       "We try to keep the servers updated with the latest versions and patches.",
     icon: CheckCircle2,
-    className: "md:col-span-1",
-    gradient: "from-emerald-500/20 via-emerald-500/5 to-transparent",
-    border: "group-hover:border-emerald-500/50",
-    iconColor: "text-emerald-500",
-    delay: 0.4,
+    className: "md:col-span-2 lg:col-span-4",
+    media: { image: "/witherswrath/spawn.webp" },
   },
   {
     title: "Modded & Vanilla",
     description: "From modpacks to modified vanilla survival, we have it all.",
     icon: Gamepad2,
-    className: "md:col-span-2",
-    gradient: "from-blue-500/20 via-blue-500/5 to-transparent",
-    border: "group-hover:border-blue-500/50",
-    iconColor: "text-blue-500",
-    delay: 0.5,
+    className: "md:col-span-2 lg:col-span-4",
+    media: { image: "/header/4.png" },
   },
 ];
 
+function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
+  const cardRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const inView = useInView(cardRef, { amount: 0.2 });
+  const reducedMotion = useReducedMotion();
+  const [paused, setPaused] = useState<boolean | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [mediaFailed, setMediaFailed] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (
+      inView &&
+      (reducedMotion === false || paused === false) &&
+      !paused &&
+      !videoFailed
+    ) {
+      void video.play().catch(() => setPaused(true));
+    } else {
+      video.pause();
+    }
+  }, [inView, reducedMotion, paused, videoFailed]);
+
+  return (
+    <article
+      ref={cardRef}
+      className={cn(
+        "group relative isolate flex min-h-80 min-w-0 flex-col justify-end overflow-hidden rounded-2xl bg-neutral-900 text-white",
+        index < 2 ? "lg:min-h-100" : "lg:min-h-84",
+        feature.className,
+      )}
+    >
+      {!mediaFailed && (
+        <Image
+          src={feature.media.image}
+          alt=""
+          fill
+          sizes={
+            index < 2
+              ? "(max-width: 767px) 100vw, 60vw"
+              : "(max-width: 767px) 100vw, 33vw"
+          }
+          className="-z-20 object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025] motion-reduce:transform-none motion-reduce:transition-none"
+          style={{ objectPosition: feature.media.position }}
+          onError={() => setMediaFailed(true)}
+        />
+      )}
+      {feature.media.video && !videoFailed && (
+        <video
+          ref={videoRef}
+          src={inView ? feature.media.video : undefined}
+          poster={feature.media.image}
+          muted
+          loop
+          playsInline
+          preload="none"
+          aria-hidden="true"
+          tabIndex={-1}
+          className="absolute inset-0 -z-10 size-full object-cover"
+          style={{ objectPosition: feature.media.position }}
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onError={() => setVideoFailed(true)}
+        />
+      )}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-t from-black/95 via-black/50 to-black/10"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-2xl border border-white/10"
+      />
+      {feature.media.video && !videoFailed && (
+        <button
+          type="button"
+          aria-label={`${playing ? "Pause" : "Play"} ${feature.title} video`}
+          onClick={() => {
+            const video = videoRef.current;
+            if (!video) return;
+            if (playing) {
+              setPaused(true);
+              video.pause();
+            } else {
+              setPaused(false);
+              void video.play().catch(() => setPaused(true));
+            }
+          }}
+          className="absolute right-4 top-4 flex size-11 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+        >
+          {playing ? (
+            <Pause aria-hidden="true" className="size-4" />
+          ) : (
+            <Play aria-hidden="true" className="size-4" />
+          )}
+        </button>
+      )}
+      <div className={cn("px-6 pb-6 pt-30")}>
+        <feature.icon
+          aria-hidden="true"
+          className="mb-4 size-5 text-white/80"
+        />
+        <h3
+          className={cn(
+            "font-syne text-2xl font-semibold leading-tight tracking-tight text-balance",
+            index < 2 && "lg:text-3xl",
+          )}
+        >
+          {feature.title}
+        </h3>
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-white/80 lg:text-base">
+          {feature.description}
+        </p>
+      </div>
+    </article>
+  );
+}
+
 export default function Features() {
   return (
-    <section className="py-16 md:py-20 px-4 relative overflow-hidden">
-      <div className="mx-auto max-w-7xl relative z-10">
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="font-syne text-3xl md:text-7xl font-bold tracking-tight mb-6 bg-linear-to-b from-foreground via-foreground to-foreground/40 bg-clip-text text-transparent">
+    <section
+      aria-labelledby="features-heading"
+      className="relative bg-linear-to-b from-background to-transparent px-4 py-16 md:py-24"
+    >
+      <div className="mx-auto max-w-7xl">
+        <header className="mb-8 flex flex-col gap-2">
+          <h2
+            id="features-heading"
+            className="font-syne text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl"
+          >
             What are we doing!?
           </h2>
-          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="max-w-2xl text-base lg:text-lg leading-relaxed text-muted-foreground">
             We run different kind of servers with lots of fun features for
             everyone. Whether you like modded or modified vanilla Minecraft,
             we&apos;ve got something for you. Suggest modpacks or ideas in our
             Discord!
           </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feature) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: feature.delay }}
-              className={`group relative overflow-hidden rounded-2xl border border-border/50 bg-card/70 hover:bg-card p-8 transition-all duration-300 hover:border-primary/30 shadow-sm hover:shadow-md ${feature.className} ${feature.border}`}
-            >
-              <div className="relative z-10 h-full flex flex-col justify-between">
-                <div>
-                  <div
-                    className={`p-4 rounded-xl bg-background/80 w-fit mb-6 border border-border/50 shadow-sm group-hover:scale-105 transition-transform duration-300 ${feature.iconColor}`}
-                  >
-                    <feature.icon className="size-8" />
-                  </div>
-                  <h3 className="text-2xl font-bold font-syne mb-3 text-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground font-medium leading-relaxed group-hover:text-foreground/80 transition-colors">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+        </header>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-6 lg:grid-cols-12">
+          {features.map((feature, index) => (
+            <FeatureCard key={feature.title} feature={feature} index={index} />
           ))}
         </div>
       </div>

@@ -75,10 +75,13 @@ function TimelineModalContent({ item }: { item: TimelineItem }) {
               target="_blank"
               rel="noopener noreferrer"
               className={buttonVariants({
-                className: "w-full h-10 text-sm font-medium rounded-xl",
+                variant: "feature-primary",
+                size: "feature",
+                className: "w-full",
               })}
             >
-              Learn More <ExternalLink className="size-4" />
+              Learn More{" "}
+              <ExternalLink aria-hidden="true" data-icon="inline-end" />
             </a>
           )}
           {item.downloadUrl && item.showDownload && (
@@ -87,12 +90,12 @@ function TimelineModalContent({ item }: { item: TimelineItem }) {
               target="_blank"
               rel="noopener noreferrer"
               className={buttonVariants({
-                variant: "outline",
-                className:
-                  "w-full h-10 text-sm font-medium rounded-xl hover:bg-muted transition-all",
+                variant: "feature-outline",
+                size: "feature",
+                className: "w-full",
               })}
             >
-              Download <Download className="size-4" />
+              Download <Download aria-hidden="true" data-icon="inline-end" />
             </a>
           )}
         </div>
@@ -305,11 +308,13 @@ function TimelineModalContent({ item }: { item: TimelineItem }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({
-                  size: "lg",
-                  className: "text-base font-medium rounded-xl flex-1",
+                  variant: "feature-primary",
+                  size: "feature",
+                  className: "flex-1",
                 })}
               >
-                Learn More <ExternalLink className="size-4" />
+                Learn More{" "}
+                <ExternalLink aria-hidden="true" data-icon="inline-end" />
               </a>
             )}
             {item.downloadUrl && item.showDownload && (
@@ -318,13 +323,12 @@ function TimelineModalContent({ item }: { item: TimelineItem }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({
-                  variant: "outline",
-                  size: "lg",
-                  className:
-                    "text-base font-medium rounded-xl hover:bg-muted flex-1",
+                  variant: "feature-outline",
+                  size: "feature",
+                  className: "flex-1",
                 })}
               >
-                Download <Download className="size-4" />
+                Download <Download aria-hidden="true" data-icon="inline-end" />
               </a>
             )}
           </div>
@@ -369,7 +373,7 @@ function TimelineFeature({
       initial={reduceMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0 : 0.2, ease: "easeOut" }}
-      className="flex min-h-0 flex-1 flex-col items-start justify-center-safe gap-4 py-12 lg:overflow-y-auto lg:py-4 xl:gap-5 xl:py-6"
+      className="flex min-h-0 flex-1 flex-col items-start justify-center-safe gap-4 py-12 lg:-mx-2 lg:overflow-y-auto lg:px-2 lg:py-4 xl:gap-5 xl:py-6"
     >
       <div className="w-full max-w-xl" aria-live="polite" aria-atomic="true">
         <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
@@ -387,9 +391,14 @@ function TimelineFeature({
           (item.media.length > 0 ? (
             <Dialog open={detailsOpen} onOpenChange={onDetailsOpenChange}>
               <DialogTrigger
-                render={<Button size="lg" className="rounded-full px-5 h-11" />}
+                render={<Button variant="feature-primary" size="feature" />}
               >
-                View Details <ChevronRight data-icon="inline-end" />
+                View Details
+                <ChevronRight
+                  aria-hidden="true"
+                  data-icon="inline-end"
+                  className="group-hover/button:translate-x-0.5 motion-reduce:transform-none"
+                />
               </DialogTrigger>
               <DialogContent
                 showCloseButton={false}
@@ -405,11 +414,12 @@ function TimelineFeature({
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({
-                  size: "lg",
-                  className: "rounded-full px-5 h-11",
+                  variant: "feature-primary",
+                  size: "feature",
                 })}
               >
-                Learn More <ExternalLink data-icon="inline-end" />
+                Learn More{" "}
+                <ExternalLink aria-hidden="true" data-icon="inline-end" />
               </a>
             )
           ))}
@@ -419,12 +429,11 @@ function TimelineFeature({
             target="_blank"
             rel="noopener noreferrer"
             className={buttonVariants({
-              variant: "outline",
-              size: "lg",
-              className: "rounded-full px-5 h-11",
+              variant: "feature-outline",
+              size: "feature",
             })}
           >
-            Download <Download data-icon="inline-end" />
+            Download <Download aria-hidden="true" data-icon="inline-end" />
           </a>
         )}
       </div>
@@ -578,7 +587,7 @@ export default function Timeline({ data }: ComponentProps) {
         )}
         <div className="mx-auto flex min-w-0 w-full max-w-7xl flex-col pt-4 pb-7 lg:h-full xl:pt-12 xl:pb-8">
           <header className="flex shrink-0 flex-wrap items-center justify-between gap-4">
-            <h2 className="font-syne text-3xl xl:text-4xl font-semibold tracking-tight">
+            <h2 className="font-syne text-3xl xl:text-5xl font-semibold tracking-tight">
               Our Journey
             </h2>
             {isAdmin && (

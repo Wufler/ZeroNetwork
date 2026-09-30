@@ -68,7 +68,7 @@ export default function Login({ data }: ComponentProps) {
               variant="outline"
               onClick={signIn}
               disabled={isPending}
-              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
+              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4 py-4.5"
             >
               <Discord className="size-5" />
               <span className={isPending ? "animate-pulse opacity-50" : ""}>
