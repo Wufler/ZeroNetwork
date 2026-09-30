@@ -23,7 +23,7 @@ function Mention({ name }: { name: string }) {
         openOnHover
         delay={200}
         closeDelay={150}
-        aria-label={`Minecraft account for @${name}`}
+        aria-label={`Profile for @${name}`}
         className="inline cursor-pointer rounded-sm font-inherit underline decoration-current/40 decoration-dotted underline-offset-4 hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
       >
         @{name}

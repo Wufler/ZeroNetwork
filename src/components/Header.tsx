@@ -438,7 +438,7 @@ export default function Header({ data }: ComponentProps) {
               onClick={handleToggleAlert}
               variant="outline"
               size="sm"
-              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
+              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4 mt-2"
             >
               {alertVisible ? "Hide Alert" : "Show Alert"}
             </Button>

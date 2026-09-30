@@ -9,6 +9,10 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
+  restrictToFirstScrollableAncestor,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
+import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
@@ -159,6 +163,7 @@ export default function TimelineEditDialog({
     downloadUrl: item?.downloadUrl || "",
   });
   const [mediaItems, setMediaItems] = useState(item?.media || []);
+  const [isMediaOrderDirty, setIsMediaOrderDirty] = useState(false);
   const [newMediaUrl, setNewMediaUrl] = useState("");
   const [newMediaAlt, setNewMediaAlt] = useState("");
   const [newMediaGalleryImage, setNewMediaGalleryImage] = useState(false);
@@ -186,6 +191,14 @@ export default function TimelineEditDialog({
     try {
       if (item) {
         await updateTimelineItem(item.id, formData);
+        if (isMediaOrderDirty) {
+          await Promise.all(
+            mediaItems.map((media, index) =>
+              updateTimelineMedia(media.id, { displayOrder: index }),
+            ),
+          );
+          setIsMediaOrderDirty(false);
+        }
         toast.success("Timeline item updated successfully");
       } else {
         await createTimelineItem(formData);
@@ -221,27 +234,17 @@ export default function TimelineEditDialog({
     }
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    if (isSaving || !over || active.id === over.id) return;
 
     const oldIndex = mediaItems.findIndex((m) => m.id === active.id);
     const newIndex = mediaItems.findIndex((m) => m.id === over.id);
 
-    const newItems = arrayMove(mediaItems, oldIndex, newIndex);
-    setMediaItems(newItems);
+    if (oldIndex === -1 || newIndex === -1) return;
 
-    try {
-      await Promise.all(
-        newItems.map((item, index) =>
-          updateTimelineMedia(item.id, { displayOrder: index }),
-        ),
-      );
-      toast.success("Order updated");
-    } catch (error) {
-      toast.error("Failed to update order");
-      console.error(error);
-    }
+    setMediaItems(arrayMove(mediaItems, oldIndex, newIndex));
+    setIsMediaOrderDirty(true);
   };
 
   const handleStartEdit = (media: TimelineMediaItem) => {
@@ -555,12 +558,17 @@ export default function TimelineEditDialog({
               <div className="mb-5 flex shrink-0 flex-col gap-1">
                 <h3 className="font-medium">Gallery media</h3>
                 <p className="text-sm text-muted-foreground">
-                  Drag to reorder. Media changes are saved immediately.
+                  Drag to reorder, then save changes to apply the order. Adding,
+                  editing, and deleting media are saved immediately.
                 </p>
               </div>
               <div className="grid min-h-0 flex-1 items-start gap-6 md:grid-cols-[minmax(0,1fr)_16rem] md:items-stretch">
                 <DndContext
                   sensors={sensors}
+                  modifiers={[
+                    restrictToVerticalAxis,
+                    restrictToFirstScrollableAncestor,
+                  ]}
                   collisionDetection={closestCenter}
                   onDragEnd={handleDragEnd}
                 >
@@ -568,7 +576,7 @@ export default function TimelineEditDialog({
                     items={mediaItems.map((m) => m.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div className="flex max-h-64 min-h-0 min-w-0 flex-col gap-2 overflow-y-auto overscroll-contain p-1 md:max-h-none">
+                    <div className="flex max-h-64 min-h-0 min-w-0 flex-col gap-2 overflow-x-hidden overflow-y-auto overscroll-contain p-1 md:max-h-none">
                       {mediaItems.length === 0 && (
                         <p className="py-8 text-sm text-muted-foreground">
                           Add your first image using the media form.

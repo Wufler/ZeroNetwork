@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { deleteProfile, saveProfile } from "@/app/actions/minecraft";
+import { deleteProfile, saveProfile } from "@/app/actions/mentions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,7 +37,7 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
     setError("");
     try {
       await saveProfile(form);
-      toast.success("Minecraft account saved");
+      toast.success("Mention saved");
       router.refresh();
       setForm(empty);
       setEditing(false);
@@ -45,7 +45,7 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
       setError(
         error instanceof Error
           ? error.message
-          : "Could not save account. Try again.",
+          : "Could not save mention. Try again.",
       );
     } finally {
       setPending(false);
@@ -62,9 +62,9 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
         setForm(empty);
         setEditing(false);
       }
-      toast.success("Minecraft account unlinked");
+      toast.success("Mention removed");
     } catch {
-      setError("Could not unlink account. Try again.");
+      setError("Could not remove mention. Try again.");
     } finally {
       setPending(false);
     }
@@ -79,16 +79,16 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
       </DialogTrigger>
       <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Link accounts</DialogTitle>
+          <DialogTitle>Mentions</DialogTitle>
           <DialogDescription>
-            Have mentions in descriptions and captions to Minecraft profiles.
-            These details are public.
+            Add profiles for @mentions in descriptions and captions. These
+            details are public.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2">
           {profiles.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No accounts linked yet. Add the first one below.
+              No mentions yet. Add the first one below.
             </p>
           )}
           {profiles.map((profile) => (
@@ -126,7 +126,7 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
                   disabled={pending}
                   onClick={() => remove(profile)}
                 >
-                  Unlink<span className="sr-only"> @{profile.mention}</span>
+                  Remove<span className="sr-only"> @{profile.mention}</span>
                 </Button>
               </div>
             </div>
@@ -135,9 +135,9 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
         <form onSubmit={save} className="flex flex-col gap-4">
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="mc-mention">Mention</FieldLabel>
+              <FieldLabel htmlFor="mention-mention">Mention</FieldLabel>
               <Input
-                id="mc-mention"
+                id="mention-mention"
                 required
                 maxLength={32}
                 pattern="@?[a-zA-Z0-9_]+"
@@ -151,9 +151,9 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="mc-username">Minecraft name</FieldLabel>
+              <FieldLabel htmlFor="mention-username">MC Username</FieldLabel>
               <Input
-                id="mc-username"
+                id="mention-username"
                 required
                 minLength={3}
                 maxLength={16}
@@ -164,9 +164,9 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="mc-uuid">UUID (optional)</FieldLabel>
+              <FieldLabel htmlFor="mention-uuid">UUID (optional)</FieldLabel>
               <Input
-                id="mc-uuid"
+                id="mention-uuid"
                 maxLength={36}
                 disabled={pending}
                 value={form.uuid}
@@ -178,9 +178,9 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="mc-bio">Bio (optional)</FieldLabel>
+              <FieldLabel htmlFor="mention-bio">Bio (optional)</FieldLabel>
               <Textarea
-                id="mc-bio"
+                id="mention-bio"
                 maxLength={280}
                 disabled={pending}
                 value={form.bio}
@@ -209,7 +209,7 @@ export default function Linking({ profiles }: { profiles: Profile[] }) {
               </Button>
             )}
             <Button type="submit" disabled={pending}>
-              {pending ? "Saving…" : editing ? "Save account" : "Link account"}
+              {pending ? "Saving…" : editing ? "Save mention" : "Add mention"}
             </Button>
           </div>
         </form>

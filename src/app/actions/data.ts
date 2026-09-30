@@ -3,7 +3,7 @@
 import { and, asc, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import {
-  minecraftProfiles,
+  mentionProfiles,
   serverConfigs,
   timelineItems,
   timelineMedia,
@@ -55,10 +55,10 @@ export async function fetchData() {
     ...serverConfig,
     timelineItems: timelineData,
     galleryImages,
-    minecraftProfiles: await db
+    mentionProfiles: await db
       .select()
-      .from(minecraftProfiles)
-      .orderBy(asc(minecraftProfiles.mention)),
+      .from(mentionProfiles)
+      .orderBy(asc(mentionProfiles.mention)),
   };
 }
 

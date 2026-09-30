@@ -487,6 +487,9 @@ export default function Timeline({ data }: ComponentProps) {
   const isAdmin = session?.user?.role === "admin";
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [backgroundStates, setBackgroundStates] = useState<
+    Record<string, "loaded" | "error">
+  >({});
   const selectedMomentRef = useRef<HTMLButtonElement>(null);
   const dragScroll = useDragScroll();
   const reduceMotion = useReducedMotion();
@@ -502,12 +505,21 @@ export default function Timeline({ data }: ComponentProps) {
   const selectedIndex = items.indexOf(selectedItem);
   const backgroundUrl =
     selectedItem?.backgroundUrl || selectedItem?.media[0]?.imageUrl;
+  const isBackgroundLoading =
+    !!backgroundUrl && !backgroundStates[backgroundUrl];
 
-  const handleDetailsOpenChange = (open: boolean) => {
-    setSelectedId(selectedItem.id);
+  const settleBackground = (url: string, state: "loaded" | "error") => {
+    setBackgroundStates((prev) => ({ ...prev, [url]: state }));
+  };
+
+  const handleDetailsOpenChange = (
+    open: boolean,
+    item: TimelineItem = selectedItem,
+  ) => {
+    setSelectedId(item.id);
     const url = new URL(window.location.href);
     if (open) {
-      url.searchParams.set("timeline", String(selectedItem.id));
+      url.searchParams.set("timeline", String(item.id));
       window.history.pushState(null, "", url);
     } else {
       url.searchParams.delete("timeline");
@@ -529,11 +541,19 @@ export default function Timeline({ data }: ComponentProps) {
       <div className="relative isolate grid overflow-hidden bg-background text-foreground px-4 lg:aspect-video">
         {backgroundUrl && (
           <Image
+            key={backgroundUrl}
             src={backgroundUrl}
             alt=""
             fill
             sizes="100vw"
-            className="pointer-events-none -z-10 object-cover object-center"
+            className={cn(
+              "pointer-events-none -z-10 object-cover object-center transition-opacity duration-300 motion-reduce:transition-none",
+              backgroundStates[backgroundUrl] === "loaded"
+                ? "opacity-100"
+                : "opacity-0",
+            )}
+            onLoad={() => settleBackground(backgroundUrl, "loaded")}
+            onError={() => settleBackground(backgroundUrl, "error")}
           />
         )}
         <div
@@ -544,6 +564,18 @@ export default function Timeline({ data }: ComponentProps) {
           className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-r from-background/95 via-background/60 to-transparent"
           aria-hidden="true"
         />
+        {isBackgroundLoading && (
+          <div
+            role="status"
+            className="pointer-events-none absolute right-4 top-4 flex items-center justify-center rounded-full bg-background/60 p-2 xl:right-12 xl:top-12"
+          >
+            <Loader2
+              aria-hidden="true"
+              className="size-5 animate-spin text-primary/50 motion-reduce:animate-none"
+            />
+            <span className="sr-only">Loading timeline background</span>
+          </div>
+        )}
         <div className="mx-auto flex min-w-0 w-full max-w-7xl flex-col pt-4 pb-7 lg:h-full xl:pt-12 xl:pb-8">
           <header className="flex shrink-0 flex-wrap items-center justify-between gap-4">
             <h2 className="font-syne text-3xl xl:text-4xl font-semibold tracking-tight">
@@ -551,7 +583,7 @@ export default function Timeline({ data }: ComponentProps) {
             </h2>
             {isAdmin && (
               <div className="flex flex-wrap gap-2">
-                <Linking profiles={data.minecraftProfiles} />
+                <Linking profiles={data.mentionProfiles} />
                 <Button
                   variant="outline"
                   onClick={() => setShowCreateDialog(true)}
@@ -570,7 +602,7 @@ export default function Timeline({ data }: ComponentProps) {
                 item={selectedItem}
                 isAdmin={isAdmin}
                 detailsOpen={!!linkedItem}
-                onDetailsOpenChange={handleDetailsOpenChange}
+                onDetailsOpenChange={(open) => handleDetailsOpenChange(open)}
               />
               <div className="mb-4 flex shrink-0 items-center justify-between">
                 <div className="flex flex-wrap items-center gap-3">
@@ -616,6 +648,11 @@ export default function Timeline({ data }: ComponentProps) {
                       aria-pressed={isSelected}
                       aria-label={`${item.year}: ${item.title}`}
                       onClick={() => setSelectedId(item.id)}
+                      onDoubleClick={() => {
+                        if (item.showDetails && item.media.length > 0) {
+                          handleDetailsOpenChange(true, item);
+                        }
+                      }}
                     >
                       <span
                         className={cn(

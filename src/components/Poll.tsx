@@ -1,5 +1,6 @@
 "use client";
-import { format, isBefore, isPast } from "date-fns";
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
+import { format, isPast } from "date-fns";
 import {
   ArrowLeft,
   ArrowRight,
@@ -23,6 +24,7 @@ import {
   togglePollVisibility,
   vote,
 } from "@/app/actions/poll";
+import PollCreate from "@/components/PollCreate";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -34,33 +36,28 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { authClient } from "@/lib/auth-client";
 import { getVisitorId } from "@/lib/fingerprint";
 
 export default function Poll() {
   const local_storage_key = "poll_votes";
-  const max_questions = 250;
-  const max_answers = 10;
   const { data: session } = authClient.useSession();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [hasUserVoted, setHasUserVoted] = useState<Record<number, boolean>>({});
   const [polls, setPolls] = useState<Polls[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedTime, setSelectedTime] = useState<string>("00:00");
   const [showVoteText, setShowVoteText] = useState<Record<number, boolean>>({});
-  const [newPoll, setNewPoll] = useState({
-    question: "",
-    answers: ["", ""],
-    timed: false,
-    until: null as Date | null,
-  });
   const [isVoting, setIsVoting] = useState<Record<number, boolean>>({});
   const [isDeleting, setIsDeleting] = useState<Record<number, boolean>>({});
   const [isToggling, setIsToggling] = useState<Record<number, boolean>>({});
@@ -68,31 +65,11 @@ export default function Poll() {
   const [activeTab, setActiveTab] = useState("0");
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [createHandle] = useState(() => DialogPrimitive.createHandle());
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createVersion, setCreateVersion] = useState(0);
   const [fingerprint, setFingerprint] = useState<string>("");
   const isAdmin = session?.user?.role === "admin";
-
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    if (date) {
-      const [hours, minutes] = selectedTime.split(":");
-      const newDate = new Date(date);
-      newDate.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-      setNewPoll((prev) => ({ ...prev, until: newDate }));
-    } else {
-      setNewPoll((prev) => ({ ...prev, until: null }));
-    }
-  };
-
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = e.target.value;
-    setSelectedTime(newTime);
-    if (selectedDate) {
-      const [hours, minutes] = newTime.split(":");
-      const newDate = new Date(selectedDate);
-      newDate.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-      setNewPoll((prev) => ({ ...prev, until: newDate }));
-    }
-  };
 
   const handleNavigation = (direction: "next" | "prev") => {
     const currentIndex = parseInt(activeTab);
@@ -212,7 +189,7 @@ export default function Poll() {
               <AlertDialogTrigger asChild>
                 <Button
                   variant="destructive"
-                  size="sm"
+                  size="lg"
                   className="w-full"
                   disabled={isDeleting[poll.id]}
                 >
@@ -241,7 +218,7 @@ export default function Poll() {
             </AlertDialog>
             <Button
               variant="outline"
-              size="sm"
+              size="lg"
               disabled={isToggling[poll.id]}
               onClick={() => handleToggleVisibility(poll.id, !poll.visible)}
               className="w-full"
@@ -257,7 +234,7 @@ export default function Poll() {
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="secondary"
-                    size="sm"
+                    size="lg"
                     className="w-full"
                     disabled={isEnding[poll.id]}
                   >
@@ -291,29 +268,22 @@ export default function Poll() {
     );
   };
 
-  const handleCreatePoll = async () => {
-    if (!isAdmin || !newPoll.question || newPoll.answers.some((a) => !a))
-      return;
+  const handleCreatePoll = async (
+    question: string,
+    answers: string[],
+    until?: Date,
+  ) => {
+    if (isCreating || !isAdmin) return;
 
     setIsCreating(true);
     try {
-      const poll = await createNewPoll(
-        newPoll.question,
-        newPoll.answers.filter(Boolean),
-        newPoll.timed && newPoll.until ? newPoll.until : undefined,
-      );
+      const poll = await createNewPoll(question, answers, until);
       await handleToggleVisibility(poll.id, true);
       const updatedPolls = await getAllPolls();
       setPolls(updatedPolls);
-      setNewPoll({
-        question: "",
-        answers: ["", ""],
-        timed: false,
-        until: null,
-      });
-
-      const visiblePolls = updatedPolls.filter((p) => p.visible);
-      const newPollIndex = visiblePolls.findIndex((p) => p.id === poll.id);
+      setCreateOpen(false);
+      setCreateVersion((version) => version + 1);
+      const newPollIndex = updatedPolls.findIndex((p) => p.id === poll.id);
       setActiveTab(newPollIndex.toString());
       toast.success("Poll created successfully!");
     } catch (error) {
@@ -369,19 +339,27 @@ export default function Poll() {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.8, delay: 0.3 }}
     >
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            variant="outline"
-            size="lg"
-            className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-6"
-          >
-            <span className="relative z-10">Community Polls</span>
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent className="w-full max-w-[calc(100vw-2rem)] sm:max-w-4xl p-0 bg-popover backdrop-blur-xl border-border shadow-2xl overflow-hidden">
-          <AlertDialogTitle className="hidden" />
-          <div className="flex h-[60vh] sm:h-150 relative z-10">
+      <Dialog>
+        <DialogTrigger
+          render={
+            <Button
+              variant="outline"
+              size="lg"
+              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-6"
+            />
+          }
+        >
+          Community Polls
+        </DialogTrigger>
+        <DialogContent
+          showCloseButton={false}
+          className="w-full max-w-[calc(100vw-2rem)] sm:max-w-4xl p-0 bg-popover backdrop-blur-xl border-border shadow-2xl overflow-hidden data-[nested-dialog-open]:brightness-50"
+        >
+          <DialogTitle className="sr-only">Community Polls</DialogTitle>
+          <DialogDescription className="sr-only">
+            Browse community polls and vote on your preferred answer.
+          </DialogDescription>
+          <div className="flex h-[60vh] sm:h-150 relative">
             <div className="hidden md:flex w-64 border-r border-border bg-muted/50 flex-col">
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <h3 className="font-syne font-bold text-foreground flex items-center gap-2">
@@ -507,149 +485,12 @@ export default function Poll() {
 
               {isAdmin && (
                 <div className="p-4 border-t border-border hidden md:block">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button className="w-full">Create New Poll</Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-popover backdrop-blur-xl border-border">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Create New Poll</AlertDialogTitle>
-                      </AlertDialogHeader>
-                      <ScrollArea className="max-h-[60vh] pr-4">
-                        <div className="space-y-4 py-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">
-                              Question
-                            </label>
-                            <Input
-                              type="text"
-                              value={newPoll.question}
-                              onChange={(e) => {
-                                const value = e.target.value.slice(
-                                  0,
-                                  max_questions,
-                                );
-                                setNewPoll((prev) => ({
-                                  ...prev,
-                                  question: value,
-                                }));
-                              }}
-                              placeholder="Enter your question"
-                              maxLength={max_questions}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">
-                              Answers
-                            </label>
-                            {newPoll.answers.map((answer, i) => (
-                              <div key={i} className="flex gap-2">
-                                <Input
-                                  type="text"
-                                  value={answer}
-                                  onChange={(e) =>
-                                    setNewPoll((prev) => ({
-                                      ...prev,
-                                      answers: prev.answers.map((a, index) =>
-                                        index === i ? e.target.value : a,
-                                      ),
-                                    }))
-                                  }
-                                  placeholder={`Answer ${i + 1}`}
-                                  maxLength={max_questions}
-                                />
-                                {newPoll.answers.length > 2 && (
-                                  <Button
-                                    variant="destructive"
-                                    size="icon"
-                                    onClick={() =>
-                                      setNewPoll((prev) => ({
-                                        ...prev,
-                                        answers: prev.answers.filter(
-                                          (_, index) => index !== i,
-                                        ),
-                                      }))
-                                    }
-                                  >
-                                    <X className="size-4" />
-                                  </Button>
-                                )}
-                              </div>
-                            ))}
-                            <Button
-                              onClick={() =>
-                                setNewPoll((prev) => ({
-                                  ...prev,
-                                  answers: [...prev.answers, ""],
-                                }))
-                              }
-                              variant="outline"
-                              className="w-full"
-                              disabled={newPoll.answers.length >= max_answers}
-                            >
-                              Add Answer Option ({newPoll.answers.length}/
-                              {max_answers})
-                            </Button>
-                          </div>
-                          <div className="space-y-4 pt-4 border-t border-border">
-                            <div className="flex items-center justify-between">
-                              <label className="text-sm font-medium text-foreground">
-                                Set poll end time
-                              </label>
-                              <Switch
-                                checked={newPoll.timed}
-                                onCheckedChange={(checked) =>
-                                  setNewPoll((prev) => ({
-                                    ...prev,
-                                    timed: checked,
-                                  }))
-                                }
-                              />
-                            </div>
-                            {newPoll.timed && (
-                              <div className="space-y-4">
-                                <Calendar
-                                  mode="single"
-                                  selected={selectedDate}
-                                  onSelect={handleDateSelect}
-                                  disabled={(date) =>
-                                    isBefore(date, new Date())
-                                  }
-                                  className="rounded-md border border-border bg-card w-full flex justify-center"
-                                />
-                                <div>
-                                  <label className="text-sm font-medium text-foreground">
-                                    Time
-                                  </label>
-                                  <Input
-                                    type="time"
-                                    value={selectedTime}
-                                    onChange={handleTimeChange}
-                                    className="mt-1"
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </ScrollArea>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <Button
-                          onClick={handleCreatePoll}
-                          disabled={
-                            !newPoll.question ||
-                            newPoll.answers.some((a) => !a) ||
-                            isCreating ||
-                            (newPoll.timed && !newPoll.until)
-                          }
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                        >
-                          {isCreating ? "Creating..." : "Create Poll"}
-                        </Button>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <DialogTrigger
+                    handle={createHandle}
+                    render={<Button className="w-full" />}
+                  >
+                    Create New Poll
+                  </DialogTrigger>
                 </div>
               )}
             </div>
@@ -664,156 +505,13 @@ export default function Poll() {
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   {isAdmin && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          title="Create New Poll"
-                        >
-                          <Plus className="size-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-popover backdrop-blur-xl border-border">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Create New Poll</AlertDialogTitle>
-                        </AlertDialogHeader>
-                        <ScrollArea className="max-h-[60vh] pr-4">
-                          <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium text-foreground">
-                                Question
-                              </label>
-                              <Input
-                                type="text"
-                                value={newPoll.question}
-                                onChange={(e) => {
-                                  const value = e.target.value.slice(
-                                    0,
-                                    max_questions,
-                                  );
-                                  setNewPoll((prev) => ({
-                                    ...prev,
-                                    question: value,
-                                  }));
-                                }}
-                                placeholder="Enter your question"
-                                maxLength={max_questions}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium text-foreground">
-                                Answers
-                              </label>
-                              {newPoll.answers.map((answer, i) => (
-                                <div key={i} className="flex gap-2">
-                                  <Input
-                                    type="text"
-                                    value={answer}
-                                    onChange={(e) =>
-                                      setNewPoll((prev) => ({
-                                        ...prev,
-                                        answers: prev.answers.map((a, index) =>
-                                          index === i ? e.target.value : a,
-                                        ),
-                                      }))
-                                    }
-                                    placeholder={`Answer ${i + 1}`}
-                                    maxLength={max_questions}
-                                  />
-                                  {newPoll.answers.length > 2 && (
-                                    <Button
-                                      variant="destructive"
-                                      size="icon"
-                                      onClick={() =>
-                                        setNewPoll((prev) => ({
-                                          ...prev,
-                                          answers: prev.answers.filter(
-                                            (_, index) => index !== i,
-                                          ),
-                                        }))
-                                      }
-                                    >
-                                      <X className="size-4" />
-                                    </Button>
-                                  )}
-                                </div>
-                              ))}
-                              <Button
-                                onClick={() =>
-                                  setNewPoll((prev) => ({
-                                    ...prev,
-                                    answers: [...prev.answers, ""],
-                                  }))
-                                }
-                                variant="outline"
-                                className="w-full"
-                                disabled={newPoll.answers.length >= max_answers}
-                              >
-                                Add Answer Option ({newPoll.answers.length}/
-                                {max_answers})
-                              </Button>
-                            </div>
-                            <div className="space-y-4 pt-4 border-t border-border">
-                              <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-foreground">
-                                  Set poll end time
-                                </label>
-                                <Switch
-                                  checked={newPoll.timed}
-                                  onCheckedChange={(checked) =>
-                                    setNewPoll((prev) => ({
-                                      ...prev,
-                                      timed: checked,
-                                    }))
-                                  }
-                                />
-                              </div>
-                              {newPoll.timed && (
-                                <div className="space-y-4">
-                                  <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={handleDateSelect}
-                                    disabled={(date) =>
-                                      isBefore(date, new Date())
-                                    }
-                                    className="rounded-md border border-border bg-card w-full flex justify-center"
-                                  />
-                                  <div>
-                                    <label className="text-sm font-medium text-foreground">
-                                      Time
-                                    </label>
-                                    <Input
-                                      type="time"
-                                      value={selectedTime}
-                                      onChange={handleTimeChange}
-                                      className="mt-1"
-                                    />
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </ScrollArea>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <Button
-                            onClick={handleCreatePoll}
-                            disabled={
-                              !newPoll.question ||
-                              newPoll.answers.some((a) => !a) ||
-                              isCreating ||
-                              (newPoll.timed && !newPoll.until)
-                            }
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                          >
-                            {isCreating ? "Creating..." : "Create Poll"}
-                          </Button>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <DialogTrigger
+                      handle={createHandle}
+                      render={<Button variant="ghost" size="icon-sm" />}
+                      aria-label="Create New Poll"
+                    >
+                      <Plus />
+                    </DialogTrigger>
                   )}
                   <Button
                     variant="ghost"
@@ -833,18 +531,14 @@ export default function Poll() {
                   >
                     <ArrowRight className="size-4" />
                   </Button>
-                  <AlertDialogCancel
-                    className="h-8 w-8 p-0 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground text-foreground shadow-none rounded-md flex items-center justify-center"
-                    title="Close"
+                  <DialogClose
+                    render={<Button variant="ghost" size="icon-sm" />}
+                    aria-label="Close polls"
                   >
-                    <X className="size-5" />
-                  </AlertDialogCancel>
+                    <X />
+                  </DialogClose>
                 </div>
               </div>
-
-              <AlertDialogCancel className="hidden md:flex absolute top-2 right-2 sm:top-4 sm:right-4 z-50 size-9 items-center justify-center rounded-full border border-border bg-background/80 p-0 text-foreground shadow-none backdrop-blur-md transition-colors hover:bg-background has-[>svg]:px-0">
-                <X className="size-5" />
-              </AlertDialogCancel>
 
               <ScrollArea className="flex-1 h-full min-h-0 p-4 sm:p-6 md:p-8">
                 {isLoading ? (
@@ -865,7 +559,7 @@ export default function Poll() {
                       }
                     >
                       <div className="space-y-6 sm:space-y-8 max-w-2xl mx-auto">
-                        <div className="space-y-2">
+                        <div className="space-y-2 md:pr-10">
                           <h2 className="text-xl sm:text-2xl font-bold font-syne text-foreground leading-tight wrap-anywhere">
                             {poll.question}
                           </h2>
@@ -1007,10 +701,30 @@ export default function Poll() {
                   ))
                 )}
               </ScrollArea>
+              <DialogClose
+                render={<Button variant="outline" size="icon" />}
+                aria-label="Close polls"
+                className="hidden md:flex absolute top-2 right-2 sm:top-4 sm:right-4 rounded-full"
+              >
+                <X />
+              </DialogClose>
             </div>
           </div>
-        </AlertDialogContent>
-      </AlertDialog>
+          <Dialog
+            handle={createHandle}
+            open={createOpen}
+            onOpenChange={(open) => {
+              if (!isCreating) setCreateOpen(open);
+            }}
+          >
+            <PollCreate
+              key={createVersion}
+              isCreating={isCreating}
+              onCreate={handleCreatePoll}
+            />
+          </Dialog>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

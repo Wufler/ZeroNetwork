@@ -37,8 +37,8 @@ export const users = pgTable(
   (table) => [uniqueIndex("user_email_key").on(table.email)],
 );
 
-export const minecraftProfiles = pgTable(
-  "minecraft_profile",
+export const mentionProfiles = pgTable(
+  "mention_profile",
   {
     id: serial("id").primaryKey(),
     mention: text("mention").notNull(),
@@ -47,7 +47,7 @@ export const minecraftProfiles = pgTable(
     bio: text("bio").notNull().default(""),
     ...timestamps,
   },
-  (table) => [uniqueIndex("minecraft_profile_mention_key").on(table.mention)],
+  (table) => [uniqueIndex("mention_profile_mention_key").on(table.mention)],
 );
 
 export const sessions = pgTable(
