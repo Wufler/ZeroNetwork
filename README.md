@@ -7,7 +7,7 @@ Check out our minecraft server where we host different modpacks and more, this i
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/WoIfey/ZeroNetwork.git
+git clone https://github.com/Wufler/ZeroNetwork.git
 cd ZeroNetwork
 ```
 
@@ -19,10 +19,14 @@ pnpm install
 
 3. **Initialize the database with docker**
 
-Copy the `env.example` file and rename it to `.env`:
+Have docker installed and copy the `env.example` file and rename it to `.env` and enter your environment variables
 
 ```bash
 pnpm db:start
+```
+or
+```bash
+pnpm db:reset
 ```
 
 4. **Push the Drizzle schema and seed the database**
