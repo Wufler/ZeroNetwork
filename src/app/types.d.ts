@@ -1,15 +1,15 @@
-type ServerPlayers = {
+declare type ServerPlayers = {
   online: number;
   max: number;
 };
 
-type ServerMotd = {
+declare type ServerMotd = {
   raw: string[];
   clean: string[];
   html: string[];
 };
 
-type ServerInfo = {
+declare type ServerInfo = {
   hostname: string;
   port?: number;
   version: string;
@@ -19,13 +19,13 @@ type ServerInfo = {
   motd?: ServerMotd;
 };
 
-type BaseItem = {
+declare type BaseItem = {
   id: number;
   createdAt: Date;
   updatedAt: Date;
 };
 
-type GalleryImage = {
+declare type GalleryImage = {
   id: number;
   imageUrl: string;
   altText: string;
@@ -33,7 +33,7 @@ type GalleryImage = {
   updatedAt: Date;
 };
 
-type TimelineMediaItem = BaseItem & {
+declare type TimelineMediaItem = BaseItem & {
   imageUrl: string;
   altText: string;
   displayOrder: number;
@@ -41,10 +41,12 @@ type TimelineMediaItem = BaseItem & {
   timelineItemId: number;
 };
 
-type TimelineItem = BaseItem & {
+declare type TimelineItem = BaseItem & {
   title: string;
   subtitle: string;
   description: string;
+  thumbnailUrl: string | null;
+  backgroundUrl: string | null;
   year: number;
   showDetails: boolean;
   showDownload: boolean;
@@ -54,7 +56,15 @@ type TimelineItem = BaseItem & {
   media: TimelineMediaItem[];
 };
 
-type ServerConfig = BaseItem & {
+declare type Profile = BaseItem & {
+  mention: string;
+  username: string;
+  uuid: string | null;
+  bio: string;
+};
+
+declare type ServerConfig = BaseItem & {
+  mentionProfiles: Profile[];
   serverIps: string[];
   alertMessage: string;
   alertVisible: boolean;
@@ -65,17 +75,11 @@ type ServerConfig = BaseItem & {
   galleryImages: GalleryImage[];
 };
 
-type ComponentProps = {
+declare type ComponentProps = {
   data: ServerConfig;
 };
 
-type ImageDialogProps = {
-  src: string;
-  alt: string;
-  index: number;
-};
-
-type Polls = {
+declare type Polls = {
   id: number;
   question: string;
   answers: string[];
@@ -91,7 +95,7 @@ type Polls = {
   };
 };
 
-type PollVote = {
+declare type PollVote = {
   id: number;
   pollId: number;
   ipHash: string;
@@ -100,7 +104,7 @@ type PollVote = {
   createdAt: Date;
 };
 
-type Embed = {
+declare type Embed = {
   title?: string;
   description?: string;
   color?: number;

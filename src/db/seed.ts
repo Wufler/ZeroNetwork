@@ -1,6 +1,13 @@
 import "dotenv/config";
+import { and, asc, eq } from "drizzle-orm";
 import { db, pool } from ".";
-import { polls, serverConfigs, timelineItems, timelineMedia } from "./schema";
+import {
+  mentionProfiles,
+  polls,
+  serverConfigs,
+  timelineItems,
+  timelineMedia,
+} from "./schema";
 
 const serverData: typeof serverConfigs.$inferInsert = {
   serverIps: ["play.wolfey.me", "play.wolfey.me:25566"],
@@ -11,7 +18,14 @@ const serverData: typeof serverConfigs.$inferInsert = {
   whitelistVisible: true,
 };
 
-const timelineData = [
+type TimelineSeed = Omit<
+  typeof timelineItems.$inferInsert,
+  "serverConfigId"
+> & {
+  media: Omit<typeof timelineMedia.$inferInsert, "timelineItemId">[];
+};
+
+const timelineData: TimelineSeed[] = [
   {
     title: "Javarock v4",
     subtitle:
@@ -23,7 +37,6 @@ const timelineData = [
     showDownload: true,
     detailsUrl: "https://feed-the-beast.com/modpacks/130-ftb-stoneblock-4",
     downloadUrl: "https://www.feed-the-beast.com/ftb-app",
-    serverConfigId: 1,
     media: [
       {
         imageUrl: "https://up.wolfey.me/Ox9BuzXO",
@@ -60,7 +73,6 @@ const timelineData = [
     showDownload: true,
     detailsUrl: "https://www.feed-the-beast.com/modpacks/129-ftb-skies-2",
     downloadUrl: "https://www.feed-the-beast.com/ftb-app",
-    serverConfigId: 1,
     media: [
       {
         imageUrl: "https://up.wolfey.me/61go2B-r",
@@ -87,7 +99,6 @@ const timelineData = [
     showDownload: false,
     detailsUrl: "https://feed-the-beast.com/modpacks/130-ftb-stoneblock-4",
     downloadUrl: "https://www.feed-the-beast.com/ftb-app",
-    serverConfigId: 1,
     media: [
       {
         imageUrl: "https://up.wolfey.me/1DmhYiww",
@@ -114,7 +125,6 @@ const timelineData = [
     showDownload: true,
     detailsUrl: "https://feed-the-beast.com/modpacks/130-ftb-stoneblock-4",
     downloadUrl: "https://www.feed-the-beast.com/ftb-app",
-    serverConfigId: 1,
     media: [
       {
         imageUrl: "https://up.wolfey.me/z2gPiu5U",
@@ -141,38 +151,84 @@ const pollData: (typeof polls.$inferInsert)[] = [
   },
 ];
 
+const mentionData: (typeof mentionProfiles.$inferInsert)[] = [
+  { mention: "wolfey", username: "Wolfey" },
+  { mention: "imher0", username: "ImHer0" },
+];
+
 async function main() {
-  await db
-    .insert(serverConfigs)
-    .values({ id: 1, ...serverData })
-    .onConflictDoNothing();
+  await db.transaction(async (tx) => {
+    const [existingServer] = await tx
+      .select({ id: serverConfigs.id })
+      .from(serverConfigs)
+      .orderBy(asc(serverConfigs.id))
+      .limit(1);
+    const server =
+      existingServer ??
+      (
+        await tx
+          .insert(serverConfigs)
+          .values(serverData)
+          .returning({ id: serverConfigs.id })
+      )[0];
 
-  for (const timeline of timelineData) {
-    await db.transaction(async (tx) => {
-      const [item] = await tx
-        .insert(timelineItems)
-        .values({
-          title: timeline.title,
-          subtitle: timeline.subtitle,
-          description: timeline.description,
-          year: timeline.year,
-          showDetails: timeline.showDetails,
-          showDownload: timeline.showDownload,
-          detailsUrl: timeline.detailsUrl,
-          downloadUrl: timeline.downloadUrl,
-          serverConfigId: timeline.serverConfigId,
-        })
-        .returning({ id: timelineItems.id });
-      await tx.insert(timelineMedia).values(
-        timeline.media.map((media) => ({
-          ...media,
-          timelineItemId: item.id,
-        })),
+    for (const { media, ...timeline } of timelineData) {
+      const [existingItem] = await tx
+        .select({ id: timelineItems.id })
+        .from(timelineItems)
+        .where(
+          and(
+            eq(timelineItems.serverConfigId, server.id),
+            eq(timelineItems.title, timeline.title),
+            eq(timelineItems.year, timeline.year),
+          ),
+        )
+        .limit(1);
+      const item =
+        existingItem ??
+        (
+          await tx
+            .insert(timelineItems)
+            .values({
+              ...timeline,
+              thumbnailUrl: media[0]?.imageUrl,
+              backgroundUrl: media[0]?.imageUrl,
+              serverConfigId: server.id,
+            })
+            .returning({ id: timelineItems.id })
+        )[0];
+      const existingMedia = await tx
+        .select({ imageUrl: timelineMedia.imageUrl })
+        .from(timelineMedia)
+        .where(eq(timelineMedia.timelineItemId, item.id));
+      const imageUrls = new Set(existingMedia.map((image) => image.imageUrl));
+      const missingMedia = media.filter(
+        (image) => !imageUrls.has(image.imageUrl),
       );
-    });
-  }
+      if (missingMedia.length > 0) {
+        await tx.insert(timelineMedia).values(
+          missingMedia.map((image) => ({
+            ...image,
+            timelineItemId: item.id,
+          })),
+        );
+      }
+    }
 
-  await db.insert(polls).values(pollData);
+    for (const poll of pollData) {
+      const [existingPoll] = await tx
+        .select({ id: polls.id })
+        .from(polls)
+        .where(eq(polls.question, poll.question))
+        .limit(1);
+      if (!existingPoll) await tx.insert(polls).values(poll);
+    }
+
+    await tx
+      .insert(mentionProfiles)
+      .values(mentionData)
+      .onConflictDoNothing({ target: mentionProfiles.mention });
+  });
 
   console.log("Database seeded successfully!");
 }
@@ -180,7 +236,7 @@ async function main() {
 main()
   .catch((e) => {
     console.error("Error seeding database:", e);
-    process.exit(1);
+    process.exitCode = 1;
   })
   .finally(async () => {
     await pool.end();

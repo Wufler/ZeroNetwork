@@ -1,47 +1,26 @@
 "use client";
 
 import {
-  closestCenter,
-  DndContext,
-  type DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
-  Calendar,
+  ChevronLeft,
   ChevronRight,
   Download,
   Edit,
   ExternalLink,
-  GripVertical,
   Image as ImageIcon,
   Loader2,
   Plus,
   Trash2,
   X,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-  addTimelineMedia,
-  createTimelineItem,
-  deleteTimelineItem,
-  deleteTimelineMedia,
-  updateTimelineItem,
-  updateTimelineMedia,
-} from "@/app/actions/timeline";
+import { deleteTimelineItem } from "@/app/actions/timeline";
+import Linking from "@/components/Linking";
+import Mentions from "@/components/Mentions";
+import TimelineEditDialog from "@/components/TimelineEdit";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,465 +32,18 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { useSession } from "@/lib/auth-client";
+import { useDragScroll } from "@/lib/use-drag-scroll";
 import { cn } from "@/lib/utils";
 
-type TimelineItemType = ComponentProps["data"]["timelineItems"][0];
-type MediaItemType = TimelineItemType["media"][0];
-
-function SortableMediaItem({
-  media,
-  editingMediaId,
-  onEdit,
-  onDelete,
-}: {
-  media: MediaItemType;
-  editingMediaId: number | null;
-  onEdit: (media: MediaItemType) => void;
-  onDelete: (id: number) => void;
-}) {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: media.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        "flex items-center gap-2 p-2 border border-border rounded-md bg-card shadow-sm",
-        editingMediaId === media.id && "ring-2 ring-primary border-primary",
-        isDragging && "opacity-50 shadow-xl",
-      )}
-    >
-      <button
-        className="cursor-grab active:cursor-grabbing touch-none p-1 hover:bg-muted rounded"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="size-4 text-muted-foreground" />
-      </button>
-      <div className="relative size-12 rounded overflow-hidden bg-muted shrink-0">
-        {!isLoaded && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/40">
-            <Loader2 className="size-4 animate-spin text-primary/50" />
-          </div>
-        )}
-        <Image
-          src={media.imageUrl}
-          alt={media.altText}
-          fill
-          sizes="48px"
-          className="object-cover"
-          placeholder="empty"
-          onLoad={() => setIsLoaded(true)}
-        />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm wrap-anywhere max-w-96">{media.altText}</p>
-        {media.galleryImage && (
-          <span className="text-xs text-primary">• Gallery</span>
-        )}
-      </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onEdit(media)}
-        disabled={editingMediaId !== null}
-      >
-        <Edit className="size-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onDelete(media.id)}
-        disabled={editingMediaId !== null}
-      >
-        <Trash2 className="size-4" />
-      </Button>
-    </div>
-  );
-}
-
-function TimelineEditDialog({
-  item,
-  onClose,
-}: {
-  item?: TimelineItemType;
-  onClose: () => void;
-}) {
-  const [formData, setFormData] = useState({
-    title: item?.title || "",
-    subtitle: item?.subtitle || "",
-    description: item?.description || "",
-    year: item?.year || new Date().getFullYear(),
-    showDetails: item?.showDetails || false,
-    showDownload: item?.showDownload || false,
-    detailsUrl: item?.detailsUrl || "",
-    downloadUrl: item?.downloadUrl || "",
-  });
-  const [mediaItems, setMediaItems] = useState(item?.media || []);
-  const [newMediaUrl, setNewMediaUrl] = useState("");
-  const [newMediaAlt, setNewMediaAlt] = useState("");
-  const [newMediaGalleryImage, setNewMediaGalleryImage] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [editingMediaId, setEditingMediaId] = useState<number | null>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  const handleSave = async () => {
-    if (!formData.title || !formData.subtitle || !formData.description) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      if (item) {
-        await updateTimelineItem(item.id, formData);
-        toast.success("Timeline item updated successfully");
-      } else {
-        await createTimelineItem(formData);
-        toast.success("Timeline item created successfully");
-      }
-      onClose();
-    } catch (error) {
-      toast.error("Failed to save timeline item");
-      console.error(error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleAddMedia = async () => {
-    if (!newMediaUrl || !newMediaAlt || !item) return;
-
-    try {
-      const media = await addTimelineMedia(item.id, {
-        imageUrl: newMediaUrl,
-        altText: newMediaAlt,
-        displayOrder: mediaItems.length,
-        galleryImage: newMediaGalleryImage,
-      });
-      setMediaItems([...mediaItems, media]);
-      setNewMediaUrl("");
-      setNewMediaAlt("");
-      setNewMediaGalleryImage(false);
-      toast.success("Media added successfully");
-    } catch (error) {
-      toast.error("Failed to add media");
-      console.error(error);
-    }
-  };
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = mediaItems.findIndex((m) => m.id === active.id);
-    const newIndex = mediaItems.findIndex((m) => m.id === over.id);
-
-    const newItems = arrayMove(mediaItems, oldIndex, newIndex);
-    setMediaItems(newItems);
-
-    try {
-      await Promise.all(
-        newItems.map((item, index) =>
-          updateTimelineMedia(item.id, { displayOrder: index }),
-        ),
-      );
-      toast.success("Order updated");
-    } catch (error) {
-      toast.error("Failed to update order");
-      console.error(error);
-    }
-  };
-
-  const handleStartEdit = (media: MediaItemType) => {
-    setEditingMediaId(media.id);
-    setNewMediaUrl(media.imageUrl);
-    setNewMediaAlt(media.altText);
-    setNewMediaGalleryImage(media.galleryImage);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingMediaId(null);
-    setNewMediaUrl("");
-    setNewMediaAlt("");
-    setNewMediaGalleryImage(false);
-  };
-
-  const handleUpdateMedia = async () => {
-    if (!editingMediaId || !newMediaUrl || !newMediaAlt) return;
-
-    try {
-      const updated = await updateTimelineMedia(editingMediaId, {
-        imageUrl: newMediaUrl,
-        altText: newMediaAlt,
-        galleryImage: newMediaGalleryImage,
-      });
-      setMediaItems(
-        mediaItems.map((m) =>
-          m.id === editingMediaId ? { ...m, ...updated } : m,
-        ),
-      );
-      setEditingMediaId(null);
-      setNewMediaUrl("");
-      setNewMediaAlt("");
-      setNewMediaGalleryImage(false);
-      toast.success("Media updated successfully");
-    } catch (error) {
-      toast.error("Failed to update media");
-      console.error(error);
-    }
-  };
-
-  const handleDeleteMedia = async (mediaId: number) => {
-    try {
-      await deleteTimelineMedia(mediaId);
-      setMediaItems(mediaItems.filter((m) => m.id !== mediaId));
-      toast.success("Media deleted successfully");
-    } catch (error) {
-      toast.error("Failed to delete media");
-      console.error(error);
-    }
-  };
-
-  return (
-    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-      <DialogTitle>
-        {item ? "Edit Timeline Item" : "Create Timeline Item"}
-      </DialogTitle>
-      <DialogDescription>
-        {item
-          ? "Update the timeline item details below"
-          : "Create a new timeline item"}
-      </DialogDescription>
-
-      <div className="space-y-4 py-4">
-        <div>
-          <label className="text-sm font-medium">Title *</label>
-          <Input
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            placeholder="Timeline title"
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium">Subtitle *</label>
-          <Input
-            value={formData.subtitle}
-            onChange={(e) =>
-              setFormData({ ...formData, subtitle: e.target.value })
-            }
-            placeholder="Short description"
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium">Description *</label>
-          <textarea
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            placeholder="Full description"
-            className="w-full min-h-25 p-2 border rounded-md resize-none bg-background text-foreground"
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium">Year *</label>
-          <Input
-            type="number"
-            value={formData.year}
-            onChange={(e) =>
-              setFormData({ ...formData, year: parseInt(e.target.value) || 0 })
-            }
-            placeholder="2024"
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Show Details</label>
-          <Switch
-            checked={formData.showDetails}
-            onCheckedChange={(checked) =>
-              setFormData({ ...formData, showDetails: checked })
-            }
-          />
-        </div>
-
-        {formData.showDetails && (
-          <div>
-            <label className="text-sm font-medium">Details URL</label>
-            <Input
-              value={formData.detailsUrl}
-              onChange={(e) =>
-                setFormData({ ...formData, detailsUrl: e.target.value })
-              }
-              placeholder="https://..."
-            />
-          </div>
-        )}
-
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Show Download</label>
-          <Switch
-            checked={formData.showDownload}
-            onCheckedChange={(checked) =>
-              setFormData({ ...formData, showDownload: checked })
-            }
-          />
-        </div>
-
-        {formData.showDownload && (
-          <div>
-            <label className="text-sm font-medium">Download URL</label>
-            <Input
-              value={formData.downloadUrl}
-              onChange={(e) =>
-                setFormData({ ...formData, downloadUrl: e.target.value })
-              }
-              placeholder="https://..."
-            />
-          </div>
-        )}
-
-        {item && (
-          <div className="border-t pt-4">
-            <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-              <ImageIcon className="size-4" />
-              Media Items
-              <span className="text-xs text-muted-foreground ml-auto">
-                Drag to reorder
-              </span>
-            </h3>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={mediaItems.map((m) => m.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-2 mb-3">
-                  {mediaItems.map((media) => (
-                    <SortableMediaItem
-                      key={media.id}
-                      media={media}
-                      editingMediaId={editingMediaId}
-                      onEdit={handleStartEdit}
-                      onDelete={handleDeleteMedia}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-
-            <div className="space-y-2">
-              <Input
-                value={newMediaUrl}
-                onChange={(e) => setNewMediaUrl(e.target.value)}
-                placeholder="Image URL"
-              />
-              <Input
-                value={newMediaAlt}
-                onChange={(e) => setNewMediaAlt(e.target.value)}
-                placeholder="Image description"
-              />
-              <div className="flex items-center gap-2 px-3 py-2 border rounded-md">
-                <label className="text-sm text-muted-foreground">
-                  Show in Gallery
-                </label>
-                <Switch
-                  checked={newMediaGalleryImage}
-                  onCheckedChange={setNewMediaGalleryImage}
-                />
-              </div>
-              {editingMediaId ? (
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCancelEdit}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={handleUpdateMedia}
-                    disabled={!newMediaUrl || !newMediaAlt}
-                    className="flex-1"
-                  >
-                    <Edit className="size-4" />
-                    Update Media
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddMedia}
-                  disabled={!newMediaUrl || !newMediaAlt}
-                  className="w-full"
-                >
-                  <Plus className="size-4" />
-                  Add Media
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={onClose} disabled={isSaving}>
-          Cancel
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save"}
-        </Button>
-      </div>
-    </DialogContent>
-  );
-}
-
-function TimelineModalContent({ item }: { item: TimelineItemType }) {
+function TimelineModalContent({ item }: { item: TimelineItem }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -519,13 +51,12 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
   const mediaRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
-    if (selectedImageIndex >= 0 && mediaRefs.current[selectedImageIndex]) {
-      mediaRefs.current[selectedImageIndex]?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
-    }
-  }, [selectedImageIndex]);
+    if (!hasInteracted) return;
+    mediaRefs.current[selectedImageIndex]?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+  }, [selectedImageIndex, hasInteracted]);
 
   return (
     <div className="flex flex-col-reverse lg:flex-row w-screen h-dvh bg-background/95">
@@ -544,10 +75,13 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
               target="_blank"
               rel="noopener noreferrer"
               className={buttonVariants({
-                className: "w-full h-10 text-sm font-medium rounded-xl",
+                variant: "feature-primary",
+                size: "feature",
+                className: "w-full",
               })}
             >
-              Learn More <ExternalLink className="size-4" />
+              Learn More{" "}
+              <ExternalLink aria-hidden="true" data-icon="inline-end" />
             </a>
           )}
           {item.downloadUrl && item.showDownload && (
@@ -556,12 +90,12 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
               target="_blank"
               rel="noopener noreferrer"
               className={buttonVariants({
-                variant: "outline",
-                className:
-                  "w-full h-10 text-sm font-medium rounded-xl hover:bg-muted transition-all",
+                variant: "feature-outline",
+                size: "feature",
+                className: "w-full",
               })}
             >
-              Download <Download className="size-4" />
+              Download <Download aria-hidden="true" data-icon="inline-end" />
             </a>
           )}
         </div>
@@ -645,7 +179,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
 
             <div className="absolute bottom-0 w-full p-4 bg-linear-to-t from-black/90 via-black/50 to-transparent pt-16">
               <p className="text-white/90 lg:text-lg text-sm font-medium wrap-anywhere text-center">
-                {selectedImage.altText}
+                <Mentions text={selectedImage.altText} />
               </p>
             </div>
           </>
@@ -699,7 +233,7 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
                 Description
               </h3>
               <div className="text-sm lg:text-base text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                {item.description}
+                <Mentions text={item.description} />
               </div>
             </div>
 
@@ -710,19 +244,14 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                   {item.media.map((mediaItem, i) => (
-                    <button
+                    <div
                       key={mediaItem.id}
-                      ref={(el) => {
-                        mediaRefs.current[i] = el;
-                      }}
-                      onClick={() => {
-                        setSelectedImageIndex(i);
-                        setHasInteracted(true);
-                      }}
                       className={cn(
                         "relative aspect-video rounded-lg overflow-hidden bg-muted transition-all duration-300",
                         selectedImageIndex === i
-                          ? "ring-2 ring-primary z-10"
+                          ? hasInteracted
+                            ? "ring-2 ring-primary z-10"
+                            : "lg:ring-2 lg:ring-primary lg:z-10"
                           : "hover:ring-2 hover:ring-primary/50",
                       )}
                     >
@@ -746,12 +275,24 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
                           })
                         }
                       />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent transition-opacity">
-                        <span className="absolute bottom-1 left-1 right-1 text-[10px] text-white/90 truncate">
-                          {mediaItem.altText}
+                      <button
+                        type="button"
+                        ref={(el) => {
+                          mediaRefs.current[i] = el;
+                        }}
+                        onClick={() => {
+                          setSelectedImageIndex(i);
+                          setHasInteracted(true);
+                        }}
+                        aria-label={`View image: ${mediaItem.altText}`}
+                        className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2"
+                      />
+                      <div className="pointer-events-none absolute inset-0">
+                        <span className="pointer-events-auto absolute bottom-1 left-1 right-1 text-[10px] text-white/90 truncate">
+                          <Mentions text={mediaItem.altText} />
                         </span>
                       </div>
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -767,11 +308,13 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({
-                  size: "lg",
-                  className: "text-base font-medium rounded-xl flex-1",
+                  variant: "feature-primary",
+                  size: "feature",
+                  className: "flex-1",
                 })}
               >
-                Learn More <ExternalLink className="size-4" />
+                Learn More{" "}
+                <ExternalLink aria-hidden="true" data-icon="inline-end" />
               </a>
             )}
             {item.downloadUrl && item.showDownload && (
@@ -780,13 +323,12 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({
-                  variant: "outline",
-                  size: "lg",
-                  className:
-                    "text-base font-medium rounded-xl hover:bg-muted flex-1",
+                  variant: "feature-outline",
+                  size: "feature",
+                  className: "flex-1",
                 })}
               >
-                Download <Download className="size-4" />
+                Download <Download aria-hidden="true" data-icon="inline-end" />
               </a>
             )}
           </div>
@@ -796,19 +338,21 @@ function TimelineModalContent({ item }: { item: TimelineItemType }) {
   );
 }
 
-function TimelineRow({
+function TimelineFeature({
   item,
-  index,
   isAdmin,
+  detailsOpen,
+  onDetailsOpenChange,
 }: {
   item: TimelineItem;
-  index: number;
   isAdmin: boolean;
+  detailsOpen: boolean;
+  onDetailsOpenChange: (open: boolean) => void;
 }) {
-  const isEven = index % 2 !== 0;
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -826,147 +370,91 @@ function TimelineRow({
 
   return (
     <motion.div
-      className={cn(
-        "relative flex flex-col md:flex-row items-center md:items-center gap-8 md:gap-0 group",
-        isEven ? "md:flex-row-reverse" : "",
-      )}
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-2% 0px" }}
-      transition={{ duration: 0.4, delay: index * 0.04 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduceMotion ? 0 : 0.2, ease: "easeOut" }}
+      className="flex min-h-0 flex-1 flex-col items-start justify-center-safe gap-4 py-12 lg:-mx-2 lg:overflow-y-auto lg:px-2 lg:py-4 xl:gap-5 xl:py-6"
     >
-      <div
-        className={cn(
-          "hidden md:flex w-1/2 flex-col justify-center px-16",
-          isEven ? "items-start text-left" : "items-end text-right",
-        )}
-      >
-        <div className="text-8xl font-bold font-syne text-primary/30 select-none transition-colors duration-500 group-hover:text-primary/40">
+      <div className="w-full max-w-xl" aria-live="polite" aria-atomic="true">
+        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
           {item.year}
-        </div>
+        </span>
+        <h3 className="font-syne text-4xl md:text-5xl lg:text-4xl xl:text-6xl font-semibold leading-tight tracking-tight text-balance wrap-anywhere">
+          {item.title}
+        </h3>
+        <p className="mt-4 text-base md:text-lg lg:text-base xl:text-lg leading-relaxed text-muted-foreground wrap-anywhere">
+          {item.subtitle}
+        </p>
       </div>
-
-      <div className="absolute left-4 md:left-1/2 md:-translate-x-1/2 flex items-center justify-center">
-        <div className="w-4 h-4 rounded-full bg-background border-2 border-primary ring-4 ring-background shadow-[0_0_20px_rgba(120,119,198,0.4)] dark:shadow-[0_0_20px_rgba(var(--primary),0.3)] z-10 transition-transform duration-500 group-hover:scale-150" />
-      </div>
-
-      <div
-        className={cn(
-          "w-full md:w-1/2 pl-12 md:pl-0",
-          isEven ? "md:pr-12" : "md:pl-12",
-        )}
-      >
-        <Card className="bg-transparent border-none py-0 rounded-none shadow-none">
-          <CardContent
-            className={cn(
-              "-mt-1 px-0 pr-4 md:px-4",
-              isEven ? "md:text-right" : "md:text-left",
-            )}
-          >
-            {isAdmin && (
-              <div
-                className={cn(
-                  "flex gap-2 mb-4",
-                  isEven ? "md:justify-end" : "",
-                )}
+      <div className="flex min-h-11 flex-wrap items-center gap-3">
+        {item.showDetails &&
+          (item.media.length > 0 ? (
+            <Dialog open={detailsOpen} onOpenChange={onDetailsOpenChange}>
+              <DialogTrigger
+                render={<Button variant="feature-primary" size="feature" />}
               >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowEditDialog(true)}
-                  className="rounded-full"
-                >
-                  <Edit className="size-3 mr-1" />
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowDeleteDialog(true)}
-                  className="rounded-full text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                >
-                  <Trash2 className="size-3 mr-1" />
-                  Delete
-                </Button>
-              </div>
-            )}
-
-            <div className="md:hidden flex items-center gap-2 text-primary font-bold mb-4 font-mono">
-              <Calendar className="size-4" />
-              {item.year}
-            </div>
-
-            <h3 className="text-2xl md:text-3xl font-bold font-syne mb-3 group-hover/card:text-primary transition-colors duration-300">
-              {item.title}
-            </h3>
-            <p className="text-muted-foreground mb-6 leading-relaxed text-base">
-              {item.subtitle}
-            </p>
-
-            <div
-              className={cn(
-                "flex flex-wrap gap-3",
-                isEven ? "md:justify-end" : "",
-              )}
-            >
-              {item.showDownload && item.downloadUrl && (
-                <a
-                  href={item.downloadUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "lg",
-                    className: "rounded-full! px-4 group/btn",
-                  })}
-                >
-                  Download
-                  <Download className="ml-1 size-4 group-hover/btn:translate-y-0.5 transition-transform" />
-                </a>
-              )}
-
-              {item.showDetails &&
-                (item.media && item.media.length > 0 ? (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="default"
-                        size="lg"
-                        className="rounded-full px-4 group/btn"
-                      >
-                        View Details
-                        <ChevronRight className="ml-1 size-4 group-hover/btn:translate-x-0.5 transition-transform" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent
-                      showCloseButton={false}
-                      className="w-screen! h-dvh! max-w-none! max-h-none m-0 p-0 rounded-none border-none bg-background/95"
-                    >
-                      <TimelineModalContent item={item} />
-                    </DialogContent>
-                  </Dialog>
-                ) : (
-                  item.detailsUrl && (
-                    <a
-                      href={item.detailsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={buttonVariants({
-                        variant: "default",
-                        size: "lg",
-                        className:
-                          "h-9 rounded-full! px-4 text-sm group/btn shadow-none",
-                      })}
-                    >
-                      Learn More
-                      <ChevronRight className="size-4 group-hover/btn:translate-x-0.5 transition-transform" />
-                    </a>
-                  )
-                ))}
-            </div>
-          </CardContent>
-        </Card>
+                View Details
+                <ChevronRight
+                  aria-hidden="true"
+                  data-icon="inline-end"
+                  className="group-hover/button:translate-x-0.5 motion-reduce:transform-none"
+                />
+              </DialogTrigger>
+              <DialogContent
+                showCloseButton={false}
+                className="w-screen! h-dvh! max-w-none! max-h-none m-0 p-0 rounded-none border-none bg-background/95"
+              >
+                <TimelineModalContent item={item} />
+              </DialogContent>
+            </Dialog>
+          ) : (
+            item.detailsUrl && (
+              <a
+                href={item.detailsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonVariants({
+                  variant: "feature-primary",
+                  size: "feature",
+                })}
+              >
+                Learn More{" "}
+                <ExternalLink aria-hidden="true" data-icon="inline-end" />
+              </a>
+            )
+          ))}
+        {item.showDownload && item.downloadUrl && (
+          <a
+            href={item.downloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({
+              variant: "feature-outline",
+              size: "feature",
+            })}
+          >
+            Download <Download aria-hidden="true" data-icon="inline-end" />
+          </a>
+        )}
       </div>
+      {isAdmin && (
+        <div className="flex flex-wrap items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowEditDialog(true)}
+          >
+            <Edit data-icon="inline-start" /> Edit
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 data-icon="inline-start" /> Delete
+          </Button>
+        </div>
+      )}
 
       {showEditDialog && (
         <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
@@ -1003,50 +491,215 @@ function TimelineRow({
 }
 
 export default function Timeline({ data }: ComponentProps) {
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin";
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [backgroundStates, setBackgroundStates] = useState<
+    Record<string, "loaded" | "error">
+  >({});
+  const selectedMomentRef = useRef<HTMLButtonElement>(null);
+  const dragScroll = useDragScroll();
+  const reduceMotion = useReducedMotion();
+  const items = data.timelineItems;
+  const linkedItem = items.find(
+    (item) =>
+      String(item.id) === searchParams.get("timeline") &&
+      item.showDetails &&
+      item.media.length > 0,
+  );
+  const selectedItem =
+    linkedItem ?? items.find((item) => item.id === selectedId) ?? items[0];
+  const selectedIndex = items.indexOf(selectedItem);
+  const backgroundUrl =
+    selectedItem?.backgroundUrl || selectedItem?.media[0]?.imageUrl;
+  const isBackgroundLoading =
+    !!backgroundUrl && !backgroundStates[backgroundUrl];
+
+  const settleBackground = (url: string, state: "loaded" | "error") => {
+    setBackgroundStates((prev) => ({ ...prev, [url]: state }));
+  };
+
+  const handleDetailsOpenChange = (
+    open: boolean,
+    item: TimelineItem = selectedItem,
+  ) => {
+    setSelectedId(item.id);
+    const url = new URL(window.location.href);
+    if (open) {
+      url.searchParams.set("timeline", String(item.id));
+      window.history.pushState(null, "", url);
+    } else {
+      url.searchParams.delete("timeline");
+      window.history.replaceState(null, "", url);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedId === null) return;
+    selectedMomentRef.current?.scrollIntoView({
+      block: "nearest",
+      inline: "center",
+      behavior: reduceMotion ? "instant" : "smooth",
+    });
+  }, [selectedId, reduceMotion]);
 
   return (
-    <section className="py-16 md:py-20 relative overflow-hidden">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          className="text-center mb-16 md:mb-24"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-        >
-          <h2 className="font-syne text-5xl md:text-7xl font-bold tracking-tighter md:mb-6 mb-0 bg-linear-to-b from-foreground to-foreground/50 bg-clip-text text-transparent">
-            Our Journey
-          </h2>
-          {isAdmin && (
-            <Button
-              variant="outline"
-              onClick={() => setShowCreateDialog(true)}
-              className="backdrop-blur-sm relative overflow-hidden group bg-secondary hover:bg-secondary/70 dark:bg-secondary/70 dark:hover:bg-secondary/60 border border-border text-foreground rounded-full px-4"
-            >
-              <Plus className="size-4" />
-              Add Timeline Item
-            </Button>
-          )}
-        </motion.div>
-
-        <div className="relative">
-          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-1/2 bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 hidden md:block" />
-
-          <div className="absolute left-6 top-0 bottom-0 w-px bg-linear-to-b from-primary/0 via-primary/20 to-primary/0 md:hidden" />
-
-          <div className="space-y-24 md:space-y-40">
-            {data.timelineItems.map((item, index) => (
-              <TimelineRow
-                key={`${item.year}-${index}`}
-                item={item}
-                index={index}
-                isAdmin={isAdmin}
-              />
-            ))}
+    <section>
+      <div className="relative isolate grid overflow-hidden bg-background text-foreground px-4 lg:aspect-video">
+        {backgroundUrl && (
+          <Image
+            key={backgroundUrl}
+            src={backgroundUrl}
+            alt=""
+            fill
+            sizes="100vw"
+            className={cn(
+              "pointer-events-none -z-10 object-cover object-center transition-opacity duration-300 motion-reduce:transition-none",
+              backgroundStates[backgroundUrl] === "loaded"
+                ? "opacity-100"
+                : "opacity-0",
+            )}
+            onLoad={() => settleBackground(backgroundUrl, "loaded")}
+            onError={() => settleBackground(backgroundUrl, "error")}
+          />
+        )}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-t from-background via-background/80 to-background/30"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-r from-background/95 via-background/60 to-transparent"
+          aria-hidden="true"
+        />
+        {isBackgroundLoading && (
+          <div
+            role="status"
+            className="pointer-events-none absolute right-4 top-4 flex items-center justify-center rounded-full bg-background/60 p-2 xl:right-12 xl:top-12"
+          >
+            <Loader2
+              aria-hidden="true"
+              className="size-5 animate-spin text-primary/50 motion-reduce:animate-none"
+            />
+            <span className="sr-only">Loading timeline background</span>
           </div>
+        )}
+        <div className="mx-auto flex min-w-0 w-full max-w-7xl flex-col pt-4 pb-7 lg:h-full xl:pt-12 xl:pb-8">
+          <header className="flex shrink-0 flex-wrap items-center justify-between gap-4">
+            <h2 className="font-syne text-3xl xl:text-5xl font-semibold tracking-tight">
+              Our Journey
+            </h2>
+            {isAdmin && (
+              <div className="flex flex-wrap gap-2">
+                <Linking profiles={data.mentionProfiles} />
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCreateDialog(true)}
+                  className="rounded-full"
+                >
+                  <Plus data-icon="inline-start" /> Add Timeline Item
+                </Button>
+              </div>
+            )}
+          </header>
+
+          {selectedItem ? (
+            <>
+              <TimelineFeature
+                key={selectedItem.id}
+                item={selectedItem}
+                isAdmin={isAdmin}
+                detailsOpen={!!linkedItem}
+                onDetailsOpenChange={(open) => handleDetailsOpenChange(open)}
+              />
+              <div className="mb-4 flex shrink-0 items-center justify-between">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button
+                    variant="outline"
+                    size="icon-lg"
+                    className="rounded-full"
+                    aria-label="Previous timeline moment"
+                    disabled={selectedIndex === 0}
+                    onClick={() => setSelectedId(items[selectedIndex - 1].id)}
+                  >
+                    <ChevronLeft />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon-lg"
+                    className="rounded-full"
+                    aria-label="Next timeline moment"
+                    disabled={selectedIndex === items.length - 1}
+                    onClick={() => setSelectedId(items[selectedIndex + 1].id)}
+                  >
+                    <ChevronRight />
+                  </Button>
+                </div>
+              </div>
+              <div
+                {...dragScroll}
+                className="-mx-1 flex shrink-0 select-none snap-x snap-proximity scroll-px-1 items-start gap-4 overflow-x-auto overscroll-x-contain px-1 pt-4 pb-3 data-[dragging]:cursor-grabbing data-[dragging]:snap-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-6"
+                role="group"
+                aria-label="Timeline moments"
+              >
+                {items.map((item) => {
+                  const isSelected = selectedItem.id === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      ref={isSelected ? selectedMomentRef : null}
+                      className={cn(
+                        "flex flex-none basis-40 flex-col items-stretch gap-2 rounded-lg text-left text-muted-foreground cursor-inherit snap-start outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring md:basis-56",
+                        isSelected && "text-foreground",
+                      )}
+                      aria-pressed={isSelected}
+                      aria-label={`${item.year}: ${item.title}`}
+                      onClick={() => setSelectedId(item.id)}
+                      onDoubleClick={() => {
+                        if (item.showDetails && item.media.length > 0) {
+                          handleDetailsOpenChange(true, item);
+                        }
+                      }}
+                    >
+                      <span
+                        className={cn(
+                          "relative mb-2 block overflow-hidden rounded-lg bg-muted h-32 cursor-pointer",
+                          isSelected &&
+                            "outline-2 outline-primary outline-offset-2",
+                        )}
+                      >
+                        {item.thumbnailUrl ? (
+                          <Image
+                            src={item.thumbnailUrl}
+                            alt=""
+                            fill
+                            sizes="(max-width: 640px) 160px, 224px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="font-syne flex h-full items-center justify-center text-3xl text-muted-foreground">
+                            {item.year}
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-sm font-medium wrap-anywhere">
+                        {item.title}
+                      </span>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {item.year}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <p className="py-32 text-muted-foreground">
+              No timeline available. Check back soon.
+            </p>
+          )}
         </div>
       </div>
 

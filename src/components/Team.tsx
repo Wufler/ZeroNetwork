@@ -28,20 +28,20 @@ const members = [
 
 export default function Team() {
   return (
-    <section className="py-16 md:py-20 px-4 relative overflow-hidden">
-      <div className="container mx-auto relative z-10">
+    <section className="pt-8 pb-16 lg:pt-16 lg:pb-20 px-4 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto relative z-10">
         <motion.div
-          className="text-center mb-16"
+          className="mb-8"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="font-syne text-4xl md:text-6xl font-bold tracking-tight mb-6">
+          <h2 className="font-syne text-4xl lg:text-5xl font-bold tracking-tight text-center lg:text-left">
             Meet the Team
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {members.map((member, i) => (
             <motion.div
               key={member.name}

@@ -9,7 +9,8 @@ import {
 } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { buttonVariants } from "./ui/button";
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "./ui/button";
 
 const images = [
   "/witherswrath/spawn.webp",
@@ -48,7 +49,7 @@ export default function WithersWrath() {
   return (
     <section
       ref={sectionRef}
-      className="py-16 lg:py-20 px-4 relative overflow-hidden"
+      className="withers-wrath py-16 px-4 relative overflow-hidden"
     >
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid lg:grid-cols-2 lg:gap-12 gap-6 items-center">
@@ -63,7 +64,10 @@ export default function WithersWrath() {
                 {!loadedImages.has("/witherswrath/icon.png") && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
                     <Loader2
-                      className={`size-5 text-primary/50 ${isInView ? "animate-spin" : ""}`}
+                      className={cn(
+                        "size-5 text-(--wrath-purple)",
+                        isInView && "animate-spin",
+                      )}
                     />
                   </div>
                 )}
@@ -82,7 +86,7 @@ export default function WithersWrath() {
                   }
                 />
               </div>
-              <h2 className="font-syne text-4xl lg:text-5xl font-bold bg-linear-to-r from-[#9333EA] to-[#fd7704] bg-clip-text text-transparent">
+              <h2 className="font-syne text-4xl lg:text-5xl font-bold text-(--wrath-purple) text-center lg:text-left">
                 Wither&apos;s Wrath
               </h2>
             </div>
@@ -98,13 +102,16 @@ export default function WithersWrath() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({
-                  size: "lg",
-                  className:
-                    "bg-[#9333EA]! hover:bg-[#7C22CB]! text-white! rounded-full px-8",
+                  variant: "feature-primary",
+                  size: "feature",
                 })}
               >
                 <span>View on Modrinth</span>
-                <ExternalLink className="ml-2 size-4" />
+                <ExternalLink
+                  aria-hidden="true"
+                  data-icon="inline-end"
+                  className="group-hover/button:translate-x-0.5 motion-reduce:transform-none"
+                />
               </a>
             </div>
 
@@ -137,7 +144,10 @@ export default function WithersWrath() {
                   {!loadedImages.has(images[currentImageIndex]) && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/30">
                       <Loader2
-                        className={`size-8 text-primary/50 ${isInView ? "animate-spin" : ""}`}
+                        className={cn(
+                          "size-8 text-(--wrath-purple)",
+                          isInView && "animate-spin",
+                        )}
                       />
                     </div>
                   )}
@@ -160,32 +170,44 @@ export default function WithersWrath() {
                 </motion.div>
               </AnimatePresence>
 
-              <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <button
+              <div className="absolute inset-0 flex items-center justify-between p-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300">
+                <Button
+                  variant="secondary"
+                  size="icon-lg"
+                  aria-label="Previous Wither's Wrath image"
                   onClick={previousImage}
-                  className="p-2 rounded-full bg-background/90 text-foreground hover:bg-[#9333EA] hover:text-white border border-border/50 backdrop-blur-sm transition-colors"
                 >
-                  <ChevronLeft className="size-6" />
-                </button>
-                <button
+                  <ChevronLeft aria-hidden="true" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="icon-lg"
+                  aria-label="Next Wither's Wrath image"
                   onClick={nextImage}
-                  className="p-2 rounded-full bg-background/90 text-foreground hover:bg-[#9333EA] hover:text-white border border-border/50 backdrop-blur-sm transition-colors"
                 >
-                  <ChevronRight className="size-6" />
-                </button>
+                  <ChevronRight aria-hidden="true" />
+                </Button>
               </div>
 
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex z-10">
                 {images.map((_, index) => (
                   <button
+                    type="button"
                     key={index}
+                    aria-label={`Show Wither's Wrath image ${index + 1}`}
+                    aria-pressed={index === currentImageIndex}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      index === currentImageIndex
-                        ? "w-8 bg-[#9333EA]"
-                        : "w-2 bg-white/50 hover:bg-[#9333EA]/80"
-                    }`}
-                  />
+                    className="group flex h-6 shrink-0 cursor-pointer items-center justify-center rounded-sm px-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    <span
+                      className={cn(
+                        "h-1.5 rounded-full transition-all duration-300",
+                        index === currentImageIndex
+                          ? "w-8 bg-(--wrath-orange)"
+                          : "w-2 bg-white/70 group-hover:bg-white",
+                      )}
+                    />
+                  </button>
                 ))}
               </div>
             </div>

@@ -115,6 +115,18 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.withers-wrath {
+  --primary: #1bd96a;
+  --primary-foreground: #102017;
+  --wrath-purple: #67308d;
+  --wrath-orange: #a74600;
+}
+
+.dark .withers-wrath {
+  --wrath-purple: #bc8cdb;
+  --wrath-orange: #ff9b38;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

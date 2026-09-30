@@ -1,10 +1,6 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  },
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
     "includes": [
@@ -19,13 +15,16 @@
   },
   "formatter": {
     "enabled": true,
+    "formatWithErrors": false,
     "indentStyle": "space",
-    "indentWidth": 2
-  },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
-    }
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80,
+    "attributePosition": "auto",
+    "bracketSameLine": false,
+    "bracketSpacing": true,
+    "expand": "auto",
+    "useEditorconfig": true
   },
   "linter": {
     "enabled": true,
@@ -40,18 +39,13 @@
         "useKeyWithClickEvents": "off",
         "useSemanticElements": "off"
       },
-      "complexity": {
-        "noUselessFragments": "off",
-        "useOptionalChain": "off"
-      },
+      "complexity": { "noUselessFragments": "off", "useOptionalChain": "off" },
       "correctness": {
         "useExhaustiveDependencies": "off",
         "useHookAtTopLevel": "off",
         "useParseIntRadix": "off"
       },
-      "security": {
-        "noDangerouslySetInnerHtml": "off"
-      },
+      "security": { "noDangerouslySetInnerHtml": "off" },
       "style": {
         "noNonNullAssertion": "off",
         "useNodejsImportProtocol": "off"
@@ -61,16 +55,35 @@
         "noShadowRestrictedNames": "off"
       }
     },
-    "domains": {
-      "next": "recommended",
-      "react": "recommended"
+    "domains": { "next": "recommended", "react": "recommended" }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSameLine": false,
+      "quoteStyle": "double",
+      "attributePosition": "auto",
+      "bracketSpacing": true
+    }
+  },
+  "css": {
+    "parser": { "tailwindDirectives": true },
+    "formatter": null,
+    "linter": null,
+    "assist": null
+  },
+  "html": {
+    "formatter": {
+      "indentScriptAndStyle": false,
+      "selfCloseVoidElements": "always"
     }
   },
   "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "on"
-      }
-    }
+    "enabled": null,
+    "actions": { "source": { "organizeImports": "on" } }
   }
 }

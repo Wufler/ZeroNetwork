@@ -8,6 +8,12 @@ services:
   environment:
    - POSTGRES_PASSWORD=postgres
    - POSTGRES_DB=postgres
+  healthcheck:
+   test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres", "-d", "postgres"]
+   interval: 2s
+   timeout: 5s
+   retries: 30
+   start_period: 10s
 
 volumes:
  pgdata:
