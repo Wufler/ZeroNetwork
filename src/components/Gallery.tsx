@@ -5,6 +5,7 @@ import { useInView, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import Marquee from "react-fast-marquee";
+import Mentions from "@/components/Mentions";
 
 export default function Gallery({ data }: ComponentProps) {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
@@ -60,10 +61,10 @@ export default function Gallery({ data }: ComponentProps) {
               onLoad={() => markImageAsSettled(item.imageUrl)}
               onError={() => markImageAsSettled(item.imageUrl)}
             />
-            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <div className="absolute bottom-0 left-0 w-full p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-100 md:opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+              <div className="absolute bottom-0 left-0 w-full p-4 transform md:translate-y-4 group-hover:translate-y-0 group-focus-within:translate-y-0 transition-transform duration-300">
                 <span className="text-white font-medium font-syne text-lg drop-shadow-md">
-                  {item.altText}
+                  <Mentions text={item.altText} />
                 </span>
               </div>
             </div>

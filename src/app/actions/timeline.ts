@@ -20,6 +20,8 @@ export async function createTimelineItem(data: {
   title: string;
   subtitle: string;
   description: string;
+  thumbnailUrl?: string | null;
+  backgroundUrl?: string | null;
   year: number;
   showDetails?: boolean;
   showDownload?: boolean;
@@ -34,6 +36,8 @@ export async function createTimelineItem(data: {
       title: data.title,
       subtitle: data.subtitle,
       description: data.description,
+      thumbnailUrl: data.thumbnailUrl?.trim() || null,
+      backgroundUrl: data.backgroundUrl?.trim() || null,
       year: data.year,
       showDetails: data.showDetails ?? false,
       showDownload: data.showDownload ?? false,
@@ -81,6 +85,8 @@ export async function updateTimelineItem(
     title?: string;
     subtitle?: string;
     description?: string;
+    thumbnailUrl?: string | null;
+    backgroundUrl?: string | null;
     year?: number;
     showDetails?: boolean;
     showDownload?: boolean;
@@ -93,7 +99,15 @@ export async function updateTimelineItem(
 
   const [updated] = await db
     .update(timelineItems)
-    .set(data)
+    .set({
+      ...data,
+      ...(data.thumbnailUrl !== undefined && {
+        thumbnailUrl: data.thumbnailUrl?.trim() || null,
+      }),
+      ...(data.backgroundUrl !== undefined && {
+        backgroundUrl: data.backgroundUrl?.trim() || null,
+      }),
+    })
     .where(eq(timelineItems.id, id))
     .returning();
   if (!updated) throw new Error("Timeline item not found");

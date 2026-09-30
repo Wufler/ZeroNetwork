@@ -45,6 +45,8 @@ type TimelineItem = BaseItem & {
   title: string;
   subtitle: string;
   description: string;
+  thumbnailUrl: string | null;
+  backgroundUrl: string | null;
   year: number;
   showDetails: boolean;
   showDownload: boolean;
@@ -54,7 +56,15 @@ type TimelineItem = BaseItem & {
   media: TimelineMediaItem[];
 };
 
+type Profile = BaseItem & {
+  mention: string;
+  username: string;
+  uuid: string | null;
+  bio: string;
+};
+
 type ServerConfig = BaseItem & {
+  minecraftProfiles: Profile[];
   serverIps: string[];
   alertMessage: string;
   alertVisible: boolean;

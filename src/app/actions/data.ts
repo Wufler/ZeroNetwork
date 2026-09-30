@@ -2,7 +2,12 @@
 
 import { and, asc, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { serverConfigs, timelineItems, timelineMedia } from "@/db/schema";
+import {
+  minecraftProfiles,
+  serverConfigs,
+  timelineItems,
+  timelineMedia,
+} from "@/db/schema";
 import { sendWebhook } from "@/lib/webhook";
 
 export async function fetchData() {
@@ -50,6 +55,10 @@ export async function fetchData() {
     ...serverConfig,
     timelineItems: timelineData,
     galleryImages,
+    minecraftProfiles: await db
+      .select()
+      .from(minecraftProfiles)
+      .orderBy(asc(minecraftProfiles.mention)),
   };
 }
 

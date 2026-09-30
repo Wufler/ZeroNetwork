@@ -37,6 +37,19 @@ export const users = pgTable(
   (table) => [uniqueIndex("user_email_key").on(table.email)],
 );
 
+export const minecraftProfiles = pgTable(
+  "minecraft_profile",
+  {
+    id: serial("id").primaryKey(),
+    mention: text("mention").notNull(),
+    username: text("username").notNull(),
+    uuid: text("uuid"),
+    bio: text("bio").notNull().default(""),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("minecraft_profile_mention_key").on(table.mention)],
+);
+
 export const sessions = pgTable(
   "session",
   {
@@ -104,6 +117,8 @@ export const timelineItems = pgTable("timeline", {
   title: text("title").notNull(),
   subtitle: text("subtitle").notNull(),
   description: text("description").notNull(),
+  thumbnailUrl: text("thumbnailUrl"),
+  backgroundUrl: text("backgroundUrl"),
   year: integer("year").notNull(),
   showDetails: boolean("showDetails").default(false).notNull(),
   showDownload: boolean("showDownload").default(false).notNull(),
