@@ -19,12 +19,12 @@ pnpm install
 
 3. **Initialize the database with docker**
 
-Have docker installed and copy the `env.example` file and rename it to `.env` and enter your environment variables
+Have docker installed and copy the `env.example` file and rename it to `.env` and enter your environment variables and then:
 
 ```bash
 pnpm db:start
 ```
-or
+or use this to skip step 4 (make sure you are in a dev database)
 ```bash
 pnpm db:reset
 ```
