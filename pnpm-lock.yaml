@@ -60,8 +60,8 @@ importers:
         specifier: ^8.6.0
         version: 8.6.0(react@19.3.0)
       lucide-react:
-        specifier: ^1.48.0
-        version: 1.48.0(react@19.3.0)
+        specifier: ^1.49.0
+        version: 1.49.0(@types/react@19.3.0)(react@19.3.0)
       motion:
         specifier: ^13.4.6
         version: 13.4.6(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -78,8 +78,8 @@ importers:
         specifier: 19.3.0
         version: 19.3.0
       react-day-picker:
-        specifier: ^10.0.1
-        version: 10.0.1(@types/react@19.3.0)(react@19.3.0)
+        specifier: ^10.0.2
+        version: 10.0.2(@types/react@19.3.0)(react@19.3.0)
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
@@ -1580,9 +1580,6 @@ packages:
   '@ts-morph/common@0.27.0':
     resolution: {integrity: sha512-Wf29UqxWDpc+i61k3oIOzcUfQt79PIT9y/MWfAGlrkjg6lBC1hwDECLXPVJAhWjiGbfBCxZd65F/LIZF3+jeJQ==}
 
-  '@types/node@26.6.1':
-    resolution: {integrity: sha512-VqGJBMCtdhqkBUCcBLvywI0NJ+KLuVzgNnlBUNFOQjqVxzo2lxLUNg1DSey8+u2u6ktswSAxg+s68QLzWHNOuA==}
-
   '@types/node@26.6.3':
     resolution: {integrity: sha512-dsqMQQoeTLqu9wynDD00q573mNzso3IdQOAfHRJqLCcmCFPoGo9A1bDpUcv/9tnKpErQWv9uKeGfl37EIS02Yg==}
 
@@ -1947,8 +1944,8 @@ packages:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
 
-  caniuse-lite@1.0.30001813:
-    resolution: {integrity: sha512-zfjJo4rM0+fUomGDBW/xcDjhIwz/210DGvip2MAMDZ8KHcRPnOHmEgHPZP0UHlZoxr8fYKVJOqcORhYQcG4FKQ==}
+  caniuse-lite@1.0.30001814:
+    resolution: {integrity: sha512-/Uaf1lAzr59XcMpW0o96WoEfr+VXK2OX4U9AgFoiSHsVJ4HppnIFUjtYzsyDH2+tgANaQb2/oxYGwCPapN1FpA==}
 
   chalk@5.6.2:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
@@ -2230,8 +2227,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  electron-to-chromium@1.5.440:
-    resolution: {integrity: sha512-SghDzqdJokdz8zP8YNlvS74+CwLRoUPDGvP/gFA+HrKVw+pOshUAgx8pXR37xl/u16zGae746rFNWvZ/22kU2Q==}
+  electron-to-chromium@1.5.442:
+    resolution: {integrity: sha512-najZYZ3+ZpjN1z3VOsrBiv5ej18vQgfV2lvEmxWzfmKrk4bdm3Owseyud4yGU6DfFn9pyunoAHDDyM4KmP78Ew==}
 
   embla-carousel-react@8.6.0:
     resolution: {integrity: sha512-0/PjqU7geVmo6F734pmPqpyHqiM99olvyecY7zdweCw+6tKEXnrE90pBiBbMMU8s5tICemzpQ3hi5EpxzGW+JA==}
@@ -2463,8 +2460,8 @@ packages:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
 
-  hono@4.13.11:
-    resolution: {integrity: sha512-/SMX/RQNJn7oNmFwH6DtwDqcrzZU2otm1FD6OJe2cWF6cfy/F8hq0XVBv7xW3FTJshRQwuBnXHDq2kNsdZnshg==}
+  hono@4.13.12:
+    resolution: {integrity: sha512-6E2QDAc9Ick9Sq77ZrGS/dk2WUYni91aufTw6LJKpV7w8kW5/GxVUc650FOADOmlwg3K+f7Pun6XlV+pYmW6gw==}
     engines: {node: '>=16.9.0'}
 
   http-errors@2.0.1:
@@ -2737,10 +2734,14 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@1.48.0:
-    resolution: {integrity: sha512-R0CIKY/fXiC6y9xRBADgsK+VW2p/pcTJOMhLZf1T+uG+vJUvyUR02nGOgmIIC7MPkiNK4Ox8QDnbqF8rJYWPZQ==}
+  lucide-react@1.49.0:
+    resolution: {integrity: sha512-ApfaNM4/7jBrVopqLJ84Jz8TMQ1Q1JeZ1PmKh25aeS3E1FTVcMkSh1bEQB7dfzdIrwXRP8p3z4AJjTIHHb5IIA==}
     peerDependencies:
+      '@types/react': '*'
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -3033,10 +3034,6 @@ packages:
     resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
     engines: {node: '>=0.10.0'}
 
-  powershell-utils@0.1.0:
-    resolution: {integrity: sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A==}
-    engines: {node: '>=20'}
-
   powershell-utils@0.2.1:
     resolution: {integrity: sha512-C+y9x90UElAddDZmV4qOx9W53B61PO7cIqWz2dQsWlwswuq4mr8NEwytdGKboYbQlGZ3awrkTeNvcZiZNHnQ8A==}
     engines: {node: '>=20'}
@@ -3071,8 +3068,8 @@ packages:
     resolution: {integrity: sha512-K5zQjDllxWkf7Z5xJdV0/B0WTNqx6vxG70zJE4N0kBs4LovmEYWJzQGxC9bS9RAKu3bgM40lrd5zoLJ12MQ5BA==}
     engines: {node: '>= 0.10'}
 
-  react-day-picker@10.0.1:
-    resolution: {integrity: sha512-eNh6BlwcYInWaJtRv18mXQ06Ys/H6rdTZAnTaSdOYJuTpwP1JMCHNd1FDRadA+gbeinq+psdULN5Xnowy9mV8w==}
+  react-day-picker@10.0.2:
+    resolution: {integrity: sha512-QetiKtZWE9Uaw/pM/SYNv6WPYOTRnSJ2puL0GgwkmUFMIwiY0dtjH1W4B7DOVXVNQM0ZOClGpH/heOfBSzWeiA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/react': '>=16.8.0'
@@ -3471,8 +3468,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  wsl-utils@1.0.0:
-    resolution: {integrity: sha512-Hl0ZOAs672vg+06kfujwRhoS6/jehvULrlFkuF2dRu6pHgA8U06h3xqNIqNNU1LTXPcedxByAR4GS6pwQK0mgA==}
+  wsl-utils@1.0.1:
+    resolution: {integrity: sha512-c16PKLIRxBYpR3jSWsdS7SFp0COm5SOQdiFjY818dYFHJbMGuLBszpF07LBWmOS1uzrHa9VGdynsEgoeKy0oOQ==}
     engines: {node: '>=20'}
 
   xtend@4.0.2:
@@ -4133,9 +4130,9 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@hono/node-server@2.1.3(hono@4.13.11)':
+  '@hono/node-server@2.1.3(hono@4.13.12)':
     dependencies:
-      hono: 4.13.11
+      hono: 4.13.12
 
   '@img/colour@1.1.0':
     optional: true
@@ -4327,7 +4324,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.31.0(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 2.1.3(hono@4.13.11)
+      '@hono/node-server': 2.1.3(hono@4.13.12)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -4337,7 +4334,7 @@ snapshots:
       eventsource-parser: 3.1.1
       express: 5.2.1
       express-rate-limit: 8.7.0(express@5.2.1)
-      hono: 4.13.11
+      hono: 4.13.12
       jose: 6.2.12
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -4629,11 +4626,6 @@ snapshots:
       minimatch: 10.2.6
       path-browserify: 1.0.1
 
-  '@types/node@26.6.1':
-    dependencies:
-      undici-types: 8.9.0
-    optional: true
-
   '@types/node@26.6.3':
     dependencies:
       undici-types: 8.9.0
@@ -4656,7 +4648,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 26.6.1
+      '@types/node': 26.6.3
     optional: true
 
   '@typescript/typescript-aix-ppc64@7.0.2':
@@ -4839,8 +4831,8 @@ snapshots:
   browserslist@4.29.3:
     dependencies:
       baseline-browser-mapping: 2.11.26
-      caniuse-lite: 1.0.30001813
-      electron-to-chromium: 1.5.440
+      caniuse-lite: 1.0.30001814
+      electron-to-chromium: 1.5.442
       node-releases: 2.0.57
       update-browserslist-db: 1.3.3(browserslist@4.29.3)
 
@@ -4864,7 +4856,7 @@ snapshots:
 
   callsites@3.1.0: {}
 
-  caniuse-lite@1.0.30001813: {}
+  caniuse-lite@1.0.30001814: {}
 
   chalk@5.6.2: {}
 
@@ -5013,7 +5005,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  electron-to-chromium@1.5.440: {}
+  electron-to-chromium@1.5.442: {}
 
   embla-carousel-react@8.6.0(react@19.3.0):
     dependencies:
@@ -5340,7 +5332,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.13.11: {}
+  hono@4.13.12: {}
 
   http-errors@2.0.1:
     dependencies:
@@ -5541,9 +5533,11 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@1.48.0(react@19.3.0):
+  lucide-react@1.49.0(@types/react@19.3.0)(react@19.3.0):
     dependencies:
       react: 19.3.0
+    optionalDependencies:
+      '@types/react': 19.3.0
 
   magic-string@0.30.21:
     dependencies:
@@ -5616,7 +5610,7 @@ snapshots:
       '@next/env': 16.3.7
       '@swc/helpers': 0.5.23
       baseline-browser-mapping: 2.11.26
-      caniuse-lite: 1.0.30001813
+      caniuse-lite: 1.0.30001814
       postcss: 8.5.23
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
@@ -5678,7 +5672,7 @@ snapshots:
       is-in-ssh: 1.0.0
       is-inside-container: 1.0.0
       powershell-utils: 0.2.1
-      wsl-utils: 1.0.0
+      wsl-utils: 1.0.1
 
   open@8.4.2:
     dependencies:
@@ -5807,8 +5801,6 @@ snapshots:
     dependencies:
       xtend: 4.0.2
 
-  powershell-utils@0.1.0: {}
-
   powershell-utils@0.2.1: {}
 
   pretty-ms@9.3.1:
@@ -5844,7 +5836,7 @@ snapshots:
       iconv-lite: 0.7.3
       unpipe: 1.0.0
 
-  react-day-picker@10.0.1(@types/react@19.3.0)(react@19.3.0):
+  react-day-picker@10.0.2(@types/react@19.3.0)(react@19.3.0):
     dependencies:
       '@date-fns/tz': 1.5.0
       date-fns: 4.4.0
@@ -6275,10 +6267,10 @@ snapshots:
   ws@8.21.3:
     optional: true
 
-  wsl-utils@1.0.0:
+  wsl-utils@1.0.1:
     dependencies:
       is-wsl: 3.1.1
-      powershell-utils: 0.1.0
+      powershell-utils: 0.2.1
 
   xtend@4.0.2: {}
 

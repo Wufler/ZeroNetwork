@@ -54,12 +54,6 @@ function Mention({ name }: { name: string }) {
             )}
           </div>
         </div>
-        {profile?.uuid && (
-          <div className="flex flex-col gap-1 text-muted-foreground">
-            <span>UUID</span>
-            <code className="wrap-anywhere text-xs">{profile.uuid}</code>
-          </div>
-        )}
       </PopoverContent>
     </Popover>
   );

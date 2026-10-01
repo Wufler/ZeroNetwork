@@ -644,7 +644,7 @@ export default function Timeline({ data }: ComponentProps) {
               </div>
               <div
                 {...dragScroll}
-                className="-mx-1 flex shrink-0 select-none snap-x snap-proximity scroll-px-1 items-start gap-4 overflow-x-auto overscroll-x-contain px-1 pt-4 pb-3 data-[dragging]:cursor-grabbing data-[dragging]:snap-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-6"
+                className="-mx-1 flex shrink-0 select-none scroll-px-1 items-start gap-4 overflow-x-auto overscroll-x-contain px-1 pt-4 pb-3 data-[dragging]:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-6"
                 role="group"
                 aria-label="Timeline moments"
               >
@@ -656,7 +656,7 @@ export default function Timeline({ data }: ComponentProps) {
                       type="button"
                       ref={isSelected ? selectedMomentRef : null}
                       className={cn(
-                        "flex flex-none basis-40 flex-col items-stretch gap-2 rounded-lg text-left text-muted-foreground cursor-inherit snap-start outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring md:basis-56",
+                        "flex flex-none basis-40 flex-col items-stretch gap-2 rounded-lg text-left text-muted-foreground cursor-inherit outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring md:basis-56",
                         isSelected && "text-foreground",
                       )}
                       aria-pressed={isSelected}
