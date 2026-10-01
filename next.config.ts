@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
+    deviceSizes: [640, 960, 1280, 1920],
+    imageSizes: [48, 64, 128, 256, 384],
     remotePatterns: [
       {
         protocol: "https",
@@ -10,7 +12,7 @@ const nextConfig: NextConfig = {
         pathname: "/*",
       },
     ],
-    minimumCacheTTL: 86400,
+    minimumCacheTTL: 60 * 60 * 24 * 7,
   },
 };
 

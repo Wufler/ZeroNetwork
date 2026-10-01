@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { useScrollReveal } from "@/lib/use-scroll-reveal";
 
 const members = [
   {
@@ -27,29 +28,19 @@ const members = [
 ];
 
 export default function Team() {
+  const reveal = useScrollReveal();
   return (
     <section className="pt-8 pb-16 lg:pt-16 lg:pb-20 px-4 relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
+        <motion.div className="mb-8" {...reveal}>
           <h2 className="font-syne text-4xl lg:text-5xl font-bold tracking-tight text-center lg:text-left">
             Meet the Team
           </h2>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {members.map((member, i) => (
-            <motion.div
-              key={member.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-            >
+          {members.map((member) => (
+            <motion.div key={member.name} {...reveal}>
               <a
                 href={member.url}
                 target="_blank"

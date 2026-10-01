@@ -9,6 +9,7 @@ import {
 } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useScrollReveal } from "@/lib/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "./ui/button";
 
@@ -21,6 +22,7 @@ const images = [
 ];
 
 export default function WithersWrath() {
+  const reveal = useScrollReveal();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
@@ -53,12 +55,7 @@ export default function WithersWrath() {
     >
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid lg:grid-cols-2 lg:gap-12 gap-6 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
+          <motion.div {...reveal}>
             <div className="flex lg:flex-row flex-col items-center lg:justify-start justify-center gap-4 lg:mb-4 mb-2">
               <div className="relative size-16 rounded-lg overflow-hidden">
                 {!loadedImages.has("/witherswrath/icon.png") && (
@@ -120,13 +117,7 @@ export default function WithersWrath() {
             </p>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="order-1 lg:order-2"
-          >
+          <motion.div {...reveal} className="order-1 lg:order-2">
             <div
               className="relative aspect-video rounded-lg overflow-hidden group"
               onMouseEnter={() => setIsHovered(true)}

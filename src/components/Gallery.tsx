@@ -55,7 +55,7 @@ export default function Gallery({ data }: ComponentProps) {
               alt={item.altText}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
-              sizes="(max-width: 768px) 100vw, 33vw"
+              sizes="(max-width: 767px) 240px, 320px"
               placeholder="empty"
               loading="lazy"
               onLoad={() => markImageAsSettled(item.imageUrl)}

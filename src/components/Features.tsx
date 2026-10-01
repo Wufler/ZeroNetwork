@@ -1,9 +1,10 @@
 "use client";
 
 import { CheckCircle2, Clock, Gamepad2, Pause, Play, Zap } from "lucide-react";
-import { useInView, useReducedMotion } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useScrollReveal } from "@/lib/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 import { Discord } from "./ui/discord";
 
@@ -65,6 +66,7 @@ const features: Feature[] = [
 ];
 
 function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
+  const reveal = useScrollReveal();
   const cardRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const inView = useInView(cardRef, { amount: 0.2 });
@@ -90,7 +92,8 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
   }, [inView, reducedMotion, paused, videoFailed]);
 
   return (
-    <article
+    <motion.article
+      {...reveal}
       ref={cardRef}
       className={cn(
         "group relative isolate flex min-h-80 min-w-0 flex-col justify-end overflow-hidden rounded-2xl bg-neutral-900 text-white",
@@ -180,18 +183,19 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
           {feature.description}
         </p>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
 export default function Features() {
+  const reveal = useScrollReveal();
   return (
     <section
       aria-labelledby="features-heading"
       className="relative bg-linear-to-b from-background to-transparent px-4 py-16 md:py-24"
     >
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 flex flex-col gap-2">
+        <motion.header {...reveal} className="mb-8 flex flex-col gap-2">
           <h2
             id="features-heading"
             className="font-syne text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl"
@@ -204,7 +208,7 @@ export default function Features() {
             we&apos;ve got something for you. Suggest modpacks or ideas in our
             Discord!
           </p>
-        </header>
+        </motion.header>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-6 lg:grid-cols-12">
           {features.map((feature, index) => (
             <FeatureCard key={feature.title} feature={feature} index={index} />

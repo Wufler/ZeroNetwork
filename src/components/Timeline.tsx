@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dialog";
 import { useSession } from "@/lib/auth-client";
 import { useDragScroll } from "@/lib/use-drag-scroll";
+import { useScrollReveal } from "@/lib/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 
 function TimelineModalContent({ item }: { item: TimelineItem }) {
@@ -116,7 +117,7 @@ function TimelineModalContent({ item }: { item: TimelineItem }) {
                 alt={selectedImage.altText}
                 fill
                 className="object-contain lg:object-cover blur-3xl opacity-30"
-                sizes="(max-width: 1024px) 100vw, 70vw"
+                sizes="(max-width: 1023px) 100vw, 70vw"
                 priority
                 onLoad={() =>
                   setLoadedImages((prev) =>
@@ -139,7 +140,7 @@ function TimelineModalContent({ item }: { item: TimelineItem }) {
                 alt={selectedImage.altText}
                 fill
                 className="object-contain"
-                sizes="(max-width: 1024px) 100vw, 70vw"
+                sizes="(max-width: 1023px) 100vw, 70vw"
                 priority
                 onLoad={() =>
                   setLoadedImages((prev) =>
@@ -265,7 +266,7 @@ function TimelineModalContent({ item }: { item: TimelineItem }) {
                         alt={mediaItem.altText}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 33vw, 50vw"
+                        sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 203px"
                         placeholder="empty"
                         onLoad={() =>
                           setLoadedImages((prev) => {
@@ -491,6 +492,7 @@ function TimelineFeature({
 }
 
 export default function Timeline({ data }: ComponentProps) {
+  const reveal = useScrollReveal();
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin";
@@ -585,7 +587,10 @@ export default function Timeline({ data }: ComponentProps) {
             <span className="sr-only">Loading timeline background</span>
           </div>
         )}
-        <div className="mx-auto flex min-w-0 w-full max-w-7xl flex-col pt-4 pb-7 lg:h-full xl:pt-12 xl:pb-8">
+        <motion.div
+          {...reveal}
+          className="mx-auto flex min-w-0 w-full max-w-7xl flex-col pt-4 pb-7 lg:h-full xl:pt-12 xl:pb-8"
+        >
           <header className="flex shrink-0 flex-wrap items-center justify-between gap-4">
             <h2 className="font-syne text-3xl xl:text-5xl font-semibold tracking-tight">
               Our Journey
@@ -675,7 +680,7 @@ export default function Timeline({ data }: ComponentProps) {
                             src={item.thumbnailUrl}
                             alt=""
                             fill
-                            sizes="(max-width: 640px) 160px, 224px"
+                            sizes="(max-width: 767px) 160px, 224px"
                             className="object-cover"
                           />
                         ) : (
@@ -700,7 +705,7 @@ export default function Timeline({ data }: ComponentProps) {
               No timeline available. Check back soon.
             </p>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {showCreateDialog && (
