@@ -2,15 +2,19 @@
 
 import { CheckCircle2, Clock, Gamepad2, Pause, Play, Zap } from "lucide-react";
 import { motion, useInView, useReducedMotion } from "motion/react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useScrollReveal } from "@/lib/use-scroll-reveal";
 import { cn } from "@/lib/utils";
+import wolfey from "../../public/header/1.png";
+import wither from "../../public/header/2.png";
+import golem from "../../public/header/3.png";
+import imher0 from "../../public/header/4.png";
 import { Discord } from "./ui/discord";
 
 type FeatureMedia = {
-  /** Public image path; also serves as the video's poster and fallback. */
-  image: string;
+  /** Static import or public image path; also the video's poster and fallback. */
+  image: string | StaticImageData;
   video?: string;
   position?: string;
 };
@@ -32,21 +36,21 @@ const features: Feature[] = [
       "Our servers are always online, so you can play whenever you want.",
     icon: Clock,
     className: "md:col-span-3 lg:col-span-7",
-    media: { image: "/header/1.png" },
+    media: { image: wolfey },
   },
   {
     title: "Lag Free Experience",
     description: "Optimized performance for smooth gameplay.",
     icon: Zap,
     className: "md:col-span-3 lg:col-span-5",
-    media: { image: "/header/2.png" },
+    media: { image: wither },
   },
   {
     title: "Vibrant Community",
     description: "Join our active Discord to chat, and suggest new features!",
     icon: Discord,
     className: "md:col-span-2 lg:col-span-4",
-    media: { image: "/header/3.png" },
+    media: { image: golem },
   },
   {
     title: "Always Updated",
@@ -61,7 +65,7 @@ const features: Feature[] = [
     description: "From modpacks to modified vanilla survival, we have it all.",
     icon: Gamepad2,
     className: "md:col-span-2 lg:col-span-4",
-    media: { image: "/header/4.png" },
+    media: { image: imher0 },
   },
 ];
 
@@ -120,7 +124,11 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
         <video
           ref={videoRef}
           src={inView ? feature.media.video : undefined}
-          poster={feature.media.image}
+          poster={
+            typeof feature.media.image === "string"
+              ? feature.media.image
+              : feature.media.image.src
+          }
           muted
           loop
           playsInline

@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useScrollReveal } from "@/lib/use-scroll-reveal";
 import { cn } from "@/lib/utils";
+import withersWrathIcon from "../../public/witherswrath/icon.png";
 import { Button, buttonVariants } from "./ui/button";
 
 const images = [
@@ -69,7 +70,7 @@ export default function WithersWrath() {
                   </div>
                 )}
                 <Image
-                  src="/witherswrath/icon.png"
+                  src={withersWrathIcon}
                   alt="Withers Wrath Logo"
                   fill
                   sizes="64px"

@@ -19,6 +19,10 @@ import * as Editable from "@/components/ui/editable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import wolfey from "../../public/header/1.png";
+import wither from "../../public/header/2.png";
+import golem from "../../public/header/3.png";
+import imher0 from "../../public/header/4.png";
 import Login from "./Login";
 import Poll from "./Poll";
 
@@ -549,7 +553,7 @@ export default function Header({ data }: ComponentProps) {
             >
               <Image
                 fill
-                src="/header/2.png"
+                src={wither}
                 alt="Wither"
                 sizes="(max-width: 768px) 35vw, 420px"
                 className="object-contain object-bottom"
@@ -566,7 +570,7 @@ export default function Header({ data }: ComponentProps) {
           >
             <Image
               fill
-              src="/header/3.png"
+              src={golem}
               alt="Golem"
               sizes="(max-width: 768px) 30vw, 350px"
               className="object-contain object-bottom"
@@ -582,7 +586,7 @@ export default function Header({ data }: ComponentProps) {
           >
             <Image
               fill
-              src="/header/4.png"
+              src={imher0}
               alt="ImHer0"
               sizes="(max-width: 768px) 20vw, 233px"
               className="object-contain object-bottom"
@@ -598,7 +602,7 @@ export default function Header({ data }: ComponentProps) {
           >
             <Image
               fill
-              src="/header/1.png"
+              src={wolfey}
               alt="Wolfey"
               sizes="(max-width: 768px) 20vw, 233px"
               className="object-contain object-bottom"

@@ -6,6 +6,8 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useScrollReveal } from "@/lib/use-scroll-reveal";
+import imher0 from "../../public/team/imher0.png";
+import wolfey from "../../public/team/wolfey.png";
 
 const members = [
   {
@@ -14,7 +16,7 @@ const members = [
     location: "United Kingdom",
     description:
       'The creator of "The Im Her Zero Network" (ZeroNetwork). Does datapack development and sometimes manages the Minecraft servers.',
-    image: "/team/imher0.png",
+    image: imher0,
     url: "https://github.com/ImHer0",
   },
   {
@@ -22,7 +24,7 @@ const members = [
     role: "Web Developer",
     location: "Finland",
     description: "hi i do the website and do the game server hosting",
-    image: "/team/wolfey.png",
+    image: wolfey,
     url: "https://wolfey.me",
   },
 ];
